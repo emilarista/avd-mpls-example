@@ -7,7 +7,7 @@ all:
           ansible_httpapi_host: 10.20.20.20
           ansible_host: 10.20.20.20
           ansible_user: cvpadmin
-          ansible_password: volvov90t6
+          ansible_password: somepassword
           ansible_connection: httpapi
           ansible_httpapi_use_ssl: true
           ansible_httpapi_validate_certs: false
@@ -15,14 +15,6 @@ all:
           ansible_httpapi_port: 443
           # Configuration to get Virtual Env information
           ansible_python_interpreter: $(which python3)
-    # DC fabric - EVPN Fabric running in home lab
-    DHCP_SERVER:
-      hosts:
-        dhcp.yllenet.com:
-          ansible_host: 10.20.20.30
-          ansible_user: root
-          ansible_python_interpreter: $(which python3)
-          config_file: "dhcp_configuration/dhcpd.conf"
 
     MPLS_FABRIC:
       children:

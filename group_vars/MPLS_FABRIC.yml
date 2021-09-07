@@ -35,17 +35,17 @@ local_users:
   emil:
     privilege: 15
     role: network-admin
-    sha512_password: "$6$kiCAKn8fb8T12ClP$UchWUxo0y/CpYptWYxj7pC8uzjoUJnvi4lSg1c009mqJG2inlUDQdTi/YVY4M0dzgf4LOkaVtL7U11ZRkP7Rm/"
+    sha512_password: "someshapassword"
 
   cvpadmin:
     privilege: 15
     role: network-admin
-    sha512_password: "$6$WRH0YV9I461XA.qn$BYsYGThSIHOh4ic8qdjnHWq9Zi/l0W8Ws4DZ5Y5yI3hBBWGP03W3ggXWdY7MTqVA8plRvaazG/U8CeMPkT5aE."
+    sha512_password: "someshapassword"
 
 # Cloud Vision server information
 cvp_instance_ip: 10.20.20.20
 # This ingest key is set at CVP install time.
-cvp_ingestauth_key: dudeface
+cvp_ingestauth_key: somekey
 
 # OOB Management network default gateway.
 mgmt_gateway: 10.30.30.1
@@ -83,28 +83,6 @@ bfd_multihop:
   min_rx: 5000
   multiplier: 3
 
-# L3 Edge contruct for DCI
-# l3_edge:
-#   p2p_links_ip_pools:
-#     borderleaf_dci_pool: 100.64.48.0/24
-#   p2p_links:
-#     # dc1-borderleaf1 to backbone1
-#     - nodes: [ dc1-borderleaf1a, dc2-borderleaf1 ]
-#       id: 1
-#       interfaces: [ Ethernet5, Ethernet6 ]
-#       as: [ "65000.111", "65000.210" ]
-#       ip_pool: borderleaf_dci_pool
-#       bfd: false
-#       include_in_underlay_protocol: true
-#     # dc2-borderleaf2 to backbone2
-#     - nodes: [ dc1-borderleaf1b, dc2-borderleaf1 ]
-#       id: 2
-#       interfaces: [ Ethernet5, Ethernet5 ]
-#       as: [ "65000.111", "65000.210" ]
-#       ip_pool: borderleaf_dci_pool
-#       bfd: false
-#       include_in_underlay_protocol: true
-
 custom_structured_configuration_sflow:
   sample: 40000
   vrfs:
@@ -113,21 +91,6 @@ custom_structured_configuration_sflow:
         "127.0.0.1":
       source_interface: Management1
   run: true
-
-# Stuff for validate_state
-# ansible_user: cvpadmin
-# ansible_password: volvov90t6
-# ansible_network_os: eos
-# ansible_become: yes
-# ansible_become_method: enable
-# validation_mode_loose: true
-# ansible_httpapi_use_ssl: true
-# ansible_httpapi_validate_certs: false
-
-# L3LS Fabric Values - update these values with caution,
-# SOME CHANGES COULD BE DISRUPTIVE.
-
-# dc_name: DC1_FABRIC
 
 # Disable vlan aware bundles
 vxlan_vlan_aware_bundles: false
@@ -166,10 +129,7 @@ p:
           uplink_switch: pe1
           uplink_switch_interface: Ethernet2
 
-# Leaf switch groups
-# A maximum of two nodes can form a leaf group
-# When two nodes are in a leaf group this will automatically form mlag pair
-
+# PE nodes
 pe:
   defaults:
     virtual_router_mac_address: 00:1c:73:00:dc:00
@@ -224,9 +184,6 @@ pe:
             - interface: Ethernet2
               uplink_switch: pe3
               uplink_switch_interface: Ethernet2
-              # id: 5
-              # For auto p2p link addressing we could use the link id and get a /31 subnet from a supernet.
-              # Then for IP calculation we could use the lowest node id to allocate the first address in the subnet.
     pe3:
       filter:
         tenants: [ TENANT_B ]
@@ -264,6 +221,7 @@ pe:
               uplink_switch: rr7
               uplink_switch_interface: Ethernet3
 
+# Route Reflector
 rr:
   defaults:
     platform: vEOS-LAB
@@ -297,6 +255,7 @@ rr:
               uplink_switch: p4
               uplink_switch_interface: Ethernet3
 
+# Connected Endpoints keys.
 connected_endpoints_keys:
   routers:
     type: router

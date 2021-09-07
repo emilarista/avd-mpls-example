@@ -1,0 +1,45 @@
+---
+CVP_DEVICES:
+  - fqdn: p4
+    parentContainerName: P
+    configlets:
+      - MPLS-AVD_p4
+  - fqdn: p6
+    parentContainerName: P
+    configlets:
+      - MPLS-AVD_p6
+  - fqdn: pe1
+    parentContainerName: SITE1
+    configlets:
+      - MPLS-AVD_pe1
+  - fqdn: pe2
+    parentContainerName: SITE1
+    configlets:
+      - MPLS-AVD_pe2
+  - fqdn: pe3
+    parentContainerName: SITE2
+    configlets:
+      - MPLS-AVD_pe3
+  - fqdn: pe5
+    parentContainerName: SITE3
+    configlets:
+      - MPLS-AVD_pe5
+  - fqdn: rr7
+    parentContainerName: RR
+    configlets:
+      - MPLS-AVD_rr7
+CVP_CONTAINERS:
+  MPLS_FABRIC:
+    parentContainerName: Tenant
+  P:
+    parentContainerName: PE
+  PE:
+    parentContainerName: MPLS_FABRIC
+  RR:
+    parentContainerName: PE
+  SITE1:
+    parentContainerName: PE
+  SITE2:
+    parentContainerName: PE
+  SITE3:
+    parentContainerName: PE

@@ -1,0 +1,30 @@
+---
+# This file is maintained by avd_sync.py script.
+# Port profiles may be edited manually, but servers will be overwritten on next run.
+port_profiles:
+  TENANT_A_WAN_SERVICE_10:
+    mode: access
+    vlans: 10
+    spanning_tree_portfast: edge
+cpes:
+  CPE_TENANT_A_SITE1:
+    adapters:
+    - profile: TENANT_A_WAN_SERVICE_10
+      endpoint_ports:
+      - Ethernet1
+      switch_ports:
+      - Ethernet5
+      switches:
+      - pe1
+    rack: Undefined
+  CPE_TENANT_A_SITE5:
+    adapters:
+    - profile: TENANT_A_WAN_SERVICE_10
+      endpoint_ports:
+      - eth0
+      switch_ports:
+      - Ethernet5
+      switches:
+      - pe5
+    rack: Undefined
+

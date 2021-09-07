@@ -1,0 +1,11 @@
+Type, Node,Node Interface,Leaf IP Address,Peer Type,Peer Node,Peer Interface,Peer IP Address
+p,p4,Ethernet1,unnumbered Loopback0,pe,pe3,Ethernet1,unnumbered Loopback0
+p,p4,Ethernet2,unnumbered Loopback0,pe,pe5,Ethernet2,unnumbered Loopback0
+p,p4,Ethernet3,unnumbered Loopback0,rr,rr7,Ethernet4,unnumbered Loopback0
+p,p6,Ethernet1,unnumbered Loopback0,pe,pe5,Ethernet1,unnumbered Loopback0
+p,p6,Ethernet2,unnumbered Loopback0,pe,pe1,Ethernet2,unnumbered Loopback0
+pe,pe1,Ethernet1,unnumbered Loopback0,pe,pe2,Ethernet1,unnumbered Loopback0
+pe,pe1,Ethernet3,unnumbered Loopback0,rr,rr7,Ethernet2,unnumbered Loopback0
+pe,pe2,Ethernet2,unnumbered Loopback0,pe,pe3,Ethernet2,unnumbered Loopback0
+pe,pe3,Ethernet3,unnumbered Loopback0,rr,rr7,Ethernet1,unnumbered Loopback0
+pe,pe5,Ethernet3,unnumbered Loopback0,rr,rr7,Ethernet3,unnumbered Loopback0

@@ -1,0 +1,13 @@
+Type, Node,Node Interface,Leaf IP Address,Peer Type,Peer Node,Peer Interface,Peer IP Address
+l3leaf,dc1-borderleaf1a,Ethernet1,100.64.10.13/31,spine,dc1-spine1,Ethernet3,100.64.10.12/31
+l3leaf,dc1-borderleaf1a,Ethernet2,100.64.10.15/31,spine,dc1-spine2,Ethernet3,100.64.10.14/31
+l3leaf,dc1-borderleaf1a,Ethernet5,100.64.48.0/31,l3leaf,dc2-borderleaf1,Ethernet6,100.64.48.1/31
+l3leaf,dc1-borderleaf1b,Ethernet1,100.64.10.19/31,spine,dc1-spine1,Ethernet4,100.64.10.18/31
+l3leaf,dc1-borderleaf1b,Ethernet2,100.64.10.21/31,spine,dc1-spine2,Ethernet4,100.64.10.20/31
+l3leaf,dc1-borderleaf1b,Ethernet5,100.64.48.2/31,l3leaf,dc2-borderleaf1,Ethernet5,100.64.48.3/31
+l3leaf,dc1-serverleaf1a,Ethernet1,100.64.10.1/31,spine,dc1-spine1,Ethernet1,100.64.10.0/31
+l3leaf,dc1-serverleaf1a,Ethernet2,100.64.10.3/31,spine,dc1-spine2,Ethernet1,100.64.10.2/31
+l3leaf,dc1-serverleaf1b,Ethernet1,100.64.10.7/31,spine,dc1-spine1,Ethernet2,100.64.10.6/31
+l3leaf,dc1-serverleaf1b,Ethernet2,100.64.10.9/31,spine,dc1-spine2,Ethernet2,100.64.10.8/31
+l3leaf,dc2-borderleaf1,Ethernet1,100.64.20.1/31,spine,dc2-spine1,Ethernet1,100.64.20.0/31
+l3leaf,dc2-serverleaf1,Ethernet1,100.64.20.7/31,spine,dc2-spine1,Ethernet2,100.64.20.6/31

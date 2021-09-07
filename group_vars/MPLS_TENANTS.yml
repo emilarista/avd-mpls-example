@@ -1,0 +1,61 @@
+tenants:
+  TENANT_A:
+    ## Not implemented yet
+    # l1_services:
+    #   site1_site3_p2p:
+    #     type: vpws-pseudowire
+    l2vlans:
+      10:
+        name: TENANT_A_L2_SERVICE
+        tags:
+          - site1-2
+          - site5
+    mac_vrf_rt_base: 10000
+    vrfs:
+      TENANT_A_WAN:
+        address_families:
+          - evpn
+        svis: {}
+        vrf_rt: 10
+  TENANT_B:
+    l2vlans: {}
+    mac_vrf_rt_base: 20000
+    vrfs:
+      TENANT_B_WAN:
+        address_families:
+          - vpn-ipv4
+        l3_interfaces:
+        - description: TENANT_B_SITE_3
+          enabled: true
+          interfaces:
+          - Ethernet5
+          ip_addresses:
+          - 192.168.48.0/31
+          nodes:
+          - pe3
+        - description: TENANT_B_SITE_5
+          enabled: true
+          interfaces:
+          - Ethernet6
+          ip_addresses:
+          - 192.168.48.2/31
+          nodes:
+          - pe5
+        bgp_peers:
+          192.168.48.1:
+            description: TENANT_B_CPE_SITE3
+            # ebgp_multihop: 1
+            nodes:
+            - pe3
+            password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
+            remote_as: "65201"
+            # send_community: all
+          192.168.48.3:
+            description: TENANT_B_CPE_SITE5
+            # ebgp_multihop: 1
+            nodes:
+            - pe5
+            password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
+            remote_as: "65202"
+            # send_community: all
+        vrf_rt: 20

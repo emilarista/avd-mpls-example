@@ -18,6 +18,8 @@ label_distribution:
 
 overlay_routing_protocol: ibgp
 bgp_as: 65000
+# If meshing PEs, client-to-client reflection can be turned off using rr bgp defaults.
+bgp_mesh_pes: true
 
 # bgp peer groups passwords
 bgp_peer_groups:
@@ -277,6 +279,7 @@ rr:
       - 'graceful-restart restart-time 300'
       - 'graceful-restart'
       - 'bgp route-reflector preserve-attributes always'
+      - 'no bgp client-to-client reflection' # If meshing PEs, client-to-client reflection can be turned off
     raw_eos_cli: |
       management security
          password encryption-key common

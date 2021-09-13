@@ -7,6 +7,14 @@ underlay_routing_protocol: isis
 isis_advertise_passive_only: true
 # Disabling ISIS hello padding makes it easier with vEOS-lab.
 isis_hello_padding: false
+isis_ti_lfa:
+  enabled: true
+  protection: link
+  local_convergence_delay: 15000
+
+label_distribution:
+  # protocol: ldp
+  protocol: isis-sr # Should be the default.
 
 overlay_routing_protocol: ibgp
 bgp_as: 65000
@@ -15,18 +23,12 @@ bgp_as: 65000
 bgp_peer_groups:
   MPLS_OVERLAY_PEERS:
     password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
-  # IPv4_UNDERLAY_PEERS:
-  #   password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
 
 internal_vlan_order:
   allocation: ascending
   range:
     beginning: 3700
     ending: 3900
-
-label_distribution:
-  # protocol: ldp
-  protocol: isis-sr # Should be the default.
 
 # Update p2p mtu
 p2p_uplinks_mtu: 1600
@@ -274,11 +276,13 @@ rr:
       - 'distance bgp 20 200 200'
       - 'graceful-restart restart-time 300'
       - 'graceful-restart'
+      - 'bgp route-reflector preserve-attributes always'
     raw_eos_cli: |
       management security
          password encryption-key common
   node_groups:
     rr7:
+      bgp_cluster_id: 7.7.7.7
       nodes:
         rr7:
           id: 7

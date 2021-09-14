@@ -19,7 +19,7 @@ label_distribution:
 overlay_routing_protocol: ibgp
 bgp_as: 65000
 # If meshing PEs, client-to-client reflection can be turned off using rr bgp defaults.
-bgp_mesh_pes: true
+# bgp_mesh_pes: true
 
 # bgp peer groups passwords
 bgp_peer_groups:
@@ -35,21 +35,21 @@ internal_vlan_order:
 # Update p2p mtu
 p2p_uplinks_mtu: 1600
 
-local_users:
-  emil:
-    privilege: 15
-    role: network-admin
-    sha512_password: "$6$kiCAKn8fb8T12ClP$UchWUxo0y/CpYptWYxj7pC8uzjoUJnvi4lSg1c009mqJG2inlUDQdTi/YVY4M0dzgf4LOkaVtL7U11ZRkP7Rm/"
+# local_users:
+#   someuser:
+#     privilege: 15
+#     role: network-admin
+#     sha512_password: "someshapassword"
 
-  cvpadmin:
-    privilege: 15
-    role: network-admin
-    sha512_password: "$6$WRH0YV9I461XA.qn$BYsYGThSIHOh4ic8qdjnHWq9Zi/l0W8Ws4DZ5Y5yI3hBBWGP03W3ggXWdY7MTqVA8plRvaazG/U8CeMPkT5aE."
+#   cvpadmin:
+#     privilege: 15
+#     role: network-admin
+#     sha512_password: "someshapassword"
 
 # Cloud Vision server information
 cvp_instance_ip: 10.20.20.20
 # This ingest key is set at CVP install time.
-cvp_ingestauth_key: dudeface
+# cvp_ingestauth_key: somekey
 
 # OOB Management network default gateway.
 mgmt_gateway: 10.30.30.1
@@ -87,28 +87,6 @@ bfd_multihop:
   min_rx: 5000
   multiplier: 3
 
-# L3 Edge contruct for DCI
-# l3_edge:
-#   p2p_links_ip_pools:
-#     borderleaf_dci_pool: 100.64.48.0/24
-#   p2p_links:
-#     # dc1-borderleaf1 to backbone1
-#     - nodes: [ dc1-borderleaf1a, dc2-borderleaf1 ]
-#       id: 1
-#       interfaces: [ Ethernet5, Ethernet6 ]
-#       as: [ "65000.111", "65000.210" ]
-#       ip_pool: borderleaf_dci_pool
-#       bfd: false
-#       include_in_underlay_protocol: true
-#     # dc2-borderleaf2 to backbone2
-#     - nodes: [ dc1-borderleaf1b, dc2-borderleaf1 ]
-#       id: 2
-#       interfaces: [ Ethernet5, Ethernet5 ]
-#       as: [ "65000.111", "65000.210" ]
-#       ip_pool: borderleaf_dci_pool
-#       bfd: false
-#       include_in_underlay_protocol: true
-
 custom_structured_configuration_sflow:
   sample: 40000
   vrfs:
@@ -118,21 +96,6 @@ custom_structured_configuration_sflow:
       source_interface: Management1
   run: true
 
-# Stuff for validate_state
-# ansible_user: cvpadmin
-# ansible_password: volvov90t6
-# ansible_network_os: eos
-# ansible_become: yes
-# ansible_become_method: enable
-# validation_mode_loose: true
-# ansible_httpapi_use_ssl: true
-# ansible_httpapi_validate_certs: false
-
-# L3LS Fabric Values - update these values with caution,
-# SOME CHANGES COULD BE DISRUPTIVE.
-
-# dc_name: DC1_FABRIC
-
 # Disable vlan aware bundles
 vxlan_vlan_aware_bundles: false
 
@@ -141,6 +104,7 @@ p:
   platform: vEOS-LAB
   defaults:
     loopback_ipv4_pool: 100.70.0.0/24
+    loopback_ipv6_pool: "2000:1234:ffff:ffff::/64"
     # isis_system_id_prefix: '0000.0000'
     raw_eos_cli: |
       management security
@@ -153,6 +117,11 @@ p:
         - interface: Ethernet1
           uplink_switch: pe3
           uplink_switch_interface: Ethernet1
+          ip_address: 100.64.0.0/31
+          isis_metric: 80
+          speed: 100g
+          mtu: 1500
+          isis_hello_padding: true
         - interface: Ethernet2
           uplink_switch: pe5
           uplink_switch_interface: Ethernet2
@@ -179,14 +148,10 @@ pe:
     virtual_router_mac_address: 00:1c:73:00:dc:00
     platform: vEOS-LAB
     loopback_ipv4_pool: 100.70.0.0/24
+    loopback_ipv6_pool: "2000:1234:ffff:ffff::/64"
     # isis_system_id_prefix: '0000.0001'
     # loopback_ipv4_offset: 3
-    # vtep_loopback_ipv4_pool: 100.64.12.0/24
-    # max_uplink_switches: 3
-    # uplink_switches: [ dc1-spine1, dc1-spine2 ]
-    # uplink_ipv4_pool: 100.64.10.0/24
-    # backbone_interface_speed: forced 100gfull
-    # mlag_interfaces: [ Ethernet3, Ethernet4 ]
+    backbone_interface_speed: forced 100gfull
     spanning_tree_priority: 4096
     spanning_tree_mode: mstp
     # spanning_tree_root_super: true
@@ -195,7 +160,7 @@ pe:
       - 'distance bgp 20 200 200'
       - 'graceful-restart restart-time 300'
       - 'graceful-restart'
-    mpls_route_reflectors: [ rr7 ]
+    mpls_route_reflectors: [ rr7, rr8 ]
     raw_eos_cli: |
       management security
          password encryption-key common
@@ -228,6 +193,9 @@ pe:
             - interface: Ethernet2
               uplink_switch: pe3
               uplink_switch_interface: Ethernet2
+            - interface: Ethernet3
+              uplink_switch: rr8
+              uplink_switch_interface: Ethernet1
               # id: 5
               # For auto p2p link addressing we could use the link id and get a /31 subnet from a supernet.
               # Then for IP calculation we could use the lowest node id to allocate the first address in the subnet.
@@ -243,6 +211,11 @@ pe:
             - interface: Ethernet1
               uplink_switch: p4
               uplink_switch_interface: Ethernet1
+              ip_address: 100.64.0.1/31
+              isis_metric: 80
+              speed: 100g
+              mtu: 1500
+              isis_hello_padding: true
             - interface: Ethernet2
               uplink_switch: pe2
               uplink_switch_interface: Ethernet2
@@ -272,6 +245,7 @@ rr:
   defaults:
     platform: vEOS-LAB
     loopback_ipv4_pool: 100.70.0.0/24
+    loopback_ipv6_pool: "2000:1234:ffff:ffff::/64"
     # isis_system_id_prefix: '0000.0002'
     bgp_defaults:
       - 'no bgp default ipv4-unicast'
@@ -279,12 +253,12 @@ rr:
       - 'graceful-restart restart-time 300'
       - 'graceful-restart'
       - 'bgp route-reflector preserve-attributes always'
-      - 'no bgp client-to-client reflection' # If meshing PEs, client-to-client reflection can be turned off
+      # - 'no bgp client-to-client reflection' # If meshing PEs, client-to-client reflection can be turned off
     raw_eos_cli: |
       management security
          password encryption-key common
   node_groups:
-    rr7:
+    rr7-8:
       bgp_cluster_id: 7.7.7.7
       nodes:
         rr7:
@@ -303,6 +277,19 @@ rr:
             - interface: Ethernet4
               uplink_switch: p4
               uplink_switch_interface: Ethernet3
+            - interface: Ethernet5
+              uplink_switch: rr8
+              uplink_switch_interface: Ethernet2
+        rr8:
+          id: 8
+          mgmt_ip: 10.30.30.108/24
+          backbone_interfaces:
+            - interface: Ethernet1
+              uplink_switch: pe2
+              uplink_switch_interface: Ethernet3
+            - interface: Ethernet2
+              uplink_switch: rr7
+              uplink_switch_interface: Ethernet5
 
 connected_endpoints_keys:
   routers:

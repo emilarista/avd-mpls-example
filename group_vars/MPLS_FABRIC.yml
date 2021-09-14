@@ -19,7 +19,7 @@ label_distribution:
 overlay_routing_protocol: ibgp
 bgp_as: 65000
 # If meshing PEs, client-to-client reflection can be turned off using rr bgp defaults.
-bgp_mesh_pes: true
+# bgp_mesh_pes: true
 
 # bgp peer groups passwords
 bgp_peer_groups:
@@ -35,21 +35,21 @@ internal_vlan_order:
 # Update p2p mtu
 p2p_uplinks_mtu: 1600
 
-local_users:
-  emil:
-    privilege: 15
-    role: network-admin
-    sha512_password: "someshapassword"
+# local_users:
+#   someuser:
+#     privilege: 15
+#     role: network-admin
+#     sha512_password: "someshapassword"
 
-  cvpadmin:
-    privilege: 15
-    role: network-admin
-    sha512_password: "someshapassword"
+#   cvpadmin:
+#     privilege: 15
+#     role: network-admin
+#     sha512_password: "someshapassword"
 
 # Cloud Vision server information
 cvp_instance_ip: 10.20.20.20
 # This ingest key is set at CVP install time.
-cvp_ingestauth_key: somekey
+# cvp_ingestauth_key: somekey
 
 # OOB Management network default gateway.
 mgmt_gateway: 10.30.30.1
@@ -104,6 +104,7 @@ p:
   platform: vEOS-LAB
   defaults:
     loopback_ipv4_pool: 100.70.0.0/24
+    loopback_ipv6_pool: "2000:1234:ffff:ffff::/64"
     # isis_system_id_prefix: '0000.0000'
     raw_eos_cli: |
       management security
@@ -116,6 +117,11 @@ p:
         - interface: Ethernet1
           uplink_switch: pe3
           uplink_switch_interface: Ethernet1
+          ip_address: 100.64.0.0/31
+          isis_metric: 80
+          speed: 100g
+          mtu: 1500
+          isis_hello_padding: true
         - interface: Ethernet2
           uplink_switch: pe5
           uplink_switch_interface: Ethernet2
@@ -142,9 +148,10 @@ pe:
     virtual_router_mac_address: 00:1c:73:00:dc:00
     platform: vEOS-LAB
     loopback_ipv4_pool: 100.70.0.0/24
+    loopback_ipv6_pool: "2000:1234:ffff:ffff::/64"
     # isis_system_id_prefix: '0000.0001'
     # loopback_ipv4_offset: 3
-    # backbone_interface_speed: forced 100gfull
+    backbone_interface_speed: forced 100gfull
     spanning_tree_priority: 4096
     spanning_tree_mode: mstp
     # spanning_tree_root_super: true
@@ -153,7 +160,7 @@ pe:
       - 'distance bgp 20 200 200'
       - 'graceful-restart restart-time 300'
       - 'graceful-restart'
-    mpls_route_reflectors: [ rr7 ]
+    mpls_route_reflectors: [ rr7, rr8 ]
     raw_eos_cli: |
       management security
          password encryption-key common
@@ -186,6 +193,12 @@ pe:
             - interface: Ethernet2
               uplink_switch: pe3
               uplink_switch_interface: Ethernet2
+            - interface: Ethernet3
+              uplink_switch: rr8
+              uplink_switch_interface: Ethernet1
+              # id: 5
+              # For auto p2p link addressing we could use the link id and get a /31 subnet from a supernet.
+              # Then for IP calculation we could use the lowest node id to allocate the first address in the subnet.
     pe3:
       filter:
         tenants: [ TENANT_B ]
@@ -198,6 +211,11 @@ pe:
             - interface: Ethernet1
               uplink_switch: p4
               uplink_switch_interface: Ethernet1
+              ip_address: 100.64.0.1/31
+              isis_metric: 80
+              speed: 100g
+              mtu: 1500
+              isis_hello_padding: true
             - interface: Ethernet2
               uplink_switch: pe2
               uplink_switch_interface: Ethernet2
@@ -227,6 +245,7 @@ rr:
   defaults:
     platform: vEOS-LAB
     loopback_ipv4_pool: 100.70.0.0/24
+    loopback_ipv6_pool: "2000:1234:ffff:ffff::/64"
     # isis_system_id_prefix: '0000.0002'
     bgp_defaults:
       - 'no bgp default ipv4-unicast'
@@ -234,12 +253,12 @@ rr:
       - 'graceful-restart restart-time 300'
       - 'graceful-restart'
       - 'bgp route-reflector preserve-attributes always'
-      - 'no bgp client-to-client reflection' # If meshing PEs, client-to-client reflection can be turned off
+      # - 'no bgp client-to-client reflection' # If meshing PEs, client-to-client reflection can be turned off
     raw_eos_cli: |
       management security
          password encryption-key common
   node_groups:
-    rr7:
+    rr7-8:
       bgp_cluster_id: 7.7.7.7
       nodes:
         rr7:
@@ -258,6 +277,19 @@ rr:
             - interface: Ethernet4
               uplink_switch: p4
               uplink_switch_interface: Ethernet3
+            - interface: Ethernet5
+              uplink_switch: rr8
+              uplink_switch_interface: Ethernet2
+        rr8:
+          id: 8
+          mgmt_ip: 10.30.30.108/24
+          backbone_interfaces:
+            - interface: Ethernet1
+              uplink_switch: pe2
+              uplink_switch_interface: Ethernet3
+            - interface: Ethernet2
+              uplink_switch: rr7
+              uplink_switch_interface: Ethernet5
 
 connected_endpoints_keys:
   routers:

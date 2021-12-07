@@ -241,13 +241,10 @@ backbone_interfaces:
     - nodes: [ pe1, p6 ]
       id: 2
       interfaces: [ Ethernet2, Ethernet2 ]
-      ip_pool: underlay_pool
-      speed: 100full
-      mtu: 1500
-      isis_hello_padding: true
-      isis_circuit_type: level-2
-      isis_metric: 60
+      profile: default_bb_profile
       # qos_profile: someprofile
+      # mtu: 1600
+      # isis_hello_padding: true
     - nodes: [ pe1, rr7 ]
       id: 3
       interfaces: [ Ethernet3, Ethernet2 ]

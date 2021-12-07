@@ -7,7 +7,7 @@ all:
           ansible_httpapi_host: 10.20.20.20
           ansible_host: 10.20.20.20
           ansible_user: cvpadmin
-          ansible_password: volvov90t6
+          ansible_password: arista1234
           ansible_connection: httpapi
           ansible_httpapi_use_ssl: true
           ansible_httpapi_validate_certs: false
@@ -44,22 +44,22 @@ all:
               hosts:
                 pe5:
                   ansible_host: 10.30.30.105
-            P:
-              vars:
-                type: p
-              hosts:
-                p4:
-                  ansible_host: 10.30.30.104
-                p6:
-                  ansible_host: 10.30.30.106
-            RR:
-              vars:
-                type: rr
-              hosts:
-                rr7:
-                  ansible_host: 10.30.30.107
-                rr8:
-                  ansible_host: 10.30.30.108
+        P:
+          vars:
+            type: p
+          hosts:
+            p4:
+              ansible_host: 10.30.30.104
+            p6:
+              ansible_host: 10.30.30.106
+        RR:
+          vars:
+            type: rr
+          hosts:
+            rr7:
+              ansible_host: 10.30.30.107
+            rr8:
+              ansible_host: 10.30.30.108
 
     MPLS_TENANTS:
       children:

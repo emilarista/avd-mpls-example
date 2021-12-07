@@ -113,7 +113,7 @@ p:
     loopback_ipv6_pool: "2000:1234:ffff:ffff::/64"
     is_type: level-1-2
     node_sid_base: 300
-    # isis_system_id_prefix: '0000.0000'
+    isis_system_id_prefix: '0000.0000'
     raw_eos_cli: |
       management security
          password encryption-key common
@@ -138,7 +138,7 @@ pe:
     # node_sid_base: 10
     is_type: level-1-2
     node_sid_base: 200
-    # isis_system_id_prefix: '0000.0001'
+    isis_system_id_prefix: '0000.0001'
     # loopback_ipv4_offset: 3
     backbone_interface_speed: forced 100gfull
     spanning_tree_priority: 4096
@@ -189,7 +189,7 @@ rr:
     loopback_ipv6_pool: "2000:1234:ffff:ffff::/64"
     is_type: level-1-2
     node_sid_base: 100
-    # isis_system_id_prefix: '0000.0002'
+    isis_system_id_prefix: '0000.0002'
     bgp_defaults:
       - 'no bgp default ipv4-unicast'
       - 'distance bgp 20 200 200'
@@ -223,7 +223,12 @@ backbone_interfaces:
   p2p_links_profiles:
     default_bb_profile:
       speed: 100full
-      mtu: 9214
+      mtu: 1500
+      isis_hello_padding: false
+      isis_metric: 60
+      ip_pool: underlay_pool
+      isis_circuit_type: level-2
+      ipv6_enable: true
   p2p_links:
     # PE1 links
     # If using IP unnumbered we don't even need 2 nodes or id or pool or a second interface...
@@ -231,10 +236,8 @@ backbone_interfaces:
     - nodes: [ pe1, pe2 ]
       id: 1
       interfaces: [ Ethernet1, Ethernet1 ]
-      ip_pool: underlay_pool
       profile: default_bb_profile
       # bfd: false # should default to true
-      # include_in_underlay_protocol: true # should default to true
     - nodes: [ pe1, p6 ]
       id: 2
       interfaces: [ Ethernet2, Ethernet2 ]
@@ -244,48 +247,54 @@ backbone_interfaces:
       isis_hello_padding: true
       isis_circuit_type: level-2
       isis_metric: 60
-      qos_profile: someprofile
+      # qos_profile: someprofile
     - nodes: [ pe1, rr7 ]
       id: 3
       interfaces: [ Ethernet3, Ethernet2 ]
-      ip_pool: underlay_pool
+      profile: default_bb_profile
 
     # PE2 links
     - nodes: [ pe2, rr8 ]
       id: 4
       interfaces: [ Ethernet3, Ethernet1 ]
-      ip_pool: underlay_pool
+      profile: default_bb_profile
     - nodes: [ pe2, pe3 ]
       id: 5
       interfaces: [ Ethernet2, Ethernet2 ]
-      ip_pool: underlay_pool
+      profile: default_bb_profile
 
     # PE3 links
     - nodes: [ pe3, rr7 ]
       id: 6
       interfaces: [ Ethernet3, Ethernet1 ]
-      ip_pool: underlay_pool
+      profile: default_bb_profile
     - nodes: [ pe3, p4 ]
       id: 7
       interfaces: [ Ethernet1, Ethernet1 ]
-      ip_pool: underlay_pool
+      profile: default_bb_profile
 
     # P4 links
     - nodes: [ p4, rr7 ]
       id: 8
       interfaces: [ Ethernet3, Ethernet4 ]
-      ip_pool: underlay_pool
+      profile: default_bb_profile
     - nodes: [ p4, pe5 ]
       id: 9
       interfaces: [ Ethernet2, Ethernet2 ]
-      ip_pool: underlay_pool
+      profile: default_bb_profile
 
     # PE5 links
     - nodes: [ pe5, rr7 ]
       id: 10
       interfaces: [ Ethernet3, Ethernet3 ]
-      ip_pool: underlay_pool
+      ip: ["unnumbered loopback0", "unnumbered loopback0"]
     - nodes: [ pe5, p6 ]
-      id: 7
+      id: 11
       interfaces: [ Ethernet1, Ethernet1 ]
-      ip_pool: underlay_pool
+      profile: default_bb_profile
+
+    # RR8 links
+    - nodes: [ rr7, rr8 ]
+      id: 12
+      interfaces: [ Ethernet5, Ethernet2 ]
+      profile: default_bb_profile

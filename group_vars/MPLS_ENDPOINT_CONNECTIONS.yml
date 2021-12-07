@@ -12,11 +12,19 @@ cpes:
     - profile: TENANT_A_WAN_SERVICE_10
       endpoint_ports:
       - Ethernet1
+      - Ethernet2
       switch_ports:
+      - Ethernet5
       - Ethernet5
       switches:
       - pe1
+      - pe2
+      port_channel:
+        description: EVPN-A-A-PortChannel
+        mode: active
+        short_esi: 0303:0202:0101
     rack: Undefined
+
   CPE_TENANT_A_SITE5:
     adapters:
     - profile: TENANT_A_WAN_SERVICE_10

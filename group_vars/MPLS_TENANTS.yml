@@ -1,12 +1,11 @@
 tenants:
   TENANT_A:
-    # Not implemented yet
     l1_services:
       - name: TEN_A_site2_site5_eline
         type: vpws-pseudowire  # Should be default
         ids: [25, 57 ]
         nodes: ["pe2", "pe5"]
-        interfaces: ["Ethernet5", "Ethernet7"]
+        interfaces: ["Ethernet7", "Ethernet7"]
     l2vlans:
       10:
         name: TENANT_A_L2_SERVICE
@@ -26,6 +25,17 @@ tenants:
     mac_vrf_rt_base: 20000
     vrfs:
       TENANT_B_WAN:
+        # redistribute_ospf: true should default to true if there is ospf defined in the vrf.
+          # nodes:
+        ospf:
+          enabled: true
+          process_id: 99      # defaults to vrf RT number
+          router_id: 1.2.3.4  # defaults to switch.router_id
+          address_families: ["ipv4"] # defaults to ["ipv4"]
+          bfd: true           # implicit default is false
+          max_lsa: 10000      # omitted if not defined
+          nodes:
+            - pe3
         address_families:
           - vpn-ipv4
         l3_interfaces:
@@ -35,6 +45,21 @@ tenants:
           - Ethernet5
           ip_addresses:
           - 192.168.48.0/31
+          nodes:
+          - pe3
+        - description: TENANT_B_SITE_3_OSPF
+          enabled: true
+          ospf:
+            enabled: true
+            p2p: true
+            area: 0
+            cost: 10
+            # autentication: "simple"
+            # simple_auth_key: "something"
+          interfaces:
+          - Ethernet6
+          ip_addresses:
+          - 192.168.48.4/31
           nodes:
           - pe3
         - description: TENANT_B_SITE_5

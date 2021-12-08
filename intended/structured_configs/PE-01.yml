@@ -55,15 +55,6 @@ router_bgp:
         - 65000:10010
       redistribute_routes:
       - learned
-  vpws:
-  - name: TENANT_A
-    rd: 100.70.0.1:1000
-    route_targets:
-      import_export: 65000:1000
-    pseudowires:
-    - name: TEN_A_site1_site2_eline
-      id_local: 52
-      id_remote: 513
 static_routes:
 - vrf: mgmt
   destination_address_prefix: 0.0.0.0/0
@@ -203,13 +194,6 @@ ethernet_interfaces:
     isis_circuit_type: level-1-2
     mpls:
       ip: true
-  Ethernet5/2:
-    type: routed
-    lldp:
-      transmit: false
-      receive: false
-    peer_type: l3_interface
-    shutdown: false
   Ethernet5/1:
     peer: speed_config
     peer_interface: 10g
@@ -229,15 +213,5 @@ vlans:
     name: TENANT_A_L2_SERVICE
 ip_igmp_snooping:
   globally_enabled: true
-patch_panel:
-  patches:
-  - name: TEN_A_site1_site2_eline
-    enabled: true
-    connectors:
-    - id: 1
-      type: interface
-      endpoint: Ethernet5/2
-    - id: 2
-      type: pseudowire
-      endpoint: bgp vpws TENANT_A pseudowire TEN_A_site1_site2_eline
+patch_panel: {}
 ip_virtual_router_mac_address: 00:1c:73:00:dc:00

@@ -215,9 +215,9 @@ ethernet_interfaces:
     isis_circuit_type: level-1-2
     mpls:
       ip: true
-  Ethernet5/3.100:
+  Ethernet5/3.200:
     type: l3dot1q
-    encapsulation_dot1q_vlan: 100
+    encapsulation_dot1q_vlan: 200
     peer_type: l3_interface
     vrf: TENANT_A_WAN
     ip_address: 10.10.200.2/24
@@ -225,15 +225,9 @@ ethernet_interfaces:
     shutdown: false
     description: L3vpn service, vlan 100
   Ethernet5/3:
-    type: switched
-    peer_type: cpe
+    type: routed
+    peer_type: l3_interface
     shutdown: false
-    peer: CPE-2
-    peer_interface: Ethernet34
-    description: CPE-2_Ethernet34
-    mode: access
-    vlans: 10
-    spanning_tree_portfast: edge
   Ethernet5/1:
     peer: speed_config
     peer_interface: 10g

@@ -398,7 +398,7 @@ groups:
   - P-02
   - CPE-01
   - CPE-02
-omit: __omit_place_holder__e45510a2862c37d8a6481a8d5700a726b872d651
+omit: __omit_place_holder__63dcb6304e8069580574ddae266b3176de33fc6f
 ansible_version:
   string: 2.10.12
   full: 2.10.12

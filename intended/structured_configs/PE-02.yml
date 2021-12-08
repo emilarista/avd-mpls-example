@@ -231,15 +231,17 @@ ethernet_interfaces:
     shutdown: false
     description: L3vpn service, vlan 100
   Ethernet52/2:
-    type: switched
-    peer_type: cpe
+    type: routed
+    peer_type: l3_interface
     shutdown: false
-    peer: CPE-1
-    peer_interface: Ethernet2
-    description: CPE-1_Ethernet2
-    mode: access
-    vlans: 10
-    spanning_tree_portfast: edge
+  Ethernet52/1:
+    peer: speed_config
+    peer_interface: 10g
+    peer_type: cpe
+    description: speed_config_10g
+    speed: forced 10000full
+    type: switched
+    shutdown: false
 router_bfd:
   multihop:
     interval: 300

@@ -7,18 +7,18 @@ port_profiles:
     vlans: 10
     spanning_tree_portfast: edge
 cpes:
-  CPE-1:
-    adapters:
-    - profile: TENANT_A_WAN_SERVICE_10
-      endpoint_ports: [ Ethernet2 ]
-      switch_ports: [ Ethernet52/2 ]
-      switches: [ PE-02 ]
-  CPE-2:
-    adapters:
-    - profile: TENANT_A_WAN_SERVICE_10
-      endpoint_ports: [ Ethernet34 ]
-      switch_ports: [ Ethernet5/3 ]
-      switches: [ PE-04 ]
+  # CPE-1:
+  #   adapters:
+  #   - profile: TENANT_A_WAN_SERVICE_10
+  #     endpoint_ports: [ Ethernet2 ]
+  #     switch_ports: [ Ethernet52/2 ]
+  #     switches: [ PE-02 ]
+  # CPE-2:
+  #   adapters:
+  #   - profile: TENANT_A_WAN_SERVICE_10
+  #     endpoint_ports: [ Ethernet34 ]
+  #     switch_ports: [ Ethernet5/3 ]
+  #     switches: [ PE-04 ]
 
   # Interface speeds dependent on 5/1
   speed_config:
@@ -30,4 +30,8 @@ cpes:
     - endpoint_ports: [ "10g" ]
       switch_ports: [ Ethernet5/1 ]
       switches: [ PE-04 ]
+      speed: forced 10000full
+    - endpoint_ports: [ "10g" ]
+      switch_ports: [ Ethernet52/1 ]
+      switches: [ PE-02 ]
       speed: forced 10000full

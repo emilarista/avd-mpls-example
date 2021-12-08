@@ -13,24 +13,6 @@ port_profiles:
     vlans: 10
     spanning_tree_portfast: edge
 cpes:
-  CPE-1:
-    adapters:
-    - profile: TENANT_A_WAN_SERVICE_10
-      endpoint_ports:
-      - Ethernet2
-      switch_ports:
-      - Ethernet52/2
-      switches:
-      - PE-02
-  CPE-2:
-    adapters:
-    - profile: TENANT_A_WAN_SERVICE_10
-      endpoint_ports:
-      - Ethernet34
-      switch_ports:
-      - Ethernet5/3
-      switches:
-      - PE-04
   speed_config:
     adapters:
     - endpoint_ports:
@@ -46,6 +28,13 @@ cpes:
       - Ethernet5/1
       switches:
       - PE-04
+      speed: forced 10000full
+    - endpoint_ports:
+      - 10g
+      switch_ports:
+      - Ethernet52/1
+      switches:
+      - PE-02
       speed: forced 10000full
 backbone_interfaces:
   p2p_links_ip_pools:
@@ -264,9 +253,9 @@ tenants:
           - PE-02
         - description: L3vpn service, vlan 100
           interfaces:
-          - Ethernet5/3.100
+          - Ethernet5/3.200
           encapsulation_dot1q_vlan:
-          - 100
+          - 200
           enabled: true
           mtu: 9000
           ip_addresses:
@@ -556,7 +545,7 @@ groups:
   - P-02
   - CPE-01
   - CPE-02
-omit: __omit_place_holder__e45510a2862c37d8a6481a8d5700a726b872d651
+omit: __omit_place_holder__63dcb6304e8069580574ddae266b3176de33fc6f
 ansible_version:
   string: 2.10.12
   full: 2.10.12

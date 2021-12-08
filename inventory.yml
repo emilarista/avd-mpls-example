@@ -40,7 +40,7 @@ all:
         CPE-01:
           ansible_host: 10.92.61.157
         CPE-02:
-          ansible_host: 10.92.61.156
+          ansible_host: 10.92.61.169
 
     VPN_SERVICES:
       children:

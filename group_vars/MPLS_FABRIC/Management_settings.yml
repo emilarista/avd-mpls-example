@@ -10,7 +10,7 @@ local_users:
   cvpadmin:
     privilege: 15
     role: network-admin
-    sha512_password: "$6$F9XqxW52QkmBqIpi$dBN8olH2I8VlnIciAmVZgJP5FcR7Vr1tm/8qK7NxNhGDf6SdMGV.QSshVPTxcIctWlWu47LaauKQuNZBSh3fX."
+    sha512_password: "$6$0vli3tFaghW2wEQn$To2mxaQwn/VBm/8t/L2XjaXDEP0ZOXmbvHv2OoMwxDF.qPdSpJHz7GbuEOnnh1FqU8cxrbFSZHxgUqmKAuxEe/"
   dcidemo:
     privilege: 15
     role: dcidemo
@@ -31,11 +31,11 @@ dns_domain: sjc.aristanetworks.com
 ntp_servers:
   - 172.22.22.50
 
-internal_vlan_order:
-  allocation: ascending
-  range:
-    beginning: 3700
-    ending: 3900
+# internal_vlan_order:
+#   allocation: ascending
+#   range:
+#     beginning: 3700
+#     ending: 3900
 
 
 connected_endpoints_keys:

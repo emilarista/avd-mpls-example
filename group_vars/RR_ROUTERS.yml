@@ -2,7 +2,7 @@ type: rr
 
 # RR Routers
 rr:
-  platform: vEOS-LAB
+  platform: jericho
   defaults:
     loopback_ipv4_pool: 100.70.0.0/24
     loopback_ipv6_pool: "2000:1234:ffff:ffff::/64"

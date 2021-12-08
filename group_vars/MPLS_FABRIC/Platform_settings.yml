@@ -1,0 +1,12 @@
+---
+platform_settings:
+  - platforms: [ jericho ]
+    tcam_profile: mpls-evpn
+  - platforms: [ jericho2 ]
+    tcam_profile: vxlan-routing
+
+# Set Hardware Speed Groups per Platform
+# platform_speed_groups:
+#   < platform >:
+#     < speed >: [ < speed_group >, < speed_group > ]
+

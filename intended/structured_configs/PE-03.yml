@@ -191,11 +191,17 @@ ethernet_interfaces:
     isis_circuit_type: level-1-2
     mpls:
       ip: true
-  Ethernet51/3:
-    type: routed
+  Ethernet51/3.10:
+    type: l2dot1q
+    encapsulation_vlan:
+      client_dot1q: 10
     lldp:
       transmit: false
       receive: false
+    peer_type: l3_interface
+    shutdown: false
+  Ethernet51/3:
+    type: routed
     peer_type: l3_interface
     shutdown: false
 router_bfd:
@@ -216,7 +222,7 @@ patch_panel:
     connectors:
     - id: 1
       type: interface
-      endpoint: Ethernet51/3
+      endpoint: Ethernet51/3.10
     - id: 2
       type: pseudowire
       endpoint: bgp vpws TENANT_A pseudowire TEN_A_site1_site2_eline

@@ -195,6 +195,14 @@ ethernet_interfaces:
     mode: access
     vlans: 10
     spanning_tree_portfast: edge
+  Ethernet5/1:
+    peer: speed_config
+    peer_interface: 10g
+    peer_type: cpe
+    description: speed_config_10g
+    speed: forced 10000full
+    type: switched
+    shutdown: false
 router_bfd:
   multihop:
     interval: 300

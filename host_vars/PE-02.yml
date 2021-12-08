@@ -1,8 +1,7 @@
 ---
-mgmt_gateway: 10.92.61.65
 
 custom_structured_configuration_ethernet_interfaces:
-  Ethernet5/1:
+  Ethernet52/1:
     speed: forced 10000full
     type: switched
     shutdown: false

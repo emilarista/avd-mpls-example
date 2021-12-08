@@ -28,7 +28,7 @@ all:
               ansible_host: 10.92.61.165
             PE-04:
               ansible_host: 10.92.61.98
-        P_ROUTERS:
+        RR_ROUTERS:
           hosts:
             P-01:
               ansible_host: 10.92.61.162

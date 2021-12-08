@@ -40,19 +40,43 @@ router_bgp:
       MPLS-OVERLAY-PEERS:
         activate: true
   neighbors:
-    100.70.0.5:
+    100.70.0.7:
       peer_group: MPLS-OVERLAY-PEERS
-      description: P-01
-    100.70.0.6:
+      description: rr7
+    100.70.0.8:
       peer_group: MPLS-OVERLAY-PEERS
-      description: P-02
+      description: rr8
+  vlans:
+    10:
+      tenant: TENANT_A
+      rd: 100.70.0.1:10010
+      route_targets:
+        both:
+        - 65000:10010
+      redistribute_routes:
+      - learned
+  vpws:
+  - name: TENANT_A
+    rd: 100.70.0.1:1000
+    route_targets:
+      import_export: 65000:1000
 static_routes:
-- vrf: mgmt
+- vrf: MGMT
   destination_address_prefix: 0.0.0.0/0
-  gateway: 10.92.61.129
+  gateway: 10.30.30.1
 service_routing_protocols_model: multi-agent
 ip_routing: true
 ipv6_unicast_routing: true
+daemon_terminattr:
+  cvaddrs:
+  - 10.20.20.20:9910
+  cvauth:
+    method: key
+    key: dudeface
+  cvvrf: MGMT
+  smashexcludes: ale,flexCounter,hardware,kni,pulse,strata
+  ingestexclude: /Sysdb/cell/1/agent,/Sysdb/cell/2/agent
+  disable_aaa: false
 vlan_internal_order:
   allocation: ascending
   range:
@@ -60,42 +84,38 @@ vlan_internal_order:
     ending: 3900
 name_server:
   source:
-    vrf: mgmt
+    vrf: MGMT
   nodes:
-  - 172.22.22.10
-  - 172.22.22.40
+  - 10.20.20.13
+  - 8.8.8.8
 spanning_tree:
   mode: mstp
   mst_instances:
     '0':
       priority: 4096
 local_users:
-  admin:
-    privilege: 15
-    role: network-admin
-    sha512_password: $6$YCJxvEgvNNgeS/Za$42NHyES9xkPUOiODx29DudRdqRqXnCmFV3kCaF0blakZJq60q/KcXhH3t7VeSm0DSpkqeF2RCALD0/c81jQhl1
   cvpadmin:
     privilege: 15
     role: network-admin
-    sha512_password: $6$F9XqxW52QkmBqIpi$dBN8olH2I8VlnIciAmVZgJP5FcR7Vr1tm/8qK7NxNhGDf6SdMGV.QSshVPTxcIctWlWu47LaauKQuNZBSh3fX.
-  dcidemo:
+    sha512_password: $6$WRH0YV9I461XA.qn$BYsYGThSIHOh4ic8qdjnHWq9Zi/l0W8Ws4DZ5Y5yI3hBBWGP03W3ggXWdY7MTqVA8plRvaazG/U8CeMPkT5aE.
+  emil:
     privilege: 15
-    role: dcidemo
-    sha512_password: $6$IQnDVIimX9VLbjhz$1JzwFWiZfiVmYk5wutOyslz/NJ2vf9xd2iXtnXlxP9utJgbHvDzMScEQSsMvVpRXLEKLJF9IiwYrkyOuZ43G71
+    role: network-admin
+    sha512_password: $6$kiCAKn8fb8T12ClP$UchWUxo0y/CpYptWYxj7pC8uzjoUJnvi4lSg1c009mqJG2inlUDQdTi/YVY4M0dzgf4LOkaVtL7U11ZRkP7Rm/
 vrfs:
-  mgmt:
+  MGMT:
     ip_routing: false
 management_interfaces:
   Management1:
     description: oob_management
     shutdown: false
-    vrf: mgmt
+    vrf: MGMT
     ip_address: 10.30.30.101/24
-    gateway: 10.92.61.129
+    gateway: 10.30.30.1
     type: oob
 management_api_http:
   enable_vrfs:
-    mgmt: {}
+    MGMT: {}
   enable_https: true
 eos_cli: "management security\n   password encryption-key common\n"
 loopback_interfaces:
@@ -135,48 +155,101 @@ router_isis:
     router_id: 100.70.0.1
     enabled: true
 ethernet_interfaces:
-  Ethernet1/1:
-    peer: P-01
-    peer_interface: Ethernet1/1
-    peer_type: rr
-    description: P2P_LINK_TO_P-01_Ethernet1/1
-    type: routed
-    shutdown: false
-    mtu: 1500
-    ip_address: 100.64.48.3/31
-    speed: 100gfull
-    ipv6_enable: true
-    isis_enable: MPLS_UNDERLAY
-    isis_metric: 50
-    isis_network_point_to_point: true
-    isis_hello_padding: true
-    isis_circuit_type: level-1-2
-    mpls:
-      ip: true
-  Ethernet2/1:
-    peer: PE-02
-    peer_interface: Ethernet49/1
+  Ethernet1:
+    peer: pe2
+    peer_interface: Ethernet1
     peer_type: pe
-    description: P2P_LINK_TO_PE-02_Ethernet49/1
+    description: P2P_LINK_TO_pe2_Ethernet1
     type: routed
     shutdown: false
     mtu: 1500
-    ip_address: 100.64.48.16/31
-    speed: 100gfull
+    ip_address: 100.64.48.0/31
+    speed: 100full
     ipv6_enable: true
     isis_enable: MPLS_UNDERLAY
-    isis_metric: 50
+    isis_metric: 60
     isis_network_point_to_point: true
-    isis_hello_padding: true
-    isis_circuit_type: level-1-2
+    isis_hello_padding: false
+    isis_circuit_type: level-2
     mpls:
       ip: true
+  Ethernet2:
+    peer: p6
+    peer_interface: Ethernet2
+    peer_type: p
+    description: P2P_LINK_TO_p6_Ethernet2
+    type: routed
+    shutdown: false
+    mtu: 1500
+    ip_address: 100.64.48.2/31
+    speed: 100full
+    isis_enable: MPLS_UNDERLAY
+    isis_metric: 60
+    isis_network_point_to_point: true
+    isis_hello_padding: true
+    isis_circuit_type: level-2
+    mpls:
+      ip: true
+  Ethernet3:
+    peer: rr7
+    peer_interface: Ethernet2
+    peer_type: rr
+    description: P2P_LINK_TO_rr7_Ethernet2
+    type: routed
+    shutdown: false
+    mtu: 1500
+    ip_address: 100.64.48.4/31
+    speed: 100full
+    ipv6_enable: true
+    isis_enable: MPLS_UNDERLAY
+    isis_metric: 60
+    isis_network_point_to_point: true
+    isis_hello_padding: false
+    isis_circuit_type: level-2
+    mpls:
+      ip: true
+  Ethernet5:
+    peer: CPE_TENANT_A_SITE1
+    peer_interface: Ethernet1
+    peer_type: cpe
+    description: CPE_TENANT_A_SITE1_Ethernet1
+    type: switched
+    shutdown: false
+    mode: access
+    vlans: 10
+    spanning_tree_portfast: edge
+    channel_group:
+      id: 5
+      mode: active
 router_bfd:
   multihop:
-    interval: 300
-    min_rx: 300
+    interval: 5000
+    min_rx: 5000
     multiplier: 3
+vlans:
+  10:
+    tenant: TENANT_A
+    name: TENANT_A_L2_SERVICE
 ip_igmp_snooping:
   globally_enabled: true
 patch_panel: {}
 ip_virtual_router_mac_address: 00:1c:73:00:dc:00
+port_channel_interfaces:
+  Port-Channel5:
+    description: CPE_TENANT_A_SITE1_EVPN-A-A-PortChannel
+    type: switched
+    shutdown: false
+    mode: access
+    vlans: 10
+    spanning_tree_portfast: edge
+    esi: 0000:0000:0303:0202:0101
+    rt: 03:03:02:02:01:01
+    lacp_id: 0303.0202.0101
+sflow:
+  sample: 40000
+  vrfs:
+    MGMT:
+      destinations:
+        127.0.0.1: null
+      source_interface: Management1
+  run: true

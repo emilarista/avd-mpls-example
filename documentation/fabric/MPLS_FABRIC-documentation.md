@@ -18,8 +18,8 @@
 
 | POD | Type | Node | Management IP | Platform | Provisioned in CloudVision |
 | --- | ---- | ---- | ------------- | -------- | -------------------------- |
-| MPLS_FABRIC | p | P-01 | 10.92.61.162/26 | - | Provisioned |
-| MPLS_FABRIC | p | P-02 | 10.92.61.164/26 | - | Provisioned |
+| MPLS_FABRIC | rr | P-01 | 10.92.61.162/26 | - | Provisioned |
+| MPLS_FABRIC | rr | P-02 | 10.92.61.164/26 | - | Provisioned |
 | MPLS_FABRIC | pe | PE-01 | 10.30.30.101/24 | vEOS-LAB | Provisioned |
 | MPLS_FABRIC | pe | PE-02 | 10.30.30.102/24 | vEOS-LAB | Provisioned |
 | MPLS_FABRIC | pe | PE-03 | 10.30.30.103/24 | vEOS-LAB | Provisioned |
@@ -35,14 +35,14 @@
 
 | Type | Node | Node Interface | Peer Type | Peer Node | Peer Interface |
 | ---- | ---- | -------------- | --------- | ----------| -------------- |
-| p | P-01 | Ethernet1/1 | pe | PE-01 | Ethernet1/1 |
-| p | P-01 | Ethernet2/1 | pe | PE-02 | Ethernet50/1 |
-| p | P-01 | Ethernet25/1 | p | P-02 | Ethernet25/1 |
-| p | P-01 | Ethernet26/1 | pe | PE-03 | Ethernet55/1 |
-| p | P-02 | Ethernet1/1 | pe | PE-04 | Ethernet1/1 |
-| p | P-02 | Ethernet2/1 | pe | PE-04 | Ethernet2/1 |
-| p | P-02 | Ethernet4/1 | pe | PE-03 | Ethernet50/1 |
-| p | P-02 | Ethernet26/1 | pe | PE-02 | Ethernet55/1 |
+| rr | P-01 | Ethernet1/1 | pe | PE-01 | Ethernet1/1 |
+| rr | P-01 | Ethernet2/1 | pe | PE-02 | Ethernet50/1 |
+| rr | P-01 | Ethernet25/1 | rr | P-02 | Ethernet25/1 |
+| rr | P-01 | Ethernet26/1 | pe | PE-03 | Ethernet55/1 |
+| rr | P-02 | Ethernet1/1 | pe | PE-04 | Ethernet1/1 |
+| rr | P-02 | Ethernet2/1 | pe | PE-04 | Ethernet2/1 |
+| rr | P-02 | Ethernet4/1 | pe | PE-03 | Ethernet50/1 |
+| rr | P-02 | Ethernet26/1 | pe | PE-02 | Ethernet55/1 |
 | pe | PE-01 | Ethernet2/1 | pe | PE-02 | Ethernet49/1 |
 
 # Fabric IP Allocation
@@ -61,10 +61,10 @@
 | P-01 | Ethernet25/1 | 100.64.48.0/31 | P-02 | Ethernet25/1 | 100.64.48.1/31 |
 | P-01 | Ethernet26/1 | 100.64.48.6/31 | PE-03 | Ethernet55/1 | 100.64.48.7/31 |
 | P-02 | Ethernet1/1 | 100.64.48.12/31 | PE-04 | Ethernet1/1 | 100.64.48.13/31 |
-| P-02 | Ethernet2/1 | 100.64.48.12/31 | PE-04 | Ethernet2/1 | 100.64.48.13/31 |
+| P-02 | Ethernet2/1 | 100.64.48.14/31 | PE-04 | Ethernet2/1 | 100.64.48.15/31 |
 | P-02 | Ethernet4/1 | 100.64.48.10/31 | PE-03 | Ethernet50/1 | 100.64.48.11/31 |
 | P-02 | Ethernet26/1 | 100.64.48.8/31 | PE-02 | Ethernet55/1 | 100.64.48.9/31 |
-| PE-01 | Ethernet2/1 | 100.64.48.14/31 | PE-02 | Ethernet49/1 | 100.64.48.15/31 |
+| PE-01 | Ethernet2/1 | 100.64.48.16/31 | PE-02 | Ethernet49/1 | 100.64.48.17/31 |
 
 ## Loopback Interfaces (BGP EVPN Peering)
 
@@ -76,7 +76,7 @@
 
 | POD | Node | Loopback0 |
 | --- | ---- | --------- |
-| MPLS_FABRIC | P-01 | 100.70.0.4/32 |
+| MPLS_FABRIC | P-01 | 100.70.0.5/32 |
 | MPLS_FABRIC | P-02 | 100.70.0.6/32 |
 | MPLS_FABRIC | PE-01 | 100.70.0.1/32 |
 | MPLS_FABRIC | PE-02 | 100.70.0.2/32 |
@@ -87,7 +87,7 @@
 
 | POD | Node | CLNS Address |
 | --- | ---- | ------------ |
-| MPLS_FABRIC | P-01 | 49.0001.0000.0000.0004.00 |
+| MPLS_FABRIC | P-01 | 49.0001.0000.0000.0005.00 |
 | MPLS_FABRIC | P-02 | 49.0001.0000.0000.0006.00 |
 | MPLS_FABRIC | PE-01 | 49.0001.0000.0001.0001.00 |
 | MPLS_FABRIC | PE-02 | 49.0001.0000.0001.0002.00 |

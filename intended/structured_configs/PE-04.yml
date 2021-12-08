@@ -39,6 +39,13 @@ router_bgp:
     peer_groups:
       MPLS-OVERLAY-PEERS:
         activate: true
+  neighbors:
+    100.70.0.5:
+      peer_group: MPLS-OVERLAY-PEERS
+      description: P-01
+    100.70.0.6:
+      peer_group: MPLS-OVERLAY-PEERS
+      description: P-02
 static_routes:
 - vrf: mgmt
   destination_address_prefix: 0.0.0.0/0
@@ -131,37 +138,37 @@ ethernet_interfaces:
   Ethernet1/1:
     peer: P-02
     peer_interface: Ethernet1/1
-    peer_type: p
+    peer_type: rr
     description: P2P_LINK_TO_P-02_Ethernet1/1
     type: routed
     shutdown: false
     mtu: 1500
     ip_address: 100.64.48.13/31
-    speed: 100full
+    speed: 100gfull
     ipv6_enable: true
     isis_enable: MPLS_UNDERLAY
-    isis_metric: 60
+    isis_metric: 50
     isis_network_point_to_point: true
-    isis_hello_padding: false
-    isis_circuit_type: level-2
+    isis_hello_padding: true
+    isis_circuit_type: level-1-2
     mpls:
       ip: true
   Ethernet2/1:
     peer: P-02
     peer_interface: Ethernet2/1
-    peer_type: p
+    peer_type: rr
     description: P2P_LINK_TO_P-02_Ethernet2/1
     type: routed
     shutdown: false
     mtu: 1500
-    ip_address: 100.64.48.13/31
-    speed: 100full
+    ip_address: 100.64.48.15/31
+    speed: 100gfull
     ipv6_enable: true
     isis_enable: MPLS_UNDERLAY
-    isis_metric: 60
+    isis_metric: 50
     isis_network_point_to_point: true
-    isis_hello_padding: false
-    isis_circuit_type: level-2
+    isis_hello_padding: true
+    isis_circuit_type: level-1-2
     mpls:
       ip: true
   Ethernet52/2:

@@ -32,10 +32,10 @@ pe:
       nodes:
         PE-01:
           id: 1
-          mgmt_ip: 10.30.30.101/24
+          mgmt_ip: 10.92.61.97/26
         PE-02:
           id: 2
-          mgmt_ip: 10.30.30.102/24
+          mgmt_ip: 10.92.61.163/26
     SITE_2:
       filter:
         tenants: [ TENANT_A, TENANT_B ]
@@ -43,7 +43,7 @@ pe:
       nodes:
         PE-03:
           id: 3
-          mgmt_ip: 10.30.30.103/24
+          mgmt_ip: 10.92.61.164/26
         PE-04:
           id: 4
-          mgmt_ip: 10.30.30.105/24
+          mgmt_ip: 10.92.61.165/26

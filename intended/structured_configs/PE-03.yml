@@ -90,7 +90,7 @@ management_interfaces:
     description: oob_management
     shutdown: false
     vrf: mgmt
-    ip_address: 10.30.30.103/24
+    ip_address: 10.92.61.164/26
     gateway: 10.92.61.129
     type: oob
 management_api_http:

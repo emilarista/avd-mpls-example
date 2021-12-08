@@ -20,10 +20,10 @@
 | --- | ---- | ---- | ------------- | -------- | -------------------------- |
 | MPLS_FABRIC | rr | P-01 | 10.92.61.162/26 | - | Provisioned |
 | MPLS_FABRIC | rr | P-02 | 10.92.61.164/26 | - | Provisioned |
-| MPLS_FABRIC | pe | PE-01 | 10.30.30.101/24 | vEOS-LAB | Provisioned |
-| MPLS_FABRIC | pe | PE-02 | 10.30.30.102/24 | vEOS-LAB | Provisioned |
-| MPLS_FABRIC | pe | PE-03 | 10.30.30.103/24 | vEOS-LAB | Provisioned |
-| MPLS_FABRIC | pe | PE-04 | 10.30.30.105/24 | vEOS-LAB | Provisioned |
+| MPLS_FABRIC | pe | PE-01 | 10.92.61.97/26 | vEOS-LAB | Provisioned |
+| MPLS_FABRIC | pe | PE-02 | 10.92.61.163/26 | vEOS-LAB | Provisioned |
+| MPLS_FABRIC | pe | PE-03 | 10.92.61.164/26 | vEOS-LAB | Provisioned |
+| MPLS_FABRIC | pe | PE-04 | 10.92.61.165/26 | vEOS-LAB | Provisioned |
 
 > Provision status is based on Ansible inventory declaration and do not represent real status from CloudVision.
 

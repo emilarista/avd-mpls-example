@@ -8,10 +8,6 @@
     - arista.cvp
 
   tasks:
-    - name: 'build local folders for output'
-      tags: [build, generate]
-      import_role:
-        name: arista.avd.build_output_folders
 
     - name: generate intended variables
       tags: [build, generate]

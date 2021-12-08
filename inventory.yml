@@ -42,7 +42,7 @@ all:
         CPE-02:
           ansible_host: 10.92.61.156
 
-    MPLS_TENANTS:
+    VPN_SERVICES:
       children:
         PE_ROUTERS:
 

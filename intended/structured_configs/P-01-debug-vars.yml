@@ -7,66 +7,6 @@ ansible_become_method: enable
 ansible_httpapi_use_ssl: true
 ansible_httpapi_validate_certs: false
 validation_mode_loose: true
-fabric_name: MPLS_FABRIC
-underlay_routing_protocol: isis
-isis_advertise_passive_only: true
-isis_hello_padding: false
-isis_ti_lfa:
-  enabled: true
-  protection: link
-  local_convergence_delay: 15000
-isis_default_is_type: level-1-2
-isis_default_circuit_type: level-1-2
-isis_default_metric: 50
-label_distribution:
-  protocol: isis-sr
-overlay_routing_protocol: ibgp
-bgp_as: 65000
-bgp_peer_groups:
-  MPLS_OVERLAY_PEERS:
-    password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
-internal_vlan_order:
-  allocation: ascending
-  range:
-    beginning: 3700
-    ending: 3900
-p2p_uplinks_mtu: 1600
-local_users:
-  admin:
-    privilege: 15
-    role: network-admin
-    sha512_password: someshapassword
-mgmt_gateway: 10.92.61.129
-name_servers:
-- 10.20.20.13
-- 8.8.8.8
-ntp_servers:
-- 0.se.pool.ntp.org
-- 1.se.pool.ntp.org
-overlay_rd_type:
-  admin_subfield: overlay_loopback
-overlay_rt_type:
-  admin_subfield: 65000
-bgp_maximum_paths: 4
-bgp_ecmp: 4
-overlay_prevent_readvertise_to_server: true
-bfd_multihop:
-  interval: 5000
-  min_rx: 5000
-  multiplier: 3
-custom_structured_configuration_sflow:
-  sample: 40000
-  vrfs:
-    MGMT:
-      destinations:
-        127.0.0.1: null
-      source_interface: Management1
-  run: true
-connected_endpoints_keys:
-  routers:
-    type: router
-  cpes:
-    type: cpe
 backbone_interfaces:
   p2p_links_ip_pools:
     underlay_pool: 100.64.48.0/24
@@ -152,6 +92,90 @@ backbone_interfaces:
     - Ethernet2/1
     - Ethernet49/1
     profile: default_bb_profile
+fabric_name: MPLS_FABRIC
+overlay_rd_type:
+  admin_subfield: overlay_loopback
+overlay_rt_type:
+  admin_subfield: 65000
+bgp_maximum_paths: 4
+bgp_ecmp: 4
+overlay_prevent_readvertise_to_server: true
+underlay_routing_protocol: isis
+isis_advertise_passive_only: true
+isis_hello_padding: false
+isis_ti_lfa:
+  enabled: true
+  protection: link
+  local_convergence_delay: 15000
+isis_default_is_type: level-1-2
+isis_default_circuit_type: level-1-2
+isis_default_metric: 50
+label_distribution:
+  protocol: isis-sr
+overlay_routing_protocol: ibgp
+bgp_as: 65000
+bgp_peer_groups:
+  MPLS_OVERLAY_PEERS:
+    password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
+p2p_uplinks_mtu: 9000
+local_users:
+  admin:
+    privilege: 15
+    role: network-admin
+    sha512_password: $6$YCJxvEgvNNgeS/Za$42NHyES9xkPUOiODx29DudRdqRqXnCmFV3kCaF0blakZJq60q/KcXhH3t7VeSm0DSpkqeF2RCALD0/c81jQhl1
+  cvpadmin:
+    privilege: 15
+    role: network-admin
+    sha512_password: $6$F9XqxW52QkmBqIpi$dBN8olH2I8VlnIciAmVZgJP5FcR7Vr1tm/8qK7NxNhGDf6SdMGV.QSshVPTxcIctWlWu47LaauKQuNZBSh3fX.
+  dcidemo:
+    privilege: 15
+    role: dcidemo
+    sha512_password: $6$IQnDVIimX9VLbjhz$1JzwFWiZfiVmYk5wutOyslz/NJ2vf9xd2iXtnXlxP9utJgbHvDzMScEQSsMvVpRXLEKLJF9IiwYrkyOuZ43G71
+mgmt_gateway: 10.92.61.129
+mgmt_interface_vrf: mgmt
+name_servers:
+- 172.22.22.10
+- 172.22.22.40
+dns_domain: sjc.aristanetworks.com
+ntp_servers:
+- 172.22.22.50
+internal_vlan_order:
+  allocation: ascending
+  range:
+    beginning: 3700
+    ending: 3900
+connected_endpoints_keys:
+  routers:
+    type: router
+  cpes:
+    type: cpe
+aliases: 'alias agents bash ls -lrt /var/log/agents/
+
+  alias c bash clear
+
+  alias core bash ls -lrt /var/core/
+
+  alias d show interfaces description | grep -v ''not\|down''
+
+  alias log bash sudo tail -f /var/log/messages | grep -v -i xcvr
+
+  alias m show run section monitor
+
+  alias qt bash ls -lrt /var/log/qt/
+
+  alias senz show interface counter error | nz
+
+  alias shmc show int | awk ''/^[A-Z]/ { intf = \$1 } /, address is/ { print intf, \$6 }''
+
+  alias snz show interface counter | nz
+
+  alias spd show port-channel %1 detail all
+
+  alias sqnz show interface counter queue | nz
+
+  alias srnz show interface counter rate | nz
+
+  alias top show proc top'
 type: p
 p:
   platform: vEOS-LAB
@@ -322,7 +346,7 @@ groups:
   CPE_ROUTERS:
   - CPE-01
   - CPE-02
-  MPLS_TENANTS:
+  VPN_SERVICES:
   - PE-01
   - PE-02
   - PE-03
@@ -341,7 +365,7 @@ groups:
   - P-02
   - CPE-01
   - CPE-02
-omit: __omit_place_holder__1c4aa64cfcb1bb36ed2e54ea78e1ad835f1b97e0
+omit: __omit_place_holder__4a8b78537248b5c3fa555a53c4b44f703f5bf4a5
 ansible_version:
   string: 2.11.6
   full: 2.11.6
@@ -349,7 +373,7 @@ ansible_version:
   minor: 11
   revision: 6
 ansible_check_mode: false
-ansible_diff_mode: false
+ansible_diff_mode: true
 ansible_forks: 16
 ansible_inventory_sources:
 - /home/carlbuchmann/Git_Projects/SP-AVD/avd-mpls-example/inventory.yml

@@ -40,7 +40,7 @@ router_bgp:
       MPLS-OVERLAY-PEERS:
         activate: true
 static_routes:
-- vrf: MGMT
+- vrf: mgmt
   destination_address_prefix: 0.0.0.0/0
   gateway: 10.92.61.129
 service_routing_protocols_model: multi-agent
@@ -53,10 +53,10 @@ vlan_internal_order:
     ending: 3900
 name_server:
   source:
-    vrf: MGMT
+    vrf: mgmt
   nodes:
-  - 10.20.20.13
-  - 8.8.8.8
+  - 172.22.22.10
+  - 172.22.22.40
 spanning_tree:
   mode: mstp
   mst_instances:
@@ -66,21 +66,29 @@ local_users:
   admin:
     privilege: 15
     role: network-admin
-    sha512_password: someshapassword
+    sha512_password: $6$YCJxvEgvNNgeS/Za$42NHyES9xkPUOiODx29DudRdqRqXnCmFV3kCaF0blakZJq60q/KcXhH3t7VeSm0DSpkqeF2RCALD0/c81jQhl1
+  cvpadmin:
+    privilege: 15
+    role: network-admin
+    sha512_password: $6$F9XqxW52QkmBqIpi$dBN8olH2I8VlnIciAmVZgJP5FcR7Vr1tm/8qK7NxNhGDf6SdMGV.QSshVPTxcIctWlWu47LaauKQuNZBSh3fX.
+  dcidemo:
+    privilege: 15
+    role: dcidemo
+    sha512_password: $6$IQnDVIimX9VLbjhz$1JzwFWiZfiVmYk5wutOyslz/NJ2vf9xd2iXtnXlxP9utJgbHvDzMScEQSsMvVpRXLEKLJF9IiwYrkyOuZ43G71
 vrfs:
-  MGMT:
+  mgmt:
     ip_routing: false
 management_interfaces:
   Management1:
     description: oob_management
     shutdown: false
-    vrf: MGMT
+    vrf: mgmt
     ip_address: 10.30.30.101/24
     gateway: 10.92.61.129
     type: oob
 management_api_http:
   enable_vrfs:
-    MGMT: {}
+    mgmt: {}
   enable_https: true
 eos_cli: "management security\n   password encryption-key common\n"
 loopback_interfaces:
@@ -158,18 +166,10 @@ ethernet_interfaces:
       ip: true
 router_bfd:
   multihop:
-    interval: 5000
-    min_rx: 5000
+    interval: 300
+    min_rx: 300
     multiplier: 3
 ip_igmp_snooping:
   globally_enabled: true
 patch_panel: {}
 ip_virtual_router_mac_address: 00:1c:73:00:dc:00
-sflow:
-  sample: 40000
-  vrfs:
-    MGMT:
-      destinations:
-        127.0.0.1: null
-      source_interface: Management1
-  run: true

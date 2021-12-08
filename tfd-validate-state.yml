@@ -1,0 +1,8 @@
+- name: validate states on EOS devices
+  hosts: MPLS_FABRIC
+
+  tasks:
+
+    - name: validate states on EOS devices
+      import_role:
+         name: arista.avd.eos_validate_state

@@ -8,26 +8,26 @@ tenants:
     #     ids: [52, 513 ]
     #     nodes: ["PE-01", "PE-03"]
     #     interfaces: ["Ethernet5/2", "Ethernet51/3"]
-    # vrfs:
-    #   TENANT_A_WAN:
-    #     vrf_rt: 10
-    #     address_families:
-    #       - evpn
-    #     l3_interfaces:
-    #       - description: "L3vpn service, vlan 100"
-    #         interfaces: [ Ethernet52/2.100 ]
-    #         encapsulation_dot1q_vlan: [ 100 ]
-    #         enabled: true
-    #         mtu: 9000
-    #         ip_addresses: [ 10.10.100.2/24 ]
-    #         nodes: [ PE-02 ]
-    #       - description: "L3vpn service, vlan 100"
-    #         interfaces: [ Ethernet5/3.200 ]
-    #         encapsulation_dot1q_vlan: [ 200 ]
-    #         enabled: true
-    #         mtu: 9000
-    #         ip_addresses: [ 10.10.200.2/24 ]
-    #         nodes: [ PE-04 ]
+    vrfs:
+      TENANT_A_WAN:
+        vrf_rt: 10
+        address_families:
+          - evpn
+        l3_interfaces:
+          - description: "L3vpn service, vlan 100"
+            interfaces: [ Ethernet52/2.100 ]
+            encapsulation_dot1q_vlan: [ 100 ]
+            enabled: true
+            mtu: 9000
+            ip_addresses: [ 10.10.100.2/24 ]
+            nodes: [ PE-02 ]
+          - description: "L3vpn service, vlan 100"
+            interfaces: [ Ethernet5/3.200 ]
+            encapsulation_dot1q_vlan: [ 200 ]
+            enabled: true
+            mtu: 9000
+            ip_addresses: [ 10.10.200.2/24 ]
+            nodes: [ PE-04 ]
     l2vlans:
       10:
         name: TENANT_A_L2_SERVICE

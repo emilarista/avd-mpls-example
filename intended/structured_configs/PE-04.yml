@@ -46,6 +46,19 @@ router_bgp:
     100.70.0.6:
       peer_group: MPLS-OVERLAY-PEERS
       description: P-02
+  vrfs:
+    TENANT_A_WAN:
+      router_id: 100.70.0.4
+      rd: 100.70.0.4:10
+      route_targets:
+        import:
+          evpn:
+          - '65000:10'
+        export:
+          evpn:
+          - '65000:10'
+      redistribute_routes:
+      - connected
   vlans:
     10:
       tenant: TENANT_A
@@ -111,6 +124,9 @@ local_users:
 vrfs:
   mgmt:
     ip_routing: false
+  TENANT_A_WAN:
+    tenant: TENANT_A
+    ip_routing: true
 management_interfaces:
   Management1:
     description: oob_management
@@ -199,13 +215,22 @@ ethernet_interfaces:
     isis_circuit_type: level-1-2
     mpls:
       ip: true
+  Ethernet5/3.100:
+    type: l3dot1q
+    encapsulation_dot1q_vlan: 100
+    peer_type: l3_interface
+    vrf: TENANT_A_WAN
+    ip_address: 10.10.200.2/24
+    mtu: 9000
+    shutdown: false
+    description: L3vpn service, vlan 100
   Ethernet5/3:
+    type: switched
+    peer_type: cpe
+    shutdown: false
     peer: CPE-2
     peer_interface: Ethernet34
-    peer_type: cpe
     description: CPE-2_Ethernet34
-    type: switched
-    shutdown: false
     mode: access
     vlans: 10
     spanning_tree_portfast: edge

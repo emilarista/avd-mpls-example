@@ -12,12 +12,12 @@ backbone_interfaces:
     underlay_pool: 100.64.48.0/24
   p2p_links_profiles:
     default_bb_profile:
-      speed: 100full
-      mtu: 1500
-      isis_hello_padding: false
-      isis_metric: 60
+      speed: forced 40gfull
+      mtu: 9000
+      isis_hello_padding: true
+      isis_metric: 10
       ip_pool: underlay_pool
-      isis_circuit_type: level-2
+      isis_circuit_type: level-1-2
       ipv6_enable: true
   p2p_links:
   - nodes:
@@ -48,6 +48,7 @@ backbone_interfaces:
     - P-01
     - PE-03
     id: 4
+    speed: forced 100gfull
     interfaces:
     - Ethernet26/1
     - Ethernet55/1
@@ -79,7 +80,7 @@ backbone_interfaces:
   - nodes:
     - P-02
     - PE-04
-    id: 7
+    id: 8
     interfaces:
     - Ethernet2/1
     - Ethernet2/1
@@ -87,7 +88,7 @@ backbone_interfaces:
   - nodes:
     - PE-01
     - PE-02
-    id: 8
+    id: 9
     interfaces:
     - Ethernet2/1
     - Ethernet49/1
@@ -126,7 +127,7 @@ local_users:
   cvpadmin:
     privilege: 15
     role: network-admin
-    sha512_password: $6$F9XqxW52QkmBqIpi$dBN8olH2I8VlnIciAmVZgJP5FcR7Vr1tm/8qK7NxNhGDf6SdMGV.QSshVPTxcIctWlWu47LaauKQuNZBSh3fX.
+    sha512_password: $6$0vli3tFaghW2wEQn$To2mxaQwn/VBm/8t/L2XjaXDEP0ZOXmbvHv2OoMwxDF.qPdSpJHz7GbuEOnnh1FqU8cxrbFSZHxgUqmKAuxEe/
   dcidemo:
     privilege: 15
     role: dcidemo
@@ -139,11 +140,6 @@ name_servers:
 dns_domain: sjc.aristanetworks.com
 ntp_servers:
 - 172.22.22.50
-internal_vlan_order:
-  allocation: ascending
-  range:
-    beginning: 3700
-    ending: 3900
 connected_endpoints_keys:
   routers:
     type: router
@@ -176,38 +172,65 @@ aliases: 'alias agents bash ls -lrt /var/log/agents/
   alias srnz show interface counter rate | nz
 
   alias top show proc top'
-type: p
-p:
-  platform: vEOS-LAB
+platform_settings:
+- platforms:
+  - 7280QR-C36-M
+  tcam_profile: mpls-evpn
+- platforms:
+  - 7280SR3K-48YC8
+  tcam_profile: vxlan-routing
+- platforms:
+  - 7280CR3K-32D4
+  tcam_profile: vxlan-routing
+platform_speed_groups:
+  7280CR3K-32D4:
+    10g:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+type: rr
+rr:
   defaults:
+    platform: 7280QR-C36-M
     loopback_ipv4_pool: 100.70.0.0/24
     loopback_ipv6_pool: 2000:1234:ffff:ffff::/64
     is_type: level-1-2
     node_sid_base: 300
     isis_system_id_prefix: '0000.0000'
+    bgp_defaults:
+    - no bgp default ipv4-unicast
+    - distance bgp 20 200 200
+    - graceful-restart restart-time 300
+    - graceful-restart
+    - bgp route-reflector preserve-attributes always
     raw_eos_cli: "management security\n   password encryption-key common\n"
-  nodes:
-    P-01:
-      id: 4
-      mgmt_ip: 10.92.61.162/26
-    P-02:
-      id: 6
-      mgmt_ip: 10.92.61.164/26
-inventory_file: /home/carlbuchmann/Git_Projects/SP-AVD/avd-mpls-example/inventory.yml
-inventory_dir: /home/carlbuchmann/Git_Projects/SP-AVD/avd-mpls-example
+  node_groups:
+    P-01-02:
+      bgp_cluster_id: 100.70.0.5
+      nodes:
+        P-01:
+          id: 5
+          mgmt_ip: 10.92.61.162/26
+        P-02:
+          id: 6
+          mgmt_ip: 10.92.61.164/26
+inventory_file: /projects/ansible/development/AVD_MPLS_TESTING/inventory.yml
+inventory_dir: /projects/ansible/development/AVD_MPLS_TESTING
 ansible_host: 10.92.61.162
 inventory_hostname: P-01
 inventory_hostname_short: P-01
 group_names:
 - EOS
 - MPLS_FABRIC
-- P_ROUTERS
+- RR_ROUTERS
 ansible_facts:
   switch:
-    type: p
-    node_type_key: p
+    type: rr
+    node_type_key: rr
     connected_endpoints: false
-    default_evpn_role: none
+    default_evpn_role: server
     mlag_support: false
     network_services_l1: false
     network_services_l2: false
@@ -226,16 +249,14 @@ ansible_facts:
       connected_endpoints_port_channel_interfaces: interface_descriptions/connected_endpoints/port-channel-interfaces.j2
       overlay_loopback_interface: interface_descriptions/loopback_interfaces/overlay-loopback.j2
       vtep_loopback_interface: interface_descriptions/loopback_interfaces/vtep-loopback.j2
-    id: 4
+    group: P-01-02
+    id: 5
     mgmt_ip: 10.92.61.162/26
+    platform: 7280QR-C36-M
     platform_settings:
       platforms:
-      - default
-      reload_delay:
-        mlag: 300
-        non_mlag: 330
-      feature_support:
-        queue_monitor_length_notify: false
+      - 7280QR-C36-M
+      tcam_profile: mpls-evpn
     underlay_routing_protocol: isis
     overlay_routing_protocol: ibgp
     spanning_tree_mode: none
@@ -244,24 +265,31 @@ ansible_facts:
     raw_eos_cli: "management security\n   password encryption-key common\n"
     loopback_ipv4_pool: 100.70.0.0/24
     loopback_ipv4_offset: 0
-    router_id: 100.70.0.4
+    router_id: 100.70.0.5
     loopback_ipv6_pool: 100.70.0.0/24
     loopback_ipv6_offset: 0
-    ipv6_router_id: 2000:1234:ffff:ffff::4
-    evpn_role: none
-    bgp_defaults: []
-    isis_net: 49.0001.0000.0000.0004.00
+    ipv6_router_id: 2000:1234:ffff:ffff::5
+    evpn_role: server
+    bgp_as: '65000'
+    bgp_defaults:
+    - no bgp default ipv4-unicast
+    - distance bgp 20 200 200
+    - graceful-restart restart-time 300
+    - graceful-restart
+    - bgp route-reflector preserve-attributes always
+    bgp_cluster_id: 100.70.0.5
+    isis_net: 49.0001.0000.0000.0005.00
     is_type: level-1-2
-    node_sid: 304
+    node_sid: 305
     mlag: false
   topology:
     peers: []
     vlans: []
 switch:
-  type: p
-  node_type_key: p
+  type: rr
+  node_type_key: rr
   connected_endpoints: false
-  default_evpn_role: none
+  default_evpn_role: server
   mlag_support: false
   network_services_l1: false
   network_services_l2: false
@@ -280,16 +308,14 @@ switch:
     connected_endpoints_port_channel_interfaces: interface_descriptions/connected_endpoints/port-channel-interfaces.j2
     overlay_loopback_interface: interface_descriptions/loopback_interfaces/overlay-loopback.j2
     vtep_loopback_interface: interface_descriptions/loopback_interfaces/vtep-loopback.j2
-  id: 4
+  group: P-01-02
+  id: 5
   mgmt_ip: 10.92.61.162/26
+  platform: 7280QR-C36-M
   platform_settings:
     platforms:
-    - default
-    reload_delay:
-      mlag: 300
-      non_mlag: 330
-    feature_support:
-      queue_monitor_length_notify: false
+    - 7280QR-C36-M
+    tcam_profile: mpls-evpn
   underlay_routing_protocol: isis
   overlay_routing_protocol: ibgp
   spanning_tree_mode: none
@@ -298,22 +324,29 @@ switch:
   raw_eos_cli: "management security\n   password encryption-key common\n"
   loopback_ipv4_pool: 100.70.0.0/24
   loopback_ipv4_offset: 0
-  router_id: 100.70.0.4
+  router_id: 100.70.0.5
   loopback_ipv6_pool: 100.70.0.0/24
   loopback_ipv6_offset: 0
-  ipv6_router_id: 2000:1234:ffff:ffff::4
-  evpn_role: none
-  bgp_defaults: []
-  isis_net: 49.0001.0000.0000.0004.00
+  ipv6_router_id: 2000:1234:ffff:ffff::5
+  evpn_role: server
+  bgp_as: '65000'
+  bgp_defaults:
+  - no bgp default ipv4-unicast
+  - distance bgp 20 200 200
+  - graceful-restart restart-time 300
+  - graceful-restart
+  - bgp route-reflector preserve-attributes always
+  bgp_cluster_id: 100.70.0.5
+  isis_net: 49.0001.0000.0000.0005.00
   is_type: level-1-2
-  node_sid: 304
+  node_sid: 305
   mlag: false
 topology:
   peers: []
   vlans: []
-playbook_dir: /home/carlbuchmann/Git_Projects/SP-AVD/avd-mpls-example
-ansible_playbook_python: /home/carlbuchmann/.venv/bin/python
-ansible_config_file: /home/carlbuchmann/Git_Projects/SP-AVD/avd-mpls-example/ansible.cfg
+playbook_dir: /projects/ansible/development/AVD_MPLS_TESTING
+ansible_playbook_python: /usr/local/bin/python
+ansible_config_file: /projects/ansible/development/AVD_MPLS_TESTING/ansible.cfg
 groups:
   all:
   - cv_server
@@ -340,7 +373,7 @@ groups:
   - PE-02
   - PE-03
   - PE-04
-  P_ROUTERS:
+  RR_ROUTERS:
   - P-01
   - P-02
   CPE_ROUTERS:
@@ -365,19 +398,20 @@ groups:
   - P-02
   - CPE-01
   - CPE-02
-omit: __omit_place_holder__4a8b78537248b5c3fa555a53c4b44f703f5bf4a5
+omit: __omit_place_holder__e45510a2862c37d8a6481a8d5700a726b872d651
 ansible_version:
-  string: 2.11.6
-  full: 2.11.6
+  string: 2.10.12
+  full: 2.10.12
   major: 2
-  minor: 11
-  revision: 6
+  minor: 10
+  revision: 12
 ansible_check_mode: false
-ansible_diff_mode: true
+ansible_diff_mode: false
 ansible_forks: 16
 ansible_inventory_sources:
-- /home/carlbuchmann/Git_Projects/SP-AVD/avd-mpls-example/inventory.yml
+- /projects/ansible/development/AVD_MPLS_TESTING/inventory.yml
 ansible_skip_tags: []
 ansible_run_tags:
+- debug
 - build
 ansible_verbosity: 0

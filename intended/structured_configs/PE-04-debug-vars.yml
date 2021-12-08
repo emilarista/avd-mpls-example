@@ -17,37 +17,47 @@ cpes:
     adapters:
     - profile: TENANT_A_WAN_SERVICE_10
       endpoint_ports:
-      - Ethernet1
       - Ethernet2
       switch_ports:
-      - Ethernet5/2
       - Ethernet52/2
       switches:
-      - PE-03
-      - PE-04
+      - PE-02
   CPE-2:
     adapters:
     - profile: TENANT_A_WAN_SERVICE_10
       endpoint_ports:
-      - Ethernet33
       - Ethernet34
       switch_ports:
-      - Ethernet51/3
       - Ethernet5/3
       switches:
-      - PE-03
       - PE-04
+  speed_config:
+    adapters:
+    - endpoint_ports:
+      - 10g
+      switch_ports:
+      - Ethernet5/1
+      switches:
+      - PE-01
+      speed: forced 10000full
+    - endpoint_ports:
+      - 10g
+      switch_ports:
+      - Ethernet5/1
+      switches:
+      - PE-04
+      speed: forced 10000full
 backbone_interfaces:
   p2p_links_ip_pools:
     underlay_pool: 100.64.48.0/24
   p2p_links_profiles:
     default_bb_profile:
-      speed: 100full
-      mtu: 1500
-      isis_hello_padding: false
-      isis_metric: 60
+      speed: forced 40gfull
+      mtu: 9000
+      isis_hello_padding: true
+      isis_metric: 10
       ip_pool: underlay_pool
-      isis_circuit_type: level-2
+      isis_circuit_type: level-1-2
       ipv6_enable: true
   p2p_links:
   - nodes:
@@ -78,6 +88,7 @@ backbone_interfaces:
     - P-01
     - PE-03
     id: 4
+    speed: forced 100gfull
     interfaces:
     - Ethernet26/1
     - Ethernet55/1
@@ -109,7 +120,7 @@ backbone_interfaces:
   - nodes:
     - P-02
     - PE-04
-    id: 7
+    id: 8
     interfaces:
     - Ethernet2/1
     - Ethernet2/1
@@ -117,7 +128,7 @@ backbone_interfaces:
   - nodes:
     - PE-01
     - PE-02
-    id: 8
+    id: 9
     interfaces:
     - Ethernet2/1
     - Ethernet49/1
@@ -156,12 +167,12 @@ local_users:
   cvpadmin:
     privilege: 15
     role: network-admin
-    sha512_password: $6$F9XqxW52QkmBqIpi$dBN8olH2I8VlnIciAmVZgJP5FcR7Vr1tm/8qK7NxNhGDf6SdMGV.QSshVPTxcIctWlWu47LaauKQuNZBSh3fX.
+    sha512_password: $6$0vli3tFaghW2wEQn$To2mxaQwn/VBm/8t/L2XjaXDEP0ZOXmbvHv2OoMwxDF.qPdSpJHz7GbuEOnnh1FqU8cxrbFSZHxgUqmKAuxEe/
   dcidemo:
     privilege: 15
     role: dcidemo
     sha512_password: $6$IQnDVIimX9VLbjhz$1JzwFWiZfiVmYk5wutOyslz/NJ2vf9xd2iXtnXlxP9utJgbHvDzMScEQSsMvVpRXLEKLJF9IiwYrkyOuZ43G71
-mgmt_gateway: 10.92.61.129
+mgmt_gateway: 10.92.61.65
 mgmt_interface_vrf: mgmt
 name_servers:
 - 172.22.22.10
@@ -169,11 +180,6 @@ name_servers:
 dns_domain: sjc.aristanetworks.com
 ntp_servers:
 - 172.22.22.50
-internal_vlan_order:
-  allocation: ascending
-  range:
-    beginning: 3700
-    ending: 3900
 connected_endpoints_keys:
   routers:
     type: router
@@ -206,100 +212,78 @@ aliases: 'alias agents bash ls -lrt /var/log/agents/
   alias srnz show interface counter rate | nz
 
   alias top show proc top'
+platform_settings:
+- platforms:
+  - 7280QR-C36-M
+  tcam_profile: mpls-evpn
+- platforms:
+  - 7280SR3K-48YC8
+  tcam_profile: vxlan-routing
+- platforms:
+  - 7280CR3K-32D4
+  tcam_profile: vxlan-routing
+platform_speed_groups:
+  7280CR3K-32D4:
+    10g:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
 tenants:
   TENANT_A:
     l1_services:
-    - name: TEN_A_site2_site5_eline
+    - name: TEN_A_site1_site2_eline
       type: vpws-pseudowire
       ids:
-      - 25
-      - 57
+      - 52
+      - 513
       nodes:
-      - pe2
-      - pe5
+      - PE-01
+      - PE-03
       interfaces:
-      - Ethernet7
-      - Ethernet7
-    l2vlans:
-      10:
-        name: TENANT_A_L2_SERVICE
-        tags:
-        - site1-2
-        - site5
+      - Ethernet5/2
+      - Ethernet51/3
     mac_vrf_rt_base: 10000
     pw_rt_base: 1000
     vrfs:
       TENANT_A_WAN:
         address_families:
         - evpn
-        svis: {}
-        vrf_rt: 10
-  TENANT_B:
-    l2vlans: {}
-    mac_vrf_rt_base: 20000
-    vrfs:
-      TENANT_B_WAN:
-        ospf:
-          enabled: true
-          process_id: 99
-          router_id: 1.2.3.4
-          address_families:
-          - ipv4
-          bfd: true
-          max_lsa: 10000
-          nodes:
-          - pe3
-        address_families:
-        - vpn-ipv4
         l3_interfaces:
-        - description: TENANT_B_SITE_3
-          enabled: true
+        - description: L3vpn service, vlan 100
           interfaces:
-          - Ethernet5
-          ip_addresses:
-          - 192.168.48.0/31
-          nodes:
-          - pe3
-        - description: TENANT_B_SITE_3_OSPF
+          - Ethernet52/2.100
+          encapsulation_dot1q_vlan:
+          - 100
           enabled: true
-          ospf:
-            enabled: true
-            p2p: true
-            area: 0
-            cost: 10
-          interfaces:
-          - Ethernet6
+          mtu: 9000
           ip_addresses:
-          - 192.168.48.4/31
+          - 10.10.100.2/24
           nodes:
-          - pe3
-        - description: TENANT_B_SITE_5
+          - PE-02
+        - description: L3vpn service, vlan 100
+          interfaces:
+          - Ethernet5/3.100
+          encapsulation_dot1q_vlan:
+          - 100
           enabled: true
-          interfaces:
-          - Ethernet6
+          mtu: 9000
           ip_addresses:
-          - 192.168.48.2/31
+          - 10.10.200.2/24
           nodes:
-          - pe5
-        bgp_peers:
-          192.168.48.1:
-            description: TENANT_B_CPE_SITE3
-            nodes:
-            - pe3
-            password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
-            remote_as: '65201'
-          192.168.48.3:
-            description: TENANT_B_CPE_SITE5
-            nodes:
-            - pe5
-            password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
-            remote_as: '65202'
-        vrf_rt: 20
+          - PE-04
+        vrf_rt: 10
+    l2vlans:
+      10:
+        name: TENANT_A_L2_SERVICE
+        tags:
+        - site1
+        - site2
 type: pe
 pe:
   defaults:
     virtual_router_mac_address: 00:1c:73:00:dc:00
-    platform: vEOS-LAB
     loopback_ipv4_pool: 100.70.0.0/24
     loopback_ipv6_pool: 2000:1234:ffff:ffff::/64
     is_type: level-1-2
@@ -328,10 +312,12 @@ pe:
       nodes:
         PE-01:
           id: 1
-          mgmt_ip: 10.30.30.101/24
+          platform: 7280CR3K-32D4
+          mgmt_ip: 10.92.61.97/26
         PE-02:
           id: 2
-          mgmt_ip: 10.30.30.102/24
+          platform: 7280SR3K-48YC8
+          mgmt_ip: 10.92.61.163/26
     SITE_2:
       filter:
         tenants:
@@ -342,12 +328,14 @@ pe:
       nodes:
         PE-03:
           id: 3
-          mgmt_ip: 10.30.30.103/24
+          platform: 7280SR3K-48YC8
+          mgmt_ip: 10.92.61.165/26
         PE-04:
           id: 4
-          mgmt_ip: 10.30.30.105/24
-inventory_file: /home/carlbuchmann/Git_Projects/SP-AVD/avd-mpls-example/inventory.yml
-inventory_dir: /home/carlbuchmann/Git_Projects/SP-AVD/avd-mpls-example
+          platform: 7280CR3K-32D4
+          mgmt_ip: 10.92.61.98/26
+inventory_file: /projects/ansible/development/AVD_MPLS_TESTING/inventory.yml
+inventory_dir: /projects/ansible/development/AVD_MPLS_TESTING
 ansible_host: 10.92.61.98
 inventory_hostname: PE-04
 inventory_hostname_short: PE-04
@@ -383,16 +371,12 @@ ansible_facts:
       vtep_loopback_interface: interface_descriptions/loopback_interfaces/vtep-loopback.j2
     group: SITE_2
     id: 4
-    mgmt_ip: 10.30.30.105/24
-    platform: vEOS-LAB
+    mgmt_ip: 10.92.61.98/26
+    platform: 7280CR3K-32D4
     platform_settings:
       platforms:
-      - default
-      reload_delay:
-        mlag: 300
-        non_mlag: 330
-      feature_support:
-        queue_monitor_length_notify: false
+      - 7280CR3K-32D4
+      tcam_profile: vxlan-routing
     underlay_routing_protocol: isis
     overlay_routing_protocol: ibgp
     filter_tenants:
@@ -428,11 +412,18 @@ ansible_facts:
     node_sid: 204
     mlag: false
     evpn_services_l2_only: false
-    tenants: {}
-    vlans: []
+    tenants:
+      TENANT_A:
+        vrfs:
+          TENANT_A_WAN: {}
+        l2vlans:
+        - 10
+    vlans:
+    - 10
   topology:
     peers: []
-    vlans: []
+    vlans:
+    - 10
 switch:
   type: pe
   node_type_key: pe
@@ -458,16 +449,12 @@ switch:
     vtep_loopback_interface: interface_descriptions/loopback_interfaces/vtep-loopback.j2
   group: SITE_2
   id: 4
-  mgmt_ip: 10.30.30.105/24
-  platform: vEOS-LAB
+  mgmt_ip: 10.92.61.98/26
+  platform: 7280CR3K-32D4
   platform_settings:
     platforms:
-    - default
-    reload_delay:
-      mlag: 300
-      non_mlag: 330
-    feature_support:
-      queue_monitor_length_notify: false
+    - 7280CR3K-32D4
+    tcam_profile: vxlan-routing
   underlay_routing_protocol: isis
   overlay_routing_protocol: ibgp
   filter_tenants:
@@ -503,14 +490,21 @@ switch:
   node_sid: 204
   mlag: false
   evpn_services_l2_only: false
-  tenants: {}
-  vlans: []
+  tenants:
+    TENANT_A:
+      vrfs:
+        TENANT_A_WAN: {}
+      l2vlans:
+      - 10
+  vlans:
+  - 10
 topology:
   peers: []
-  vlans: []
-playbook_dir: /home/carlbuchmann/Git_Projects/SP-AVD/avd-mpls-example
-ansible_playbook_python: /home/carlbuchmann/.venv/bin/python
-ansible_config_file: /home/carlbuchmann/Git_Projects/SP-AVD/avd-mpls-example/ansible.cfg
+  vlans:
+  - 10
+playbook_dir: /projects/ansible/development/AVD_MPLS_TESTING
+ansible_playbook_python: /usr/local/bin/python
+ansible_config_file: /projects/ansible/development/AVD_MPLS_TESTING/ansible.cfg
 groups:
   all:
   - cv_server
@@ -537,7 +531,7 @@ groups:
   - PE-02
   - PE-03
   - PE-04
-  P_ROUTERS:
+  RR_ROUTERS:
   - P-01
   - P-02
   CPE_ROUTERS:
@@ -562,19 +556,20 @@ groups:
   - P-02
   - CPE-01
   - CPE-02
-omit: __omit_place_holder__4a8b78537248b5c3fa555a53c4b44f703f5bf4a5
+omit: __omit_place_holder__e45510a2862c37d8a6481a8d5700a726b872d651
 ansible_version:
-  string: 2.11.6
-  full: 2.11.6
+  string: 2.10.12
+  full: 2.10.12
   major: 2
-  minor: 11
-  revision: 6
+  minor: 10
+  revision: 12
 ansible_check_mode: false
-ansible_diff_mode: true
+ansible_diff_mode: false
 ansible_forks: 16
 ansible_inventory_sources:
-- /home/carlbuchmann/Git_Projects/SP-AVD/avd-mpls-example/inventory.yml
+- /projects/ansible/development/AVD_MPLS_TESTING/inventory.yml
 ansible_skip_tags: []
 ansible_run_tags:
+- debug
 - build
 ansible_verbosity: 0

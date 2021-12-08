@@ -53,5 +53,5 @@ all:
     EOS:
       children:
         PE_ROUTERS:
-        P_ROUTERS:
+        RR_ROUTERS:
         CPE_ROUTERS:

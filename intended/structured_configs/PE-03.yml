@@ -173,16 +173,6 @@ ethernet_interfaces:
     isis_circuit_type: level-1-2
     mpls:
       ip: true
-  Ethernet5/2:
-    peer: CPE-1
-    peer_interface: Ethernet1
-    peer_type: cpe
-    description: CPE-1_Ethernet1
-    type: switched
-    shutdown: false
-    mode: access
-    vlans: 10
-    spanning_tree_portfast: edge
   Ethernet51/3:
     peer: CPE-2
     peer_interface: Ethernet33

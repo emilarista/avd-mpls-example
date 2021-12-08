@@ -191,6 +191,16 @@ ethernet_interfaces:
     isis_circuit_type: level-1-2
     mpls:
       ip: true
+  Ethernet52/2:
+    peer: CPE-1
+    peer_interface: Ethernet2
+    peer_type: cpe
+    description: CPE-1_Ethernet2
+    type: switched
+    shutdown: false
+    mode: access
+    vlans: 10
+    spanning_tree_portfast: edge
 router_bfd:
   multihop:
     interval: 300

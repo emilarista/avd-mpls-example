@@ -1,0 +1,21 @@
+type: p
+
+# P Routers
+p:
+  platform: vEOS-LAB
+  defaults:
+    loopback_ipv4_pool: 100.70.0.0/24
+    loopback_ipv6_pool: "2000:1234:ffff:ffff::/64"
+    is_type: level-1-2
+    node_sid_base: 300
+    isis_system_id_prefix: '0000.0000'
+    raw_eos_cli: |
+      management security
+         password encryption-key common
+  nodes:
+    P-01:
+      id: 4
+      mgmt_ip: 10.92.61.162/26
+    P-02:
+      id: 6
+      mgmt_ip: 10.92.61.164/26

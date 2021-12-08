@@ -1,0 +1,559 @@
+ansible_connection: httpapi
+ansible_network_os: eos
+ansible_user: admin
+ansible_ssh_pass: admin
+ansible_become: true
+ansible_become_method: enable
+ansible_httpapi_use_ssl: true
+ansible_httpapi_validate_certs: false
+validation_mode_loose: true
+port_profiles:
+  TENANT_A_WAN_SERVICE_10:
+    mode: access
+    vlans: 10
+    spanning_tree_portfast: edge
+cpes:
+  CPE_TENANT_A_SITE1:
+    adapters:
+    - profile: TENANT_A_WAN_SERVICE_10
+      endpoint_ports:
+      - Ethernet1
+      - Ethernet2
+      switch_ports:
+      - Ethernet5
+      - Ethernet5
+      switches:
+      - pe1
+      - pe2
+      port_channel:
+        description: EVPN-A-A-PortChannel
+        mode: active
+        short_esi: 0303:0202:0101
+    rack: Undefined
+  CPE_TENANT_A_SITE5:
+    adapters:
+    - profile: TENANT_A_WAN_SERVICE_10
+      endpoint_ports:
+      - eth0
+      switch_ports:
+      - Ethernet5
+      switches:
+      - pe5
+    rack: Undefined
+fabric_name: MPLS_FABRIC
+underlay_routing_protocol: isis
+isis_advertise_passive_only: true
+isis_hello_padding: false
+isis_ti_lfa:
+  enabled: true
+  protection: link
+  local_convergence_delay: 15000
+isis_default_is_type: level-1-2
+isis_default_circuit_type: level-1-2
+isis_default_metric: 50
+label_distribution:
+  protocol: isis-sr
+overlay_routing_protocol: ibgp
+bgp_as: 65000
+bgp_peer_groups:
+  MPLS_OVERLAY_PEERS:
+    password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
+internal_vlan_order:
+  allocation: ascending
+  range:
+    beginning: 3700
+    ending: 3900
+p2p_uplinks_mtu: 1600
+local_users:
+  admin:
+    privilege: 15
+    role: network-admin
+    sha512_password: someshapassword
+mgmt_gateway: 10.92.61.129
+name_servers:
+- 10.20.20.13
+- 8.8.8.8
+ntp_servers:
+- 0.se.pool.ntp.org
+- 1.se.pool.ntp.org
+overlay_rd_type:
+  admin_subfield: overlay_loopback
+overlay_rt_type:
+  admin_subfield: 65000
+bgp_maximum_paths: 4
+bgp_ecmp: 4
+overlay_prevent_readvertise_to_server: true
+bfd_multihop:
+  interval: 5000
+  min_rx: 5000
+  multiplier: 3
+custom_structured_configuration_sflow:
+  sample: 40000
+  vrfs:
+    MGMT:
+      destinations:
+        127.0.0.1: null
+      source_interface: Management1
+  run: true
+connected_endpoints_keys:
+  routers:
+    type: router
+  cpes:
+    type: cpe
+backbone_interfaces:
+  p2p_links_ip_pools:
+    underlay_pool: 100.64.48.0/24
+  p2p_links_profiles:
+    default_bb_profile:
+      speed: 100full
+      mtu: 1500
+      isis_hello_padding: false
+      isis_metric: 60
+      ip_pool: underlay_pool
+      isis_circuit_type: level-2
+      ipv6_enable: true
+  p2p_links:
+  - nodes:
+    - P-01
+    - P-02
+    id: 1
+    interfaces:
+    - Ethernet25/1
+    - Ethernet25/1
+    profile: default_bb_profile
+  - nodes:
+    - P-01
+    - PE-01
+    id: 2
+    interfaces:
+    - Ethernet1/1
+    - Ethernet1/1
+    profile: default_bb_profile
+  - nodes:
+    - P-01
+    - PE-02
+    id: 3
+    interfaces:
+    - Ethernet2/1
+    - Ethernet50/1
+    profile: default_bb_profile
+  - nodes:
+    - P-01
+    - PE-03
+    id: 4
+    interfaces:
+    - Ethernet26/1
+    - Ethernet55/1
+    profile: default_bb_profile
+  - nodes:
+    - P-02
+    - PE-02
+    id: 5
+    interfaces:
+    - Ethernet26/1
+    - Ethernet55/1
+    profile: default_bb_profile
+  - nodes:
+    - P-02
+    - PE-03
+    id: 6
+    interfaces:
+    - Ethernet4/1
+    - Ethernet50/1
+    profile: default_bb_profile
+  - nodes:
+    - P-02
+    - PE-04
+    id: 7
+    interfaces:
+    - Ethernet1/1
+    - Ethernet1/1
+    profile: default_bb_profile
+  - nodes:
+    - P-02
+    - PE-04
+    id: 7
+    interfaces:
+    - Ethernet2/1
+    - Ethernet2/1
+    profile: default_bb_profile
+  - nodes:
+    - PE-01
+    - PE-02
+    id: 8
+    interfaces:
+    - Ethernet2/1
+    - Ethernet49/1
+    profile: default_bb_profile
+tenants:
+  TENANT_A:
+    l1_services:
+    - name: TEN_A_site2_site5_eline
+      type: vpws-pseudowire
+      ids:
+      - 25
+      - 57
+      nodes:
+      - pe2
+      - pe5
+      interfaces:
+      - Ethernet7
+      - Ethernet7
+    l2vlans:
+      10:
+        name: TENANT_A_L2_SERVICE
+        tags:
+        - site1-2
+        - site5
+    mac_vrf_rt_base: 10000
+    pw_rt_base: 1000
+    vrfs:
+      TENANT_A_WAN:
+        address_families:
+        - evpn
+        svis: {}
+        vrf_rt: 10
+  TENANT_B:
+    l2vlans: {}
+    mac_vrf_rt_base: 20000
+    vrfs:
+      TENANT_B_WAN:
+        ospf:
+          enabled: true
+          process_id: 99
+          router_id: 1.2.3.4
+          address_families:
+          - ipv4
+          bfd: true
+          max_lsa: 10000
+          nodes:
+          - pe3
+        address_families:
+        - vpn-ipv4
+        l3_interfaces:
+        - description: TENANT_B_SITE_3
+          enabled: true
+          interfaces:
+          - Ethernet5
+          ip_addresses:
+          - 192.168.48.0/31
+          nodes:
+          - pe3
+        - description: TENANT_B_SITE_3_OSPF
+          enabled: true
+          ospf:
+            enabled: true
+            p2p: true
+            area: 0
+            cost: 10
+          interfaces:
+          - Ethernet6
+          ip_addresses:
+          - 192.168.48.4/31
+          nodes:
+          - pe3
+        - description: TENANT_B_SITE_5
+          enabled: true
+          interfaces:
+          - Ethernet6
+          ip_addresses:
+          - 192.168.48.2/31
+          nodes:
+          - pe5
+        bgp_peers:
+          192.168.48.1:
+            description: TENANT_B_CPE_SITE3
+            nodes:
+            - pe3
+            password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
+            remote_as: '65201'
+          192.168.48.3:
+            description: TENANT_B_CPE_SITE5
+            nodes:
+            - pe5
+            password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
+            remote_as: '65202'
+        vrf_rt: 20
+type: pe
+pe:
+  defaults:
+    virtual_router_mac_address: 00:1c:73:00:dc:00
+    platform: vEOS-LAB
+    loopback_ipv4_pool: 100.70.0.0/24
+    loopback_ipv6_pool: 2000:1234:ffff:ffff::/64
+    is_type: level-1-2
+    node_sid_base: 200
+    isis_system_id_prefix: '0000.0001'
+    backbone_interface_speed: forced 100gfull
+    spanning_tree_priority: 4096
+    spanning_tree_mode: mstp
+    bgp_defaults:
+    - no bgp default ipv4-unicast
+    - distance bgp 20 200 200
+    - graceful-restart restart-time 300
+    - graceful-restart
+    mpls_route_reflectors:
+    - P-01
+    - P-02
+    raw_eos_cli: "management security\n   password encryption-key common\n"
+  node_groups:
+    SITE_1:
+      filter:
+        tenants:
+        - TENANT_A
+        - TENANT_B
+        tags:
+        - site1
+      nodes:
+        PE-01:
+          id: 1
+          mgmt_ip: 10.30.30.101/24
+        PE-02:
+          id: 2
+          mgmt_ip: 10.30.30.102/24
+    SITE_2:
+      filter:
+        tenants:
+        - TENANT_A
+        - TENANT_B
+        tags:
+        - site2
+      nodes:
+        PE-03:
+          id: 3
+          mgmt_ip: 10.30.30.103/24
+        PE-04:
+          id: 4
+          mgmt_ip: 10.30.30.105/24
+inventory_file: /home/carlbuchmann/Git_Projects/SP-AVD/avd-mpls-example/inventory.yml
+inventory_dir: /home/carlbuchmann/Git_Projects/SP-AVD/avd-mpls-example
+ansible_host: 10.92.61.98
+inventory_hostname: PE-04
+inventory_hostname_short: PE-04
+group_names:
+- EOS
+- MPLS_ENDPOINT_CONNECTIONS
+- MPLS_FABRIC
+- MPLS_TENANTS
+- PE_ROUTERS
+ansible_facts:
+  switch:
+    type: pe
+    node_type_key: pe
+    connected_endpoints: true
+    default_evpn_role: client
+    mlag_support: false
+    network_services_l1: true
+    network_services_l2: true
+    network_services_l3: true
+    underlay_router: true
+    uplink_type: p2p
+    vtep: true
+    ip_addressing:
+      router_id: ip_addressing/router-id.j2
+      p2p_uplinks_ip: ip_addressing/p2p-uplinks-ip.j2
+      ipv6_router_id: ip_addressing/router-id-ipv6.j2
+    interface_descriptions:
+      underlay_ethernet_interfaces: interface_descriptions/underlay/ethernet-interfaces.j2
+      underlay_port_channel_interfaces: interface_descriptions/underlay/port-channel-interfaces.j2
+      connected_endpoints_ethernet_interfaces: interface_descriptions/connected_endpoints/ethernet-interfaces.j2
+      connected_endpoints_port_channel_interfaces: interface_descriptions/connected_endpoints/port-channel-interfaces.j2
+      overlay_loopback_interface: interface_descriptions/loopback_interfaces/overlay-loopback.j2
+      vtep_loopback_interface: interface_descriptions/loopback_interfaces/vtep-loopback.j2
+    group: SITE_2
+    id: 4
+    mgmt_ip: 10.30.30.105/24
+    platform: vEOS-LAB
+    platform_settings:
+      platforms:
+      - default
+      reload_delay:
+        mlag: 300
+        non_mlag: 330
+      feature_support:
+        queue_monitor_length_notify: false
+    underlay_routing_protocol: isis
+    overlay_routing_protocol: ibgp
+    filter_tenants:
+    - TENANT_A
+    - TENANT_B
+    filter_tags:
+    - site2
+    spanning_tree_mode: mstp
+    spanning_tree_priority: 4096
+    igmp_snooping_enabled: true
+    virtual_router_mac_address: 00:1c:73:00:dc:00
+    max_uplink_switches: 0
+    max_parallel_uplinks: 1
+    raw_eos_cli: "management security\n   password encryption-key common\n"
+    loopback_ipv4_pool: 100.70.0.0/24
+    loopback_ipv4_offset: 0
+    router_id: 100.70.0.4
+    loopback_ipv6_pool: 100.70.0.0/24
+    loopback_ipv6_offset: 0
+    ipv6_router_id: 2000:1234:ffff:ffff::4
+    evpn_role: client
+    bgp_as: '65000'
+    bgp_defaults:
+    - no bgp default ipv4-unicast
+    - distance bgp 20 200 200
+    - graceful-restart restart-time 300
+    - graceful-restart
+    mpls_route_reflectors:
+    - P-01
+    - P-02
+    isis_net: 49.0001.0000.0001.0004.00
+    is_type: level-1-2
+    node_sid: 204
+    mlag: false
+    evpn_services_l2_only: false
+    tenants: {}
+    vlans: []
+  topology:
+    peers: []
+    vlans: []
+switch:
+  type: pe
+  node_type_key: pe
+  connected_endpoints: true
+  default_evpn_role: client
+  mlag_support: false
+  network_services_l1: true
+  network_services_l2: true
+  network_services_l3: true
+  underlay_router: true
+  uplink_type: p2p
+  vtep: true
+  ip_addressing:
+    router_id: ip_addressing/router-id.j2
+    p2p_uplinks_ip: ip_addressing/p2p-uplinks-ip.j2
+    ipv6_router_id: ip_addressing/router-id-ipv6.j2
+  interface_descriptions:
+    underlay_ethernet_interfaces: interface_descriptions/underlay/ethernet-interfaces.j2
+    underlay_port_channel_interfaces: interface_descriptions/underlay/port-channel-interfaces.j2
+    connected_endpoints_ethernet_interfaces: interface_descriptions/connected_endpoints/ethernet-interfaces.j2
+    connected_endpoints_port_channel_interfaces: interface_descriptions/connected_endpoints/port-channel-interfaces.j2
+    overlay_loopback_interface: interface_descriptions/loopback_interfaces/overlay-loopback.j2
+    vtep_loopback_interface: interface_descriptions/loopback_interfaces/vtep-loopback.j2
+  group: SITE_2
+  id: 4
+  mgmt_ip: 10.30.30.105/24
+  platform: vEOS-LAB
+  platform_settings:
+    platforms:
+    - default
+    reload_delay:
+      mlag: 300
+      non_mlag: 330
+    feature_support:
+      queue_monitor_length_notify: false
+  underlay_routing_protocol: isis
+  overlay_routing_protocol: ibgp
+  filter_tenants:
+  - TENANT_A
+  - TENANT_B
+  filter_tags:
+  - site2
+  spanning_tree_mode: mstp
+  spanning_tree_priority: 4096
+  igmp_snooping_enabled: true
+  virtual_router_mac_address: 00:1c:73:00:dc:00
+  max_uplink_switches: 0
+  max_parallel_uplinks: 1
+  raw_eos_cli: "management security\n   password encryption-key common\n"
+  loopback_ipv4_pool: 100.70.0.0/24
+  loopback_ipv4_offset: 0
+  router_id: 100.70.0.4
+  loopback_ipv6_pool: 100.70.0.0/24
+  loopback_ipv6_offset: 0
+  ipv6_router_id: 2000:1234:ffff:ffff::4
+  evpn_role: client
+  bgp_as: '65000'
+  bgp_defaults:
+  - no bgp default ipv4-unicast
+  - distance bgp 20 200 200
+  - graceful-restart restart-time 300
+  - graceful-restart
+  mpls_route_reflectors:
+  - P-01
+  - P-02
+  isis_net: 49.0001.0000.0001.0004.00
+  is_type: level-1-2
+  node_sid: 204
+  mlag: false
+  evpn_services_l2_only: false
+  tenants: {}
+  vlans: []
+topology:
+  peers: []
+  vlans: []
+playbook_dir: /home/carlbuchmann/Git_Projects/SP-AVD/avd-mpls-example
+ansible_playbook_python: /home/carlbuchmann/.venv/bin/python
+ansible_config_file: /home/carlbuchmann/Git_Projects/SP-AVD/avd-mpls-example/ansible.cfg
+groups:
+  all:
+  - cv_server
+  - CPE-01
+  - CPE-02
+  - PE-01
+  - PE-02
+  - PE-03
+  - PE-04
+  - P-01
+  - P-02
+  ungrouped: []
+  CVP:
+  - cv_server
+  MPLS_FABRIC:
+  - PE-01
+  - PE-02
+  - PE-03
+  - PE-04
+  - P-01
+  - P-02
+  PE_ROUTERS:
+  - PE-01
+  - PE-02
+  - PE-03
+  - PE-04
+  P_ROUTERS:
+  - P-01
+  - P-02
+  CPE_ROUTERS:
+  - CPE-01
+  - CPE-02
+  MPLS_TENANTS:
+  - PE-01
+  - PE-02
+  - PE-03
+  - PE-04
+  MPLS_ENDPOINT_CONNECTIONS:
+  - PE-01
+  - PE-02
+  - PE-03
+  - PE-04
+  EOS:
+  - PE-01
+  - PE-02
+  - PE-03
+  - PE-04
+  - P-01
+  - P-02
+  - CPE-01
+  - CPE-02
+omit: __omit_place_holder__1c4aa64cfcb1bb36ed2e54ea78e1ad835f1b97e0
+ansible_version:
+  string: 2.11.6
+  full: 2.11.6
+  major: 2
+  minor: 11
+  revision: 6
+ansible_check_mode: false
+ansible_diff_mode: false
+ansible_forks: 16
+ansible_inventory_sources:
+- /home/carlbuchmann/Git_Projects/SP-AVD/avd-mpls-example/inventory.yml
+ansible_skip_tags: []
+ansible_run_tags:
+- build
+ansible_verbosity: 0

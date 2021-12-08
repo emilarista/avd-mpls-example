@@ -18,43 +18,40 @@ all:
 
     MPLS_FABRIC:
       children:
-        PE:
-          vars:
-            type: pe
-          children:
-            SITE1:
-              hosts:
-                pe1:
-                  ansible_host: 10.30.30.101
-                pe2:
-                  ansible_host: 10.30.30.102
-            SITE2:
-              hosts:
-                pe3:
-                  ansible_host: 10.30.30.103
-            SITE3:
-              hosts:
-                pe5:
-                  ansible_host: 10.30.30.105
-            P:
-              vars:
-                type: p
-              hosts:
-                p4:
-                  ansible_host: 10.30.30.104
-                p6:
-                  ansible_host: 10.30.30.106
-            RR:
-              vars:
-                type: rr
-              hosts:
-                rr7:
-                  ansible_host: 10.30.30.107
+        PE_ROUTERS:
+          hosts:
+            PE-01:
+              ansible_host: 10.92.61.97
+            PE-02:
+              ansible_host: 10.92.61.163
+            PE-03:
+              ansible_host: 10.92.61.165
+            PE-04:
+              ansible_host: 10.92.61.98
+        P_ROUTERS:
+          hosts:
+            P-01:
+              ansible_host: 10.92.61.162
+            P-02:
+              ansible_host: 10.92.61.164
+
+    CPE_ROUTERS:
+      hosts:
+        CPE-01:
+          ansible_host: 10.92.61.157
+        CPE-02:
+          ansible_host: 10.92.61.156
 
     MPLS_TENANTS:
       children:
-        PE:
+        PE_ROUTERS:
 
     MPLS_ENDPOINT_CONNECTIONS:
       children:
-        PE:
+        PE_ROUTERS:
+
+    EOS:
+      children:
+        PE_ROUTERS:
+        P_ROUTERS:
+        CPE_ROUTERS:

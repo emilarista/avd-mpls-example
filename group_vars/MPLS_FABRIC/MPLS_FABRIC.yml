@@ -1,0 +1,158 @@
+---
+# Validation lab
+# local users
+fabric_name: MPLS_FABRIC
+
+underlay_routing_protocol: isis
+isis_advertise_passive_only: true
+# Disabling ISIS hello padding makes it easier with vEOS-lab.
+isis_hello_padding: false
+isis_ti_lfa:
+  enabled: true
+  protection: link
+  local_convergence_delay: 15000
+
+# What should the defaults be?
+isis_default_is_type: level-1-2
+isis_default_circuit_type: level-1-2
+isis_default_metric: 50
+
+label_distribution:
+  # protocol: ldp
+  protocol: isis-sr # Should be the default.
+
+# ibgp should be default
+overlay_routing_protocol: ibgp
+bgp_as: 65000
+# If meshing PEs, client-to-client reflection can be turned off using rr bgp defaults.
+# bgp_mesh_pes: true
+
+# bgp peer groups passwords
+bgp_peer_groups:
+  MPLS_OVERLAY_PEERS:
+    password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
+
+internal_vlan_order:
+  allocation: ascending
+  range:
+    beginning: 3700
+    ending: 3900
+
+# Update p2p mtu
+p2p_uplinks_mtu: 1600
+
+local_users:
+  admin:
+    privilege: 15
+    role: network-admin
+    sha512_password: "someshapassword"
+
+
+# OOB Management network default gateway.
+mgmt_gateway: 10.92.61.129
+
+# dns servers.
+name_servers:
+  - 10.20.20.13
+  - 8.8.8.8
+
+# NTP Servers IP or DNS
+# First NTP server will be preferred
+# Sourced from Managment VRF
+ntp_servers:
+  - 0.se.pool.ntp.org
+  - 1.se.pool.ntp.org
+
+# Sets the administrative subfield of IP/MAC VRF Route-Distinguishers and Route-Targets
+# These are actually the defaults. No need to set anything really.
+overlay_rd_type:
+  admin_subfield: overlay_loopback
+overlay_rt_type:
+  admin_subfield: 65000
+
+# BGP max-paths and ecmp
+bgp_maximum_paths: 4
+bgp_ecmp: 4
+# evpn_ebgp_multihop: 10
+
+# EVPN prevent readvertising routes
+overlay_prevent_readvertise_to_server: true
+
+# Adjust default bfd values if desired.
+bfd_multihop:
+  interval: 5000
+  min_rx: 5000
+  multiplier: 3
+
+custom_structured_configuration_sflow:
+  sample: 40000
+  vrfs:
+    MGMT:
+      destinations:
+        "127.0.0.1":
+      source_interface: Management1
+  run: true
+
+
+connected_endpoints_keys:
+  routers:
+    type: router
+  cpes:
+    type: cpe
+
+backbone_interfaces:
+  p2p_links_ip_pools:
+    underlay_pool: 100.64.48.0/24
+  p2p_links_profiles:
+    default_bb_profile:
+      speed: 100full
+      mtu: 1500
+      isis_hello_padding: false
+      isis_metric: 60
+      ip_pool: underlay_pool
+      isis_circuit_type: level-2
+      ipv6_enable: true
+  p2p_links:
+
+    # P-01 Links
+    - nodes: [ P-01, P-02 ]
+      id: 1
+      interfaces: [ Ethernet25/1, Ethernet25/1 ]
+      profile: default_bb_profile
+    - nodes: [ P-01, PE-01 ]
+      id: 2
+      interfaces: [ Ethernet1/1, Ethernet1/1 ]
+      profile: default_bb_profile
+    - nodes: [ P-01, PE-02 ]
+      id: 3
+      interfaces: [ Ethernet2/1, Ethernet50/1 ]
+      profile: default_bb_profile
+    - nodes: [ P-01, PE-03 ]
+      id: 4
+      interfaces: [ Ethernet26/1, Ethernet55/1 ]
+      profile: default_bb_profile
+
+    # P-02 Links
+    - nodes: [ P-02, PE-02 ]
+      id: 5
+      interfaces: [ Ethernet26/1, Ethernet55/1 ]
+      profile: default_bb_profile
+    - nodes: [ P-02, PE-03 ]
+      id: 6
+      interfaces: [ Ethernet4/1, Ethernet50/1 ]
+      profile: default_bb_profile
+    - nodes: [ P-02, PE-04 ]
+      id: 7
+      interfaces: [ Ethernet1/1, Ethernet1/1 ]
+      profile: default_bb_profile
+    - nodes: [ P-02, PE-04 ]
+      id: 7
+      interfaces: [ Ethernet2/1, Ethernet2/1 ]
+      profile: default_bb_profile
+
+    # PE-01 Links
+    - nodes: [ PE-01, PE-02 ]
+      id: 8
+      interfaces: [ Ethernet2/1, Ethernet49/1 ]
+      profile: default_bb_profile
+

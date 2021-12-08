@@ -1,0 +1,11 @@
+CVP_CONFIGLETS: {}
+CVP_TOPOLOGY:
+  MPLS_FABRIC:
+    parent_container: Tenant
+  PE_ROUTERS:
+    devices: []
+    parent_container: MPLS_FABRIC
+  P_ROUTERS:
+    devices: []
+    parent_container: MPLS_FABRIC
+changed: false

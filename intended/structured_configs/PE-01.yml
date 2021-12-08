@@ -254,10 +254,6 @@ router_bfd:
     interval: 300
     min_rx: 300
     multiplier: 3
-vlans:
-  10:
-    tenant: TENANT_A
-    name: TENANT_A_L2_SERVICE
 ip_igmp_snooping:
   globally_enabled: true
 patch_panel:

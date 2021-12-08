@@ -28,9 +28,9 @@ tenants:
             mtu: 9000
             ip_addresses: [ 10.10.200.2/24 ]
             nodes: [ PE-04 ]
-    l2vlans:
-      10:
-        name: TENANT_A_L2_SERVICE
-        tags:
-          - site1
-          - site2
+    # l2vlans:
+    #   10:
+    #     name: TENANT_A_L2_SERVICE
+    #     tags:
+    #       - site1
+    #       - site2

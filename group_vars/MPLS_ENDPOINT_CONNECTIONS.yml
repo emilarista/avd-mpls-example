@@ -10,13 +10,13 @@ cpes:
   CPE-1:
     adapters:
     - profile: TENANT_A_WAN_SERVICE_10
-      endpoint_ports: [ Ethernet1, Ethernet2 ]
-      switch_ports: [ Ethernet5/2, Ethernet52/2 ]
-      switches: [ PE-01, PE-02 ]
+      endpoint_ports: [ Ethernet2 ]
+      switch_ports: [ Ethernet52/2 ]
+      switches: [ PE-02 ]
   CPE-2:
     adapters:
     - profile: TENANT_A_WAN_SERVICE_10
-      endpoint_ports: [ Ethernet33, Ethernet34 ]
-      switch_ports: [ Ethernet51/3, Ethernet5/3 ]
-      switches: [ PE-03, PE-04 ]
+      endpoint_ports: [ Ethernet34 ]
+      switch_ports: [ Ethernet5/3 ]
+      switches: [ PE-04 ]
 

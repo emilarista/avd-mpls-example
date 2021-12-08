@@ -10,7 +10,7 @@ backbone_interfaces:
       speed: "forced 40gfull"
       mtu: 9000
       isis_hello_padding: true
-      isis_metric: 50
+      isis_metric: 10
       ip_pool: underlay_pool
       isis_circuit_type: level-1-2
       ipv6_enable: true

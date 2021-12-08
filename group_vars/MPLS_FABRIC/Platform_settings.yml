@@ -1,12 +1,14 @@
 ---
 platform_settings:
-  - platforms: [ jericho ]
+  - platforms: [ 7280QR-C36-M ]
     tcam_profile: mpls-evpn
-  - platforms: [ jericho2 ]
+  - platforms: [ 7280SR3K-48YC8 ]
+    tcam_profile: vxlan-routing
+  - platforms: [ 7280CR3K-32D4 ]
     tcam_profile: vxlan-routing
 
 # Set Hardware Speed Groups per Platform
-# platform_speed_groups:
-#   < platform >:
-#     < speed >: [ < speed_group >, < speed_group > ]
+platform_speed_groups:
+  7280CR3K-32D4:
+    10g: [ 1, 2, 3, 4, 5 ]
 

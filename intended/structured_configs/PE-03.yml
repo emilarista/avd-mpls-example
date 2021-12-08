@@ -149,7 +149,7 @@ ethernet_interfaces:
     speed: forced 40gfull
     ipv6_enable: true
     isis_enable: MPLS_UNDERLAY
-    isis_metric: 50
+    isis_metric: 10
     isis_network_point_to_point: true
     isis_hello_padding: true
     isis_circuit_type: level-1-2
@@ -167,22 +167,12 @@ ethernet_interfaces:
     speed: forced 100gfull
     ipv6_enable: true
     isis_enable: MPLS_UNDERLAY
-    isis_metric: 50
+    isis_metric: 10
     isis_network_point_to_point: true
     isis_hello_padding: true
     isis_circuit_type: level-1-2
     mpls:
       ip: true
-  Ethernet51/3:
-    peer: CPE-2
-    peer_interface: Ethernet33
-    peer_type: cpe
-    description: CPE-2_Ethernet33
-    type: switched
-    shutdown: false
-    mode: access
-    vlans: 10
-    spanning_tree_portfast: edge
 router_bfd:
   multihop:
     interval: 300

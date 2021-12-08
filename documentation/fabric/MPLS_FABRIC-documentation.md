@@ -18,12 +18,12 @@
 
 | POD | Type | Node | Management IP | Platform | Provisioned in CloudVision |
 | --- | ---- | ---- | ------------- | -------- | -------------------------- |
-| MPLS_FABRIC | rr | P-01 | 10.92.61.162/26 | jericho | Provisioned |
-| MPLS_FABRIC | rr | P-02 | 10.92.61.164/26 | jericho | Provisioned |
-| MPLS_FABRIC | pe | PE-01 | 10.92.61.97/26 | jericho2 | Provisioned |
-| MPLS_FABRIC | pe | PE-02 | 10.92.61.163/26 | jericho2 | Provisioned |
-| MPLS_FABRIC | pe | PE-03 | 10.92.61.165/26 | jericho2 | Provisioned |
-| MPLS_FABRIC | pe | PE-04 | 10.92.61.98/26 | jericho2 | Provisioned |
+| MPLS_FABRIC | rr | P-01 | 10.92.61.162/26 | 7280QR-C36-M | Provisioned |
+| MPLS_FABRIC | rr | P-02 | 10.92.61.164/26 | 7280QR-C36-M | Provisioned |
+| MPLS_FABRIC | pe | PE-01 | 10.92.61.97/26 | 7280CR3K-32D4 | Provisioned |
+| MPLS_FABRIC | pe | PE-02 | 10.92.61.163/26 | 7280SR3K-48YC8 | Provisioned |
+| MPLS_FABRIC | pe | PE-03 | 10.92.61.165/26 | 7280SR3K-48YC8 | Provisioned |
+| MPLS_FABRIC | pe | PE-04 | 10.92.61.98/26 | 7280CR3K-32D4 | Provisioned |
 
 > Provision status is based on Ansible inventory declaration and do not represent real status from CloudVision.
 

@@ -53,6 +53,18 @@ static_routes:
 service_routing_protocols_model: multi-agent
 ip_routing: true
 ipv6_unicast_routing: true
+hardware:
+  speed_groups:
+    1:
+      serdes: 10g
+    2:
+      serdes: 10g
+    3:
+      serdes: 10g
+    4:
+      serdes: 10g
+    5:
+      serdes: 10g
 vlan_internal_order:
   allocation: ascending
   range:
@@ -149,7 +161,7 @@ ethernet_interfaces:
     speed: forced 40gfull
     ipv6_enable: true
     isis_enable: MPLS_UNDERLAY
-    isis_metric: 50
+    isis_metric: 10
     isis_network_point_to_point: true
     isis_hello_padding: true
     isis_circuit_type: level-1-2
@@ -167,22 +179,12 @@ ethernet_interfaces:
     speed: forced 40gfull
     ipv6_enable: true
     isis_enable: MPLS_UNDERLAY
-    isis_metric: 50
+    isis_metric: 10
     isis_network_point_to_point: true
     isis_hello_padding: true
     isis_circuit_type: level-1-2
     mpls:
       ip: true
-  Ethernet5/2:
-    peer: CPE-1
-    peer_interface: Ethernet1
-    peer_type: cpe
-    description: CPE-1_Ethernet1
-    type: switched
-    shutdown: false
-    mode: access
-    vlans: 10
-    spanning_tree_portfast: edge
 router_bfd:
   multihop:
     interval: 300

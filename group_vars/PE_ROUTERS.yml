@@ -3,7 +3,6 @@ type: pe
 pe:
   defaults:
     virtual_router_mac_address: 00:1c:73:00:dc:00
-    platform: jericho2
     loopback_ipv4_pool: 100.70.0.0/24
     loopback_ipv6_pool: "2000:1234:ffff:ffff::/64"
     # node_sid_base: 10
@@ -32,9 +31,11 @@ pe:
       nodes:
         PE-01:
           id: 1
+          platform: 7280CR3K-32D4
           mgmt_ip: 10.92.61.97/26
         PE-02:
           id: 2
+          platform: 7280SR3K-48YC8
           mgmt_ip: 10.92.61.163/26
     SITE_2:
       filter:
@@ -43,7 +44,9 @@ pe:
       nodes:
         PE-03:
           id: 3
+          platform: 7280SR3K-48YC8
           mgmt_ip: 10.92.61.165/26
         PE-04:
           id: 4
+          platform: 7280CR3K-32D4
           mgmt_ip: 10.92.61.98/26

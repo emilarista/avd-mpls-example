@@ -2,8 +2,8 @@ type: rr
 
 # RR Routers
 rr:
-  platform: jericho
   defaults:
+    platform: jericho
     loopback_ipv4_pool: 100.70.0.0/24
     loopback_ipv6_pool: "2000:1234:ffff:ffff::/64"
     is_type: level-1-2

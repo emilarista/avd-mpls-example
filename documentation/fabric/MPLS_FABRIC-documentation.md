@@ -18,8 +18,8 @@
 
 | POD | Type | Node | Management IP | Platform | Provisioned in CloudVision |
 | --- | ---- | ---- | ------------- | -------- | -------------------------- |
-| MPLS_FABRIC | rr | P-01 | 10.92.61.162/26 | - | Provisioned |
-| MPLS_FABRIC | rr | P-02 | 10.92.61.164/26 | - | Provisioned |
+| MPLS_FABRIC | rr | P-01 | 10.92.61.162/26 | jericho | Provisioned |
+| MPLS_FABRIC | rr | P-02 | 10.92.61.164/26 | jericho | Provisioned |
 | MPLS_FABRIC | pe | PE-01 | 10.92.61.97/26 | jericho2 | Provisioned |
 | MPLS_FABRIC | pe | PE-02 | 10.92.61.163/26 | jericho2 | Provisioned |
 | MPLS_FABRIC | pe | PE-03 | 10.92.61.165/26 | jericho2 | Provisioned |

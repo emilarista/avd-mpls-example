@@ -94,6 +94,8 @@ management_interfaces:
     ip_address: 10.92.61.164/26
     gateway: 10.92.61.129
     type: oob
+tcam_profile:
+  system: mpls-evpn
 management_api_http:
   enable_vrfs:
     mgmt: {}

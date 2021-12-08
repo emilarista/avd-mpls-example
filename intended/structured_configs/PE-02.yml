@@ -46,33 +46,6 @@ router_bgp:
     100.70.0.6:
       peer_group: MPLS-OVERLAY-PEERS
       description: P-02
-  vlans:
-    10:
-      tenant: TENANT_A
-      rd: 100.70.0.2:10010
-      route_targets:
-        both:
-        - 65000:10010
-      redistribute_routes:
-      - learned
-  vrfs:
-    TENANT_A_WAN:
-      router_id: 100.70.0.2
-      rd: 100.70.0.2:10
-      route_targets:
-        import:
-          evpn:
-          - '65000:10'
-        export:
-          evpn:
-          - '65000:10'
-      redistribute_routes:
-      - connected
-  vpws:
-  - name: TENANT_A
-    rd: 100.70.0.2:1000
-    route_targets:
-      import_export: 65000:1000
 static_routes:
 - vrf: mgmt
   destination_address_prefix: 0.0.0.0/0

@@ -47,7 +47,7 @@ router_bgp:
     100.70.0.3:
       peer_group: MPLS-OVERLAY-PEERS
       description: PE-03
-    100.70.0.4:
+    100.70.0.5:
       peer_group: MPLS-OVERLAY-PEERS
       description: PE-04
 static_routes:

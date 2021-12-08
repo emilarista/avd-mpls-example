@@ -47,6 +47,6 @@ pe:
           platform: 7280SR3K-48YC8
           mgmt_ip: 10.92.61.165/26
         PE-04:
-          id: 4
+          id: 5
           platform: 7280CR3K-32D4
           mgmt_ip: 10.92.61.98/26

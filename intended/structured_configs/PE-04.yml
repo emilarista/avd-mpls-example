@@ -1,6 +1,6 @@
 router_bgp:
   as: '65000'
-  router_id: 100.70.0.4
+  router_id: 100.70.0.5
   bgp_defaults:
   - no bgp default ipv4-unicast
   - distance bgp 20 200 200
@@ -48,8 +48,8 @@ router_bgp:
       description: P-02
   vrfs:
     TENANT_A_WAN:
-      router_id: 100.70.0.4
-      rd: 100.70.0.4:10
+      router_id: 100.70.0.5
+      rd: 100.70.0.5:10
       route_targets:
         import:
           evpn:
@@ -61,7 +61,7 @@ router_bgp:
       - connected
   vpws:
   - name: TENANT_A
-    rd: 100.70.0.4:1000
+    rd: 100.70.0.5:1000
     route_targets:
       import_export: 65000:1000
 static_routes:
@@ -137,14 +137,14 @@ loopback_interfaces:
   Loopback0:
     description: Overlay_Peering
     shutdown: false
-    ip_address: 100.70.0.4/32
-    ipv6_address: 2000:1234:ffff:ffff::4/128
+    ip_address: 100.70.0.5/32
+    ipv6_address: 2000:1234:ffff:ffff::5/128
     isis_enable: MPLS_UNDERLAY
     isis_passive: true
     mpls:
       ip: true
     node_segment:
-      index: 204
+      index: 205
       ipv4: true
       ipv6: true
 mpls:
@@ -152,8 +152,8 @@ mpls:
 router_isis:
   instance: MPLS_UNDERLAY
   log_adjacency_changes: true
-  net: 49.0001.0000.0001.0004.00
-  router_id: 100.70.0.4
+  net: 49.0001.0000.0001.0005.00
+  router_id: 100.70.0.5
   is_type: level-1-2
   advertise_passive_only: true
   timers:
@@ -167,7 +167,7 @@ router_isis:
   - maximum-paths 4
   - fast-reroute ti-lfa mode link-protection
   segment_routing_mpls:
-    router_id: 100.70.0.4
+    router_id: 100.70.0.5
     enabled: true
 ethernet_interfaces:
   Ethernet1/1:

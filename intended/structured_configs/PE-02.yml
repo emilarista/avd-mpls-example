@@ -68,6 +68,11 @@ router_bgp:
         - 65000:10010
       redistribute_routes:
       - learned
+  vpws:
+  - name: TENANT_A
+    rd: 100.70.0.2:1000
+    route_targets:
+      import_export: 65000:1000
 static_routes:
 - vrf: mgmt
   destination_address_prefix: 0.0.0.0/0

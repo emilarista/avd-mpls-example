@@ -1,17 +1,17 @@
 tenants:
   TENANT_A:
     l1_services:
-      - name: TEN_A_site2_site5_eline
+      - name: TEN_A_site1_site2_eline
         type: vpws-pseudowire  # Should be default
-        ids: [25, 57 ]
+        ids: [52, 513 ]
         nodes: ["PE-01", "PE-03"]
         interfaces: ["Ethernet5/2", "Ethernet51/3"]
-    l2vlans:
-      10:
-        name: TENANT_A_L2_SERVICE
-        tags:
-          - site1-2
-          - site5
+    # l2vlans:
+    #   10:
+    #     name: TENANT_A_L2_SERVICE
+    #     tags:
+    #       - site1
+    #       - site2
     mac_vrf_rt_base: 10000
     pw_rt_base: 1000
     vrfs:
@@ -24,67 +24,68 @@ tenants:
     l2vlans: {}
     mac_vrf_rt_base: 20000
     vrfs:
-      TENANT_B_WAN:
-        # redistribute_ospf: true should default to true if there is ospf defined in the vrf.
-          # nodes:
-        ospf:
-          enabled: true
-          process_id: 99      # defaults to vrf RT number
-          router_id: 1.2.3.4  # defaults to switch.router_id
-          address_families: ["ipv4"] # defaults to ["ipv4"]
-          bfd: true           # implicit default is false
-          max_lsa: 10000      # omitted if not defined
-          nodes:
-            - pe3
-        address_families:
-          - vpn-ipv4
-        l3_interfaces:
-        - description: TENANT_B_SITE_3
-          enabled: true
-          interfaces:
-          - Ethernet5
-          ip_addresses:
-          - 192.168.48.0/31
-          nodes:
-          - pe3
-        - description: TENANT_B_SITE_3_OSPF
-          enabled: true
-          ospf:
-            enabled: true
-            p2p: true
-            area: 0
-            cost: 10
-            # autentication: "simple"
-            # simple_auth_key: "something"
-          interfaces:
-          - Ethernet6
-          ip_addresses:
-          - 192.168.48.4/31
-          nodes:
-          - pe3
-        - description: TENANT_B_SITE_5
-          enabled: true
-          interfaces:
-          - Ethernet6
-          ip_addresses:
-          - 192.168.48.2/31
-          nodes:
-          - pe5
-        bgp_peers:
-          192.168.48.1:
-            description: TENANT_B_CPE_SITE3
-            # ebgp_multihop: 1
-            nodes:
-            - pe3
-            password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
-            remote_as: "65201"
-            # send_community: all
-          192.168.48.3:
-            description: TENANT_B_CPE_SITE5
-            # ebgp_multihop: 1
-            nodes:
-            - pe5
-            password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
-            remote_as: "65202"
-            # send_community: all
-        vrf_rt: 20
+      # TENANT_B_WAN:
+      #   # redistribute_ospf: true should default to true if there is ospf defined in the vrf.
+      #     # nodes:
+      #   ospf:
+      #     enabled: true
+      #     process_id: 99      # defaults to vrf RT number
+      #     router_id: 1.2.3.4  # defaults to switch.router_id
+      #     address_families: ["ipv4"] # defaults to ["ipv4"]
+      #     bfd: true           # implicit default is false
+      #     max_lsa: 10000      # omitted if not defined
+      #     nodes:
+      #       - PE-02
+      #       - PE-04
+      #   address_families:
+      #     - vpn-ipv4
+      #   l3_interfaces:
+      #   # - description: TENANT_B_SITE_1
+      #   #   enabled: true
+      #   #   interfaces:
+      #   #   - Ethernet5
+      #   #   ip_addresses:
+      #   #   - 192.168.48.0/31
+      #   #   nodes:
+      #   #   - pe3
+      #   - description: TENANT_B_SITE_1_OSPF
+      #     enabled: true
+      #     ospf:
+      #       enabled: true
+      #       p2p: true
+      #       area: 0
+      #       cost: 10
+      #       # autentication: "simple"
+      #       # simple_auth_key: "something"
+      #     interfaces:
+      #     - Ethernet52/2
+      #     ip_addresses:
+      #     - 10.10.100.1/24
+      #     nodes:
+      #     - pe3
+      #   - description: TENANT_B_SITE_5
+      #     enabled: true
+      #     interfaces:
+      #     - Ethernet6
+      #     ip_addresses:
+      #     - 192.168.48.2/31
+      #     nodes:
+      #     - pe5
+      #   bgp_peers:
+      #     192.168.48.1:
+      #       description: TENANT_B_CPE_SITE3
+      #       # ebgp_multihop: 1
+      #       nodes:
+      #       - pe3
+      #       password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
+      #       remote_as: "65201"
+      #       # send_community: all
+      #     192.168.48.3:
+      #       description: TENANT_B_CPE_SITE5
+      #       # ebgp_multihop: 1
+      #       nodes:
+      #       - pe5
+      #       password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
+      #       remote_as: "65202"
+      #       # send_community: all
+      #   vrf_rt: 20

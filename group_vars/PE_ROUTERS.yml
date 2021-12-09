@@ -39,7 +39,7 @@ pe:
         tags: [ site2 ]
       nodes:
         PE-03:
-          id: 8
+          id: 3
           platform: 7280SR3K-48YC8
           mgmt_ip: 10.92.61.165/26
         PE-04:

@@ -5,7 +5,6 @@ rr:
   defaults:
     platform: 7280QR-C36-M
     loopback_ipv4_pool: 100.70.0.0/24
-    loopback_ipv6_pool: "2000:1234:ffff:ffff::/64"
     is_type: level-1-2
     node_sid_base: 300
     isis_system_id_prefix: '0000.0000'
@@ -15,7 +14,6 @@ rr:
       - 'graceful-restart restart-time 300'
       - 'graceful-restart'
       - 'bgp route-reflector preserve-attributes always'
-      # - 'no bgp client-to-client reflection' # If meshing PEs, client-to-client reflection can be turned off
     raw_eos_cli: |
       management security
          password encryption-key common

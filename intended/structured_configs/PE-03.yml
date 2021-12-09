@@ -105,7 +105,6 @@ loopback_interfaces:
     description: Overlay_Peering
     shutdown: false
     ip_address: 100.70.0.3/32
-    ipv6_address: 2000:1234:ffff:ffff::3/128
     isis_enable: MPLS_UNDERLAY
     isis_passive: true
     mpls:
@@ -113,7 +112,6 @@ loopback_interfaces:
     node_segment:
       index: 203
       ipv4: true
-      ipv6: true
 mpls:
   ip: true
 router_isis:
@@ -129,7 +127,6 @@ router_isis:
       protected_prefixes: true
   address_family:
   - ipv4 unicast
-  - ipv6 unicast
   isis_af_defaults:
   - maximum-paths 4
   - fast-reroute ti-lfa mode link-protection

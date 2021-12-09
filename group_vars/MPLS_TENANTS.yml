@@ -17,11 +17,17 @@ tenants:
     vrfs:
       TENANT_A_WAN:
         address_families:
-          - evpn
+          - vpn-ipv4
         svis: {}
         vrf_rt: 10
   TENANT_B:
-    l2vlans: {}
+    l2vlans:
+      20:
+        name: TENANT_B_L2_SERVICE
+        tags:
+          - site1-2
+          - site5
+          - site3
     mac_vrf_rt_base: 20000
     vrfs:
       TENANT_B_WAN:

@@ -46,28 +46,6 @@ router_bgp:
     100.70.0.6:
       peer_group: MPLS-OVERLAY-PEERS
       description: P-02
-  vrfs:
-    TENANT_A_WAN:
-      router_id: 100.70.0.1
-      rd: 100.70.0.1:10
-      route_targets:
-        import:
-          evpn:
-          - '65000:10'
-        export:
-          evpn:
-          - '65000:10'
-      redistribute_routes:
-      - connected
-  vpws:
-  - name: TENANT_A
-    rd: 100.70.0.1:1000
-    route_targets:
-      import_export: 65000:1000
-    pseudowires:
-    - name: TEN_A_site1_site2_eline
-      id_local: 52
-      id_remote: 513
 static_routes:
 - vrf: mgmt
   destination_address_prefix: 0.0.0.0/0
@@ -119,9 +97,6 @@ local_users:
 vrfs:
   mgmt:
     ip_routing: false
-  TENANT_A_WAN:
-    tenant: TENANT_A
-    ip_routing: true
 management_interfaces:
   Management1:
     description: oob_management
@@ -210,25 +185,6 @@ ethernet_interfaces:
     isis_circuit_type: level-1-2
     mpls:
       ip: true
-  Ethernet5/2.100:
-    type: l3dot1q
-    encapsulation_dot1q_vlan: 100
-    peer_type: l3_interface
-    vrf: TENANT_A_WAN
-    ip_address: 10.10.100.2/24
-    mtu: 9000
-    shutdown: false
-    description: L3vpn service, vlan 100
-  Ethernet5/2.10:
-    type: l2dot1q
-    encapsulation_vlan:
-      client_dot1q: 10
-    peer_type: l3_interface
-    shutdown: false
-  Ethernet5/2:
-    type: routed
-    peer_type: l3_interface
-    shutdown: false
   Ethernet5/1:
     speed: forced 10000full
     type: switched
@@ -240,15 +196,5 @@ router_bfd:
     multiplier: 3
 ip_igmp_snooping:
   globally_enabled: true
-patch_panel:
-  patches:
-  - name: TEN_A_site1_site2_eline
-    enabled: true
-    connectors:
-    - id: 1
-      type: interface
-      endpoint: Ethernet5/2.10
-    - id: 2
-      type: pseudowire
-      endpoint: bgp vpws TENANT_A pseudowire TEN_A_site1_site2_eline
+patch_panel: {}
 ip_virtual_router_mac_address: 00:1c:73:00:dc:00

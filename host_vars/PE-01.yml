@@ -6,3 +6,7 @@ custom_structured_configuration_ethernet_interfaces:
     speed: forced 10000full
     type: switched
     shutdown: false
+
+custom_structured_configuration_vrfs:
+  TENANT_A_WAN:
+    ip_routing: true

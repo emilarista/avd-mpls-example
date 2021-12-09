@@ -57,8 +57,21 @@ router_bgp:
         export:
           evpn:
           - '65000:10'
+      neighbors:
+        10.10.200.1:
+          description: CPE-02
+          remote_as: 65005
+          password: $1c$/ei4LgYRVQVyaE3DDcjbXw==
+          send_community: standard
+          default_originate:
+            always: true
       redistribute_routes:
       - connected
+      address_families:
+        ipv4:
+          neighbors:
+            10.10.200.1:
+              activate: true
   vpws:
   - name: TENANT_A
     rd: 100.70.0.4:1000

@@ -28,3 +28,36 @@ tenants:
             mtu: 9000
             ip_addresses: [ 10.10.200.2/24 ]
             nodes: [ PE-04 ]
+        bgp_peers:
+          10.10.100.1:
+            description: CPE-01
+            remote_as: 65002
+            # password is sptfd
+            password: $1c$/ei4LgYRVQVyaE3DDcjbXw==
+            send_community: standard
+            nodes: [ PE-01 ]
+            default_originate:
+              always: true
+          10.10.200.1:
+            description: CPE-02
+            remote_as: 65006
+            # password is sptfd
+            password: $1c$/ei4LgYRVQVyaE3DDcjbXw==
+            send_community: standard
+            nodes: [ PE-01 ]
+            default_originate:
+              always: true
+            # next_hop_self: < true | false >
+            # maximum_routes: < 0-4294967294 >
+            # update_source: < interface >
+            # ebgp_multihop: < 1-255 >
+            # Nodes is required to restrict configuration of BGP neighbors to certain nodes in the network.
+            # Next hop settings can be either ipv4 or ipv6 for one neighbor, this will be applied by a uniquely generated route-map per neighbor.
+            # Next hop takes precedence over route_map_out.
+            # set_ipv4_next_hop: < IPv4_address >
+            # set_ipv6_next_hop: < IPv6_address >
+            # route_map_out: < route-map name >
+            # route_map_in: < route-map name >
+            # local_as: < local BGP ASN >
+            # weight: < 0-65535>
+

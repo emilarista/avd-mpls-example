@@ -28,8 +28,15 @@ name_servers:
 
 dns_domain: sjc.aristanetworks.com
 
-ntp_servers:
-  - 172.22.22.50
+ntp:
+  local_interface:
+    name: "{{ mgmt_interface }}"
+    vrf: "{{ mgmt_interface_vrf }}"
+  servers:
+  - name: 172.22.22.50
+    preferred: True
+    vrf: "{{ mgmt_interface_vrf }}"
+
 
 # internal_vlan_order:
 #   allocation: ascending

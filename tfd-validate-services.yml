@@ -1,4 +1,6 @@
-# IP Reachability tests
+---
+
+# VPN Services tests
 
 - name: Validate PE-01 VPN Services
   hosts: PE-01
@@ -11,12 +13,17 @@
       loop:
         - "show patch panel detail"
         - "show ip route vrf TENANT_A_WAN"
+        - "show ip bgp summary vrf TENANT_A_WAN"
       ignore_errors: true
       register: PE_01_state
 
     - name: show output
       debug:
-        msg: "{{ PE_01_state.results }}"
+        msg: "{{ item }}"
+      loop:
+        - "{{ PE_01_state.results[0].stdout_lines }}"
+        - "{{ PE_01_state.results[1].stdout_lines }}"
+        - "{{ PE_01_state.results[2].stdout_lines }}"
 
 - name: Validate PE-04 VPN Services
   hosts: PE-04
@@ -29,13 +36,17 @@
       loop:
         - "show patch panel detail"
         - "show ip route vrf TENANT_A_WAN"
+        - "show ip bgp summary vrf TENANT_A_WAN"
       ignore_errors: true
-      register: PE_01_state
+      register: PE_04_state
 
     - name: show output
       debug:
-        msg: "{{ PE_01_state.results }}"
-
+        msg: "{{ item }}"
+      loop:
+        - "{{ PE_04_state.results[0].stdout_lines }}"
+        - "{{ PE_04_state.results[1].stdout_lines }}"
+        - "{{ PE_04_state.results[2].stdout_lines }}"
 
 
 - name: Validate CPE-01 VPN Services

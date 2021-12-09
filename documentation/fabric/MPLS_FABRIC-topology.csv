@@ -11,6 +11,8 @@ rr,P-02,Ethernet26/1,pe,PE-02,Ethernet55/1
 pe,PE-01,Ethernet1/1,rr,P-01,Ethernet1/1
 pe,PE-01,Ethernet2/1,pe,PE-02,Ethernet49/1
 pe,PE-01,Ethernet5/1,,,
+pe,PE-01,Ethernet5/2,l3_interface,,
+pe,PE-01,Ethernet5/2.10,l3_interface,,
 pe,PE-02,Ethernet49/1,pe,PE-01,Ethernet2/1
 pe,PE-02,Ethernet50/1,rr,P-01,Ethernet2/1
 pe,PE-02,Ethernet52/1,,,
@@ -20,3 +22,5 @@ pe,PE-03,Ethernet55/1,rr,P-01,Ethernet26/1
 pe,PE-04,Ethernet1/1,rr,P-02,Ethernet1/1
 pe,PE-04,Ethernet2/1,rr,P-02,Ethernet2/1
 pe,PE-04,Ethernet5/1,,,
+pe,PE-04,Ethernet5/3,l3_interface,,
+pe,PE-04,Ethernet5/3.10,l3_interface,,

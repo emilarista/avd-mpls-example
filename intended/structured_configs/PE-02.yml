@@ -40,10 +40,10 @@ router_bgp:
       MPLS-OVERLAY-PEERS:
         activate: true
   neighbors:
-    100.70.0.5:
+    100.70.0.11:
       peer_group: MPLS-OVERLAY-PEERS
       description: P-01
-    100.70.0.6:
+    100.70.0.12:
       peer_group: MPLS-OVERLAY-PEERS
       description: P-02
 static_routes:

@@ -22,8 +22,8 @@ rr:
       bgp_cluster_id: 100.70.0.5
       nodes:
         P-01:
-          id: 5
+          id: 11
           mgmt_ip: 10.92.61.162/26
         P-02:
-          id: 6
+          id: 12
           mgmt_ip: 10.92.61.164/26

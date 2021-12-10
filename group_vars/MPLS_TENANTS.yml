@@ -3,9 +3,9 @@ tenants:
     l1_services:
       - name: TEN_A_site2_site5_eline
         type: vpws-pseudowire  # Should be default
-        ids: [25, 57 ]
+        ids: [26200, 57200 ]
         nodes: ["pe2", "pe5"]
-        interfaces: ["Ethernet7", "Ethernet7"]
+        interfaces: ["Ethernet6.200", "Ethernet7.200"]
     l2vlans:
       10:
         name: TENANT_A_L2_SERVICE
@@ -14,23 +14,55 @@ tenants:
           - site5
     mac_vrf_rt_base: 10000
     pw_rt_base: 1000
-    vrfs:
-      TENANT_A_WAN:
-        address_families:
-          - vpn-ipv4
-        svis: {}
-        vrf_rt: 10
   TENANT_B:
-    l2vlans:
-      20:
-        name: TENANT_B_L2_SERVICE
-        tags:
-          - site1-2
-          - site5
-          - site3
+    l1_services:
+      - name: TEN_B_site3_site5_eline
+        type: vpws-pseudowire  # Should be default
+        ids: [35200, 56200 ]
+        nodes: ["pe3", "pe5"]
+        interfaces: ["Ethernet5.200", "Ethernet6.200"]
     mac_vrf_rt_base: 20000
     vrfs:
+      TENANT_B_INTRA:
+        vrf_rt: 19
+        ospf:
+          enabled: true
+          # process_id: 19 - Should default to vrf rt number
+          router_id: 123.1.1.0
+          max_lsa: 10000
+          nodes:
+            - pe3
+        l3_interfaces:
+          - description: TENANT_B_SITE_3_INTRA_L3VPN
+            enabled: true
+            interfaces:
+            - Ethernet6.10
+            ip_addresses:
+            - 123.1.1.0/31
+            nodes:
+            - pe3
+            ospf:
+              enabled: true
+              p2p: true
+              area: 0
+              cost: 10
+          - description: TENANT_B_SITE_5_INTRA_L3VPN
+            enabled: true
+            interfaces:
+            - Ethernet6.10
+            ip_addresses:
+            - 123.1.1.2/31
+            nodes:
+            - pe5
+        static_routes:
+          - destination_address_prefix: 123.0.10.0/24
+            gateway: 123.1.1.3
+            name: TENANT_B_SITE_5_SUBNET
+            interface: Ethernet6.10
+            nodes:
+              - pe5
       TENANT_B_WAN:
+        vrf_rt: 20
         # redistribute_ospf: true should default to true if there is ospf defined in the vrf.
           # nodes:
         ospf:
@@ -48,13 +80,19 @@ tenants:
         - description: TENANT_B_SITE_3
           enabled: true
           interfaces:
-          - Ethernet5
+          - Ethernet5.100
           ip_addresses:
           - 192.168.48.0/31
           nodes:
           - pe3
         - description: TENANT_B_SITE_3_OSPF
           enabled: true
+          interfaces:
+          - Ethernet6.100
+          ip_addresses:
+          - 192.168.48.4/31
+          nodes:
+          - pe3
           ospf:
             enabled: true
             p2p: true
@@ -62,16 +100,10 @@ tenants:
             cost: 10
             # autentication: "simple"
             # simple_auth_key: "something"
-          interfaces:
-          - Ethernet6
-          ip_addresses:
-          - 192.168.48.4/31
-          nodes:
-          - pe3
         - description: TENANT_B_SITE_5
           enabled: true
           interfaces:
-          - Ethernet6
+          - Ethernet6.10
           ip_addresses:
           - 192.168.48.2/31
           nodes:
@@ -93,4 +125,3 @@ tenants:
             password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
             remote_as: "65202"
             # send_community: all
-        vrf_rt: 20

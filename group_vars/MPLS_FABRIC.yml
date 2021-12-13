@@ -17,9 +17,12 @@ isis_default_is_type: level-1-2
 isis_default_circuit_type: level-1-2
 isis_default_metric: 50
 
-label_distribution:
-  # protocol: ldp
-  protocol: isis-sr # Should be the default.
+isis_sr: true
+mpls_ldp: true
+
+# label_distribution:
+#   # protocol: ldp
+#   protocol: isis-sr # Should be the default.
 
 # ibgp should be default
 overlay_routing_protocol: ibgp
@@ -241,10 +244,13 @@ backbone_interfaces:
     - nodes: [ pe1, p6 ]
       id: 2
       interfaces: [ Ethernet2, Ethernet2 ]
-      profile: default_bb_profile
+      ip_pool: underlay_pool
+      speed: 100full
+      mtu: 1500
+      isis_hello_padding: true
+      isis_circuit_type: level-2
+      isis_metric: 60
       # qos_profile: someprofile
-      # mtu: 1600
-      # isis_hello_padding: true
     - nodes: [ pe1, rr7 ]
       id: 3
       interfaces: [ Ethernet3, Ethernet2 ]

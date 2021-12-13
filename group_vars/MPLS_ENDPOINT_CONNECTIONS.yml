@@ -3,7 +3,7 @@
 # Port profiles may be edited manually, but servers will be overwritten on next run.
 port_profiles:
   TENANT_A_WAN_SERVICE_10:
-    mode: access
+    mode: trunk
     vlans: 10
     spanning_tree_portfast: edge
 cpes:

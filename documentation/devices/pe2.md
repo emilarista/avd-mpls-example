@@ -246,7 +246,7 @@ vlan 10
 
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
-| Ethernet5 | CPE_TENANT_A_SITE1_Ethernet2 | *access | *10 | *- | *- | 5 |
+| Ethernet5 | CPE_TENANT_A_SITE1_Ethernet2 | *trunk | *10 | *- | *- | 5 |
 
 *Inherited from Port-Channel Interface
 
@@ -292,6 +292,8 @@ interface Ethernet1
    isis network point-to-point
    no isis hello padding
    mpls ip
+   mpls ldp interface
+   mpls ldp igp sync
 !
 interface Ethernet2
    description P2P_LINK_TO_pe3_Ethernet2
@@ -307,6 +309,8 @@ interface Ethernet2
    isis network point-to-point
    no isis hello padding
    mpls ip
+   mpls ldp interface
+   mpls ldp igp sync
 !
 interface Ethernet3
    description P2P_LINK_TO_rr8_Ethernet1
@@ -322,6 +326,8 @@ interface Ethernet3
    isis network point-to-point
    no isis hello padding
    mpls ip
+   mpls ldp interface
+   mpls ldp igp sync
 !
 interface Ethernet5
    description CPE_TENANT_A_SITE1_Ethernet2
@@ -343,7 +349,7 @@ interface Ethernet6
 
 | Interface | Description | Type | Mode | VLANs | Native VLAN | Trunk Group | LACP Fallback Timeout | LACP Fallback Mode | MLAG ID | EVPN ESI |
 | --------- | ----------- | ---- | ---- | ----- | ----------- | ------------| --------------------- | ------------------ | ------- | -------- |
-| Port-Channel5 | CPE_TENANT_A_SITE1_EVPN-A-A-PortChannel | switched | access | 10 | - | - | - | - | - | 0000:0000:0303:0202:0101 |
+| Port-Channel5 | CPE_TENANT_A_SITE1_EVPN-A-A-PortChannel | switched | trunk | 10 | - | - | - | - | - | 0000:0000:0303:0202:0101 |
 
 ### Port-Channel Interfaces Device Configuration
 
@@ -353,7 +359,8 @@ interface Port-Channel5
    description CPE_TENANT_A_SITE1_EVPN-A-A-PortChannel
    no shutdown
    switchport
-   switchport access vlan 10
+   switchport trunk allowed vlan 10
+   switchport mode trunk
    evpn ethernet-segment
       identifier 0000:0000:0303:0202:0101
       route-target import 03:03:02:02:01:01
@@ -497,6 +504,7 @@ router isis MPLS_UNDERLAY
    advertise passive-only
    router-id ipv4 100.70.0.2
    log-adjacency-changes
+   mpls ldp sync default
    timers local-convergence-delay 15000 protected-prefixes
    !
    address-family ipv4 unicast
@@ -564,7 +572,7 @@ router isis MPLS_UNDERLAY
 
 | Instance | Route-Distinguisher | Both Route-Target| Pseudowire | Local ID | Remote ID |
 | -------- | ------------------- | -----------------| ---------- | -------- | --------- |
-| TENANT_A | 100.70.0.2:1000 | 65000:1000 | TEN_A_site2_site5_eline | 25 | 57 |
+| TENANT_A | 100.70.0.2:1000 | 65000:1000 | TEN_A_site2_site5_eline_port_based | 26 | 57200 |
 
 #### Router BGP EVPN VRFs
 
@@ -600,8 +608,8 @@ router bgp 65000
       rd 100.70.0.2:1000
       route-target import export evpn 65000:1000
       !
-      pseudowire TEN_A_site2_site5_eline
-         evpn vpws id local 25 remote 57
+      pseudowire TEN_A_site2_site5_eline_port_based
+         evpn vpws id local 26 remote 57200
    !
    address-family evpn
       neighbor default encapsulation mpls next-hop-self source-interface Loopback0
@@ -646,25 +654,31 @@ router bfd
 | Setting | Value |
 | -------- | ---- |
 | MPLS IP Enabled | True |
-| LDP Enabled | False |
-| LDP Router ID | - |
-| LDP Interface Disabled Default | - |
-| LDP Transport-Address Interface | - |
+| LDP Enabled | True |
+| LDP Router ID | 100.70.0.2 |
+| LDP Interface Disabled Default | True |
+| LDP Transport-Address Interface | Loopback0 |
 
 ### MPLS and LDP Configuration
 
 ```eos
 !
 mpls ip
+!
+mpls ldp
+   interface disabled default
+   router-id 100.70.0.2
+   no shutdown
+   transport-address interface Loopback0
 ```
 
 ## MPLS Interfaces
 
 | Interface | MPLS IP Enabled | LDP Enabled | IGP Sync |
 | --------- | --------------- | ----------- | -------- |
-| Ethernet1 | True | - | - |
-| Ethernet2 | True | - | - |
-| Ethernet3 | True | - | - |
+| Ethernet1 | True | True | True |
+| Ethernet2 | True | True | True |
+| Ethernet3 | True | True | True |
 | Loopback0 | - | - | - |
 
 # Patch Panel
@@ -673,16 +687,16 @@ mpls ip
 
 | Patch Name | Enabled | Connector A Type | Connector A Endpoint | Connector B Type | Connector B Endpoint |
 | ---------- | ------- | ---------------- | -------------------- | ---------------- | -------------------- |
-| TEN_A_site2_site5_eline | True | Interface | Ethernet6 | Pseudowire | bgp vpws TENANT_A pseudowire TEN_A_site2_site5_eline |
+| TEN_A_site2_site5_eline_port_based | True | Interface | Ethernet6 | Pseudowire | bgp vpws TENANT_A pseudowire TEN_A_site2_site5_eline_port_based |
 
 ## Patch Panel Configuration
 
 ```eos
 !
 patch panel
-   patch TEN_A_site2_site5_eline
+   patch TEN_A_site2_site5_eline_port_based
       connector 1 interface Ethernet6
-      connector 2 pseudowire bgp vpws TENANT_A pseudowire TEN_A_site2_site5_eline
+      connector 2 pseudowire bgp vpws TENANT_A pseudowire TEN_A_site2_site5_eline_port_based
    !
 ```
 

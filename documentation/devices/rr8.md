@@ -256,6 +256,8 @@ interface Ethernet1
    isis network point-to-point
    no isis hello padding
    mpls ip
+   mpls ldp interface
+   mpls ldp igp sync
 !
 interface Ethernet2
    description P2P_LINK_TO_rr7_Ethernet5
@@ -271,6 +273,8 @@ interface Ethernet2
    isis network point-to-point
    no isis hello padding
    mpls ip
+   mpls ldp interface
+   mpls ldp igp sync
 ```
 
 ## Loopback Interfaces
@@ -395,6 +399,7 @@ router isis MPLS_UNDERLAY
    advertise passive-only
    router-id ipv4 100.70.0.8
    log-adjacency-changes
+   mpls ldp sync default
    timers local-convergence-delay 15000 protected-prefixes
    !
    address-family ipv4 unicast
@@ -533,24 +538,30 @@ router bfd
 | Setting | Value |
 | -------- | ---- |
 | MPLS IP Enabled | True |
-| LDP Enabled | False |
-| LDP Router ID | - |
-| LDP Interface Disabled Default | - |
-| LDP Transport-Address Interface | - |
+| LDP Enabled | True |
+| LDP Router ID | 100.70.0.8 |
+| LDP Interface Disabled Default | True |
+| LDP Transport-Address Interface | Loopback0 |
 
 ### MPLS and LDP Configuration
 
 ```eos
 !
 mpls ip
+!
+mpls ldp
+   interface disabled default
+   router-id 100.70.0.8
+   no shutdown
+   transport-address interface Loopback0
 ```
 
 ## MPLS Interfaces
 
 | Interface | MPLS IP Enabled | LDP Enabled | IGP Sync |
 | --------- | --------------- | ----------- | -------- |
-| Ethernet1 | True | - | - |
-| Ethernet2 | True | - | - |
+| Ethernet1 | True | True | True |
+| Ethernet2 | True | True | True |
 | Loopback0 | - | - | - |
 
 # Multicast

@@ -226,7 +226,6 @@ vlan internal order ascending range 3700 3900
 | VLAN ID | Name | Trunk Groups |
 | ------- | ---- | ------------ |
 | 10 | TENANT_A_L2_SERVICE | - |
-| 20 | TENANT_B_L2_SERVICE | - |
 
 ## VLANs Device Configuration
 
@@ -234,9 +233,6 @@ vlan internal order ascending range 3700 3900
 !
 vlan 10
    name TENANT_A_L2_SERVICE
-!
-vlan 20
-   name TENANT_B_L2_SERVICE
 ```
 
 # Interfaces
@@ -249,8 +245,8 @@ vlan 20
 
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
-| Ethernet5 |  CPE_TENANT_A_SITE5_eth0 | access | 10 | - | - | - |
-| Ethernet6.10 |  - | access | - | - | - | - |
+| Ethernet5 |  CPE_TENANT_A_SITE5_eth0 | trunk | 10 | - | - | - |
+| Ethernet6.200 |  - | access | - | - | - | - |
 
 *Inherited from Port-Channel Interface
 
@@ -261,7 +257,7 @@ vlan 20
 | Ethernet1 | P2P_LINK_TO_p6_Ethernet1 | routed | - | 100.64.48.20/31 | default | 1500 | false | - | - |
 | Ethernet2 | P2P_LINK_TO_p4_Ethernet2 | routed | - | 100.64.48.17/31 | default | 1500 | false | - | - |
 | Ethernet3 | P2P_LINK_TO_rr7_Ethernet3 | routed | - | unnumbered loopback0 | default | 1600 | false | - | - |
-| Ethernet6.100 | TENANT_B_SITE_3_L3VPN_SUBIF | l3dot1q | - | 123.1.2.2/31 | TENANT_B_INTRA | - | false | - | - |
+| Ethernet6.10 | TENANT_B_SITE_5 | l3dot1q | - | 192.168.48.2/31 | TENANT_B_WAN | - | false | - | - |
 
 #### IPv6
 
@@ -296,6 +292,8 @@ interface Ethernet1
    isis network point-to-point
    no isis hello padding
    mpls ip
+   mpls ldp interface
+   mpls ldp igp sync
 !
 interface Ethernet2
    description P2P_LINK_TO_p4_Ethernet2
@@ -311,6 +309,8 @@ interface Ethernet2
    isis network point-to-point
    no isis hello padding
    mpls ip
+   mpls ldp interface
+   mpls ldp igp sync
 !
 interface Ethernet3
    description P2P_LINK_TO_rr7_Ethernet3
@@ -324,13 +324,15 @@ interface Ethernet3
    isis network point-to-point
    no isis hello padding
    mpls ip
+   mpls ldp interface
+   mpls ldp igp sync
 !
 interface Ethernet5
    description CPE_TENANT_A_SITE5_eth0
    no shutdown
    switchport
-   switchport access vlan 10
-   switchport mode access
+   switchport trunk allowed vlan 10
+   switchport mode trunk
    spanning-tree portfast
 !
 interface Ethernet6
@@ -338,22 +340,16 @@ interface Ethernet6
    no switchport
 !
 interface Ethernet6.10
+   description TENANT_B_SITE_5
+   no shutdown
+   encapsulation dot1q vlan 10
+   vrf TENANT_B_WAN
+   ip address 192.168.48.2/31
+!
+interface Ethernet6.200
    no shutdown
    encapsulation vlan
-     client dot1q 10
-!
-interface Ethernet6.100
-   description TENANT_B_SITE_3_L3VPN_SUBIF
-   no shutdown
-   encapsulation dot1q vlan 100
-   vrf TENANT_B_INTRA
-   ip address 123.1.2.2/31
-!
-interface Ethernet7
-   no shutdown
-   no switchport
-   no lldp transmit
-   no lldp receive
+     client dot1q 200
 ```
 
 ## Loopback Interfaces
@@ -457,12 +453,14 @@ ipv6 unicast-routing
 | VRF | Destination Prefix | Next Hop IP             | Exit interface      | Administrative Distance       | Tag               | Route Name                    | Metric         |
 | --- | ------------------ | ----------------------- | ------------------- | ----------------------------- | ----------------- | ----------------------------- | -------------- |
 | MGMT  | 0.0.0.0/0 |  10.30.30.1  |  -  |  1  |  -  |  -  |  - |
+| TENANT_B_INTRA  | 123.0.10.0/24 |  123.1.1.3  |  Ethernet6.10  |  1  |  -  |  TENANT_B_SITE_5_SUBNET  |  - |
 
 ### Static Routes Device Configuration
 
 ```eos
 !
 ip route vrf MGMT 0.0.0.0/0 10.30.30.1
+ip route vrf TENANT_B_INTRA 123.0.10.0/24 Ethernet6.10 123.1.1.3 name TENANT_B_SITE_5_SUBNET
 ```
 
 ## Router ISIS
@@ -498,6 +496,7 @@ router isis MPLS_UNDERLAY
    advertise passive-only
    router-id ipv4 100.70.0.5
    log-adjacency-changes
+   mpls ldp sync default
    timers local-convergence-delay 15000 protected-prefixes
    !
    address-family ipv4 unicast
@@ -544,7 +543,6 @@ router isis MPLS_UNDERLAY
 | -------- | --------- | --- | -------------- | -------------- |
 | 100.70.0.7 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS |
 | 100.70.0.8 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS |
-| 123.1.1.3 | 65202 | TENANT_B_INTRA | - | - |
 | 192.168.48.3 | 65202 | TENANT_B_WAN | - | - |
 
 ### Router BGP EVPN Address Family
@@ -562,19 +560,17 @@ router isis MPLS_UNDERLAY
 | VLAN | Route-Distinguisher | Both Route-Target | Import Route Target | Export Route-Target | Redistribute |
 | ---- | ------------------- | ----------------- | ------------------- | ------------------- | ------------ |
 | 10 | 100.70.0.5:10010 | 65000:10010 | - | - | learned |
-| 20 | 100.70.0.5:20020 | 65000:20020 | - | - | learned |
 
 #### Router BGP VPWS Instances
 
 | Instance | Route-Distinguisher | Both Route-Target| Pseudowire | Local ID | Remote ID |
 | -------- | ------------------- | -----------------| ---------- | -------- | --------- |
-| TENANT_A | 100.70.0.5:1000 | 65000:1000 | TEN_A_site2_site5_eline | 57 | 25 |
 
 #### Router BGP EVPN VRFs
 
 | VRF | Route-Distinguisher | Redistribute |
 | --- | ------------------- | ------------ |
-| TENANT_B_INTRA | 100.70.0.5:19 | connected |
+| TENANT_B_INTRA | 100.70.0.5:19 | connected<br>static |
 | TENANT_B_WAN | 100.70.0.5:20 | connected |
 
 ### Router BGP Device Configuration
@@ -605,17 +601,9 @@ router bgp 65000
       route-target both 65000:10010
       redistribute learned
    !
-   vlan 20
-      rd 100.70.0.5:20020
-      route-target both 65000:20020
-      redistribute learned
-   !
    vpws TENANT_A
       rd 100.70.0.5:1000
       route-target import export evpn 65000:1000
-      !
-      pseudowire TEN_A_site2_site5_eline
-         evpn vpws id local 57 remote 25
    !
    address-family evpn
       neighbor default encapsulation mpls next-hop-self source-interface Loopback0
@@ -637,13 +625,8 @@ router bgp 65000
       route-target import evpn 65000:19
       route-target export evpn 65000:19
       router-id 100.70.0.5
-      neighbor 123.1.1.3 remote-as 65202
-      neighbor 123.1.1.3 password 7 $1c$U4tL2vQP9QwZlxIV1K3/pw==
-      neighbor 123.1.1.3 description TENANT_B_CPE_SITE5
       redistribute connected
-      !
-      address-family ipv4
-         neighbor 123.1.1.3 activate
+      redistribute static
    !
    vrf TENANT_B_WAN
       rd 100.70.0.5:20
@@ -686,25 +669,31 @@ router bfd
 | Setting | Value |
 | -------- | ---- |
 | MPLS IP Enabled | True |
-| LDP Enabled | False |
-| LDP Router ID | - |
-| LDP Interface Disabled Default | - |
-| LDP Transport-Address Interface | - |
+| LDP Enabled | True |
+| LDP Router ID | 100.70.0.5 |
+| LDP Interface Disabled Default | True |
+| LDP Transport-Address Interface | Loopback0 |
 
 ### MPLS and LDP Configuration
 
 ```eos
 !
 mpls ip
+!
+mpls ldp
+   interface disabled default
+   router-id 100.70.0.5
+   no shutdown
+   transport-address interface Loopback0
 ```
 
 ## MPLS Interfaces
 
 | Interface | MPLS IP Enabled | LDP Enabled | IGP Sync |
 | --------- | --------------- | ----------- | -------- |
-| Ethernet1 | True | - | - |
-| Ethernet2 | True | - | - |
-| Ethernet3 | True | - | - |
+| Ethernet1 | True | True | True |
+| Ethernet2 | True | True | True |
+| Ethernet3 | True | True | True |
 | Loopback0 | - | - | - |
 
 # Patch Panel
@@ -713,21 +702,16 @@ mpls ip
 
 | Patch Name | Enabled | Connector A Type | Connector A Endpoint | Connector B Type | Connector B Endpoint |
 | ---------- | ------- | ---------------- | -------------------- | ---------------- | -------------------- |
-| TEN_A_site2_site5_eline | True | Interface | Ethernet7 | Pseudowire | bgp vpws TENANT_A pseudowire TEN_A_site2_site5_eline |
-| TEN_B_site3_site5_eline | True | Interface | Ethernet6.10 | Pseudowire | bgp vpws TENANT_B pseudowire TEN_B_site3_site5_eline |
+| TEN_B_site3_site5_eline_vlan_based | True | Interface | Ethernet6.200 | Pseudowire | bgp vpws TENANT_B pseudowire TEN_B_site3_site5_eline_vlan_based |
 
 ## Patch Panel Configuration
 
 ```eos
 !
 patch panel
-   patch TEN_A_site2_site5_eline
-      connector 1 interface Ethernet7
-      connector 2 pseudowire bgp vpws TENANT_A pseudowire TEN_A_site2_site5_eline
-   !
-   patch TEN_B_site3_site5_eline
-      connector 1 interface Ethernet6.10
-      connector 2 pseudowire bgp vpws TENANT_B pseudowire TEN_B_site3_site5_eline
+   patch TEN_B_site3_site5_eline_vlan_based
+      connector 1 interface Ethernet6.200
+      connector 2 pseudowire bgp vpws TENANT_B pseudowire TEN_B_site3_site5_eline_vlan_based
    !
 ```
 

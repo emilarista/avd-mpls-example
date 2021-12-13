@@ -57,18 +57,9 @@ router_bgp:
         export:
           evpn:
           - '65000:19'
-      neighbors:
-        123.1.1.1:
-          description: TENANT_B_CPE_SITE3_SUBIF_100
-          password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
-          remote_as: '65201'
       redistribute_routes:
       - connected
-      address_families:
-        ipv4:
-          neighbors:
-            123.1.1.1:
-              activate: true
+      - ospf
     TENANT_B_WAN:
       router_id: 100.70.0.3
       rd: 100.70.0.3:20
@@ -92,15 +83,6 @@ router_bgp:
           neighbors:
             192.168.48.1:
               activate: true
-  vlans:
-    20:
-      tenant: TENANT_B
-      rd: 100.70.0.3:20020
-      route_targets:
-        both:
-        - 65000:20020
-      redistribute_routes:
-      - learned
 static_routes:
 - vrf: MGMT
   destination_address_prefix: 0.0.0.0/0
@@ -177,6 +159,8 @@ loopback_interfaces:
     node_segment:
       index: 203
       ipv4: true
+      ldp:
+        interface: true
 router_isis:
   instance: MPLS_UNDERLAY
   log_adjacency_changes: true
@@ -184,6 +168,7 @@ router_isis:
   router_id: 100.70.0.3
   is_type: level-1-2
   advertise_passive_only: true
+  mpls_ldp_sync_default: true
   timers:
     local_convergence:
       delay: 15000
@@ -198,6 +183,11 @@ router_isis:
     enabled: true
 mpls:
   ip: true
+  ldp:
+    interface_disabled_default: true
+    router_id: 100.70.0.3
+    shutdown: false
+    transport_address_interface: Loopback0
 ethernet_interfaces:
   Ethernet1:
     peer: p4
@@ -217,6 +207,9 @@ ethernet_interfaces:
     isis_circuit_type: level-2
     mpls:
       ip: true
+      ldp:
+        interface: true
+        igp_sync: true
   Ethernet2:
     peer: pe2
     peer_interface: Ethernet2
@@ -235,6 +228,9 @@ ethernet_interfaces:
     isis_circuit_type: level-2
     mpls:
       ip: true
+      ldp:
+        interface: true
+        igp_sync: true
   Ethernet3:
     peer: rr7
     peer_interface: Ethernet1
@@ -253,29 +249,51 @@ ethernet_interfaces:
     isis_circuit_type: level-2
     mpls:
       ip: true
-  Ethernet6.100:
+      ldp:
+        interface: true
+        igp_sync: true
+  Ethernet6.10:
     type: l3dot1q
-    encapsulation_dot1q_vlan: 100
+    encapsulation_dot1q_vlan: 10
     peer_type: l3_interface
     vrf: TENANT_B_INTRA
-    ip_address: 123.1.2.0/31
+    ip_address: 123.1.1.0/31
     shutdown: false
-    description: TENANT_B_SITE_3_L3VPN_SUBIF
-  Ethernet5:
-    type: routed
+    description: TENANT_B_SITE_3_INTRA_L3VPN
+    ospf_area: 0
+    ospf_cost: 10
+    ospf_network_point_to_point: true
+  Ethernet5.100:
+    type: l3dot1q
+    encapsulation_dot1q_vlan: 100
     peer_type: l3_interface
     vrf: TENANT_B_WAN
     ip_address: 192.168.48.0/31
     shutdown: false
-    description: TENANT_B_SITE3_L3VPN1
-  Ethernet6:
+    description: TENANT_B_SITE_3
+  Ethernet6.100:
+    type: l3dot1q
+    encapsulation_dot1q_vlan: 100
+    peer_type: l3_interface
+    vrf: TENANT_B_WAN
+    ip_address: 192.168.48.4/31
+    shutdown: false
+    description: TENANT_B_SITE_3_OSPF
+    ospf_area: 0
+    ospf_cost: 10
+    ospf_network_point_to_point: true
+  Ethernet5.200:
+    type: l2dot1q
+    encapsulation_vlan:
+      client_dot1q: 200
+    peer_type: l3_interface
+    shutdown: false
+  Ethernet5:
     type: routed
     peer_type: l3_interface
     shutdown: false
-  Ethernet6.10:
-    type: l2dot1q
-    encapsulation_vlan:
-      client_dot1q: 10
+  Ethernet6:
+    type: routed
     peer_type: l3_interface
     shutdown: false
 router_bfd:
@@ -285,19 +303,15 @@ router_bfd:
     multiplier: 3
 patch_panel:
   patches:
-  - name: TEN_B_site3_site5_eline
+  - name: TEN_B_site3_site5_eline_vlan_based
     enabled: true
     connectors:
     - id: 1
       type: interface
-      endpoint: Ethernet6.10
+      endpoint: Ethernet5.200
     - id: 2
       type: pseudowire
-      endpoint: bgp vpws TENANT_B pseudowire TEN_B_site3_site5_eline
-vlans:
-  20:
-    tenant: TENANT_B
-    name: TENANT_B_L2_SERVICE
+      endpoint: bgp vpws TENANT_B pseudowire TEN_B_site3_site5_eline_vlan_based
 ip_igmp_snooping:
   globally_enabled: true
 ip_virtual_router_mac_address: 00:1c:73:00:dc:00
@@ -306,9 +320,9 @@ router_ospf:
     99:
       vrf: TENANT_B_WAN
       passive_interface_default: true
-      router_id: 1.2.3.4
+      router_id: 192.168.48.4
       no_passive_interfaces:
-      - Ethernet6
+      - Ethernet6.100
       bgp: true
 sflow:
   sample: 40000

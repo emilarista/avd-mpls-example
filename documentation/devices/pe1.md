@@ -246,7 +246,7 @@ vlan 10
 
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
-| Ethernet5 | CPE_TENANT_A_SITE1_Ethernet1 | *access | *10 | *- | *- | 5 |
+| Ethernet5 | CPE_TENANT_A_SITE1_Ethernet1 | *trunk | *10 | *- | *- | 5 |
 
 *Inherited from Port-Channel Interface
 
@@ -291,6 +291,8 @@ interface Ethernet1
    isis network point-to-point
    no isis hello padding
    mpls ip
+   mpls ldp interface
+   mpls ldp igp sync
 !
 interface Ethernet2
    description P2P_LINK_TO_p6_Ethernet2
@@ -304,6 +306,8 @@ interface Ethernet2
    isis metric 60
    isis network point-to-point
    mpls ip
+   mpls ldp interface
+   mpls ldp igp sync
 !
 interface Ethernet3
    description P2P_LINK_TO_rr7_Ethernet2
@@ -319,6 +323,8 @@ interface Ethernet3
    isis network point-to-point
    no isis hello padding
    mpls ip
+   mpls ldp interface
+   mpls ldp igp sync
 !
 interface Ethernet5
    description CPE_TENANT_A_SITE1_Ethernet1
@@ -334,7 +340,7 @@ interface Ethernet5
 
 | Interface | Description | Type | Mode | VLANs | Native VLAN | Trunk Group | LACP Fallback Timeout | LACP Fallback Mode | MLAG ID | EVPN ESI |
 | --------- | ----------- | ---- | ---- | ----- | ----------- | ------------| --------------------- | ------------------ | ------- | -------- |
-| Port-Channel5 | CPE_TENANT_A_SITE1_EVPN-A-A-PortChannel | switched | access | 10 | - | - | - | - | - | 0000:0000:0303:0202:0101 |
+| Port-Channel5 | CPE_TENANT_A_SITE1_EVPN-A-A-PortChannel | switched | trunk | 10 | - | - | - | - | - | 0000:0000:0303:0202:0101 |
 
 ### Port-Channel Interfaces Device Configuration
 
@@ -344,7 +350,8 @@ interface Port-Channel5
    description CPE_TENANT_A_SITE1_EVPN-A-A-PortChannel
    no shutdown
    switchport
-   switchport access vlan 10
+   switchport trunk allowed vlan 10
+   switchport mode trunk
    evpn ethernet-segment
       identifier 0000:0000:0303:0202:0101
       route-target import 03:03:02:02:01:01
@@ -488,6 +495,7 @@ router isis MPLS_UNDERLAY
    advertise passive-only
    router-id ipv4 100.70.0.1
    log-adjacency-changes
+   mpls ldp sync default
    timers local-convergence-delay 15000 protected-prefixes
    !
    address-family ipv4 unicast
@@ -633,25 +641,31 @@ router bfd
 | Setting | Value |
 | -------- | ---- |
 | MPLS IP Enabled | True |
-| LDP Enabled | False |
-| LDP Router ID | - |
-| LDP Interface Disabled Default | - |
-| LDP Transport-Address Interface | - |
+| LDP Enabled | True |
+| LDP Router ID | 100.70.0.1 |
+| LDP Interface Disabled Default | True |
+| LDP Transport-Address Interface | Loopback0 |
 
 ### MPLS and LDP Configuration
 
 ```eos
 !
 mpls ip
+!
+mpls ldp
+   interface disabled default
+   router-id 100.70.0.1
+   no shutdown
+   transport-address interface Loopback0
 ```
 
 ## MPLS Interfaces
 
 | Interface | MPLS IP Enabled | LDP Enabled | IGP Sync |
 | --------- | --------------- | ----------- | -------- |
-| Ethernet1 | True | - | - |
-| Ethernet2 | True | - | - |
-| Ethernet3 | True | - | - |
+| Ethernet1 | True | True | True |
+| Ethernet2 | True | True | True |
+| Ethernet3 | True | True | True |
 | Loopback0 | - | - | - |
 
 # Patch Panel

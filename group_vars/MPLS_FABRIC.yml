@@ -17,9 +17,12 @@ isis_default_is_type: level-1-2
 isis_default_circuit_type: level-1-2
 isis_default_metric: 50
 
-label_distribution:
-  # protocol: ldp
-  protocol: isis-sr # Should be the default.
+isis_sr: true
+mpls_ldp: true
+
+# label_distribution:
+#   # protocol: ldp
+#   protocol: isis-sr # Should be the default.
 
 # ibgp should be default
 overlay_routing_protocol: ibgp

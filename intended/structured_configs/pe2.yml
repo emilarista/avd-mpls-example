@@ -61,9 +61,9 @@ router_bgp:
     route_targets:
       import_export: 65000:1000
     pseudowires:
-    - name: TEN_A_site2_site5_eline
-      id_local: 25
-      id_remote: 57
+    - name: TEN_A_site2_site5_eline_port_based
+      id_local: 26
+      id_remote: 57200
 static_routes:
 - vrf: MGMT
   destination_address_prefix: 0.0.0.0/0
@@ -134,6 +134,8 @@ loopback_interfaces:
     node_segment:
       index: 202
       ipv4: true
+      ldp:
+        interface: true
 router_isis:
   instance: MPLS_UNDERLAY
   log_adjacency_changes: true
@@ -141,6 +143,7 @@ router_isis:
   router_id: 100.70.0.2
   is_type: level-1-2
   advertise_passive_only: true
+  mpls_ldp_sync_default: true
   timers:
     local_convergence:
       delay: 15000
@@ -155,6 +158,11 @@ router_isis:
     enabled: true
 mpls:
   ip: true
+  ldp:
+    interface_disabled_default: true
+    router_id: 100.70.0.2
+    shutdown: false
+    transport_address_interface: Loopback0
 ethernet_interfaces:
   Ethernet1:
     peer: pe1
@@ -174,6 +182,9 @@ ethernet_interfaces:
     isis_circuit_type: level-2
     mpls:
       ip: true
+      ldp:
+        interface: true
+        igp_sync: true
   Ethernet2:
     peer: pe3
     peer_interface: Ethernet2
@@ -192,6 +203,9 @@ ethernet_interfaces:
     isis_circuit_type: level-2
     mpls:
       ip: true
+      ldp:
+        interface: true
+        igp_sync: true
   Ethernet3:
     peer: rr8
     peer_interface: Ethernet1
@@ -210,6 +224,9 @@ ethernet_interfaces:
     isis_circuit_type: level-2
     mpls:
       ip: true
+      ldp:
+        interface: true
+        igp_sync: true
   Ethernet5:
     peer: CPE_TENANT_A_SITE1
     peer_interface: Ethernet2
@@ -217,7 +234,7 @@ ethernet_interfaces:
     description: CPE_TENANT_A_SITE1_Ethernet2
     type: switched
     shutdown: false
-    mode: access
+    mode: trunk
     vlans: 10
     spanning_tree_portfast: edge
     channel_group:
@@ -235,7 +252,7 @@ port_channel_interfaces:
     description: CPE_TENANT_A_SITE1_EVPN-A-A-PortChannel
     type: switched
     shutdown: false
-    mode: access
+    mode: trunk
     vlans: 10
     spanning_tree_portfast: edge
     esi: 0000:0000:0303:0202:0101
@@ -248,7 +265,7 @@ router_bfd:
     multiplier: 3
 patch_panel:
   patches:
-  - name: TEN_A_site2_site5_eline
+  - name: TEN_A_site2_site5_eline_port_based
     enabled: true
     connectors:
     - id: 1
@@ -256,7 +273,7 @@ patch_panel:
       endpoint: Ethernet6
     - id: 2
       type: pseudowire
-      endpoint: bgp vpws TENANT_A pseudowire TEN_A_site2_site5_eline
+      endpoint: bgp vpws TENANT_A pseudowire TEN_A_site2_site5_eline_port_based
 vlans:
   10:
     tenant: TENANT_A

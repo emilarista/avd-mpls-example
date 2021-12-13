@@ -117,6 +117,8 @@ loopback_interfaces:
     node_segment:
       index: 107
       ipv4: true
+      ldp:
+        interface: true
 router_isis:
   instance: MPLS_UNDERLAY
   log_adjacency_changes: true
@@ -124,6 +126,7 @@ router_isis:
   router_id: 100.70.0.7
   is_type: level-1-2
   advertise_passive_only: true
+  mpls_ldp_sync_default: true
   timers:
     local_convergence:
       delay: 15000
@@ -138,6 +141,11 @@ router_isis:
     enabled: true
 mpls:
   ip: true
+  ldp:
+    interface_disabled_default: true
+    router_id: 100.70.0.7
+    shutdown: false
+    transport_address_interface: Loopback0
 ethernet_interfaces:
   Ethernet1:
     peer: pe3
@@ -157,6 +165,9 @@ ethernet_interfaces:
     isis_circuit_type: level-2
     mpls:
       ip: true
+      ldp:
+        interface: true
+        igp_sync: true
   Ethernet2:
     peer: pe1
     peer_interface: Ethernet3
@@ -175,6 +186,9 @@ ethernet_interfaces:
     isis_circuit_type: level-2
     mpls:
       ip: true
+      ldp:
+        interface: true
+        igp_sync: true
   Ethernet3:
     peer: pe5
     peer_interface: Ethernet3
@@ -191,6 +205,9 @@ ethernet_interfaces:
     isis_circuit_type: level-1-2
     mpls:
       ip: true
+      ldp:
+        interface: true
+        igp_sync: true
   Ethernet4:
     peer: p4
     peer_interface: Ethernet3
@@ -209,6 +226,9 @@ ethernet_interfaces:
     isis_circuit_type: level-2
     mpls:
       ip: true
+      ldp:
+        interface: true
+        igp_sync: true
   Ethernet5:
     peer: rr8
     peer_interface: Ethernet2
@@ -227,6 +247,9 @@ ethernet_interfaces:
     isis_circuit_type: level-2
     mpls:
       ip: true
+      ldp:
+        interface: true
+        igp_sync: true
 router_bfd:
   multihop:
     interval: 5000

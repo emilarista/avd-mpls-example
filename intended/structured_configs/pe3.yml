@@ -91,6 +91,15 @@ router_bgp:
           neighbors:
             192.168.48.1:
               activate: true
+  vpws:
+  - name: TENANT_B
+    rd: 100.70.0.3:2000
+    route_targets:
+      import_export: 65000:2000
+    pseudowires:
+    - name: TEN_B_site3_site5_eline_vlan_based
+      id_local: 35200
+      id_remote: 56200
 static_routes:
 - vrf: MGMT
   destination_address_prefix: 0.0.0.0/0

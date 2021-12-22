@@ -13,7 +13,7 @@ isis_ti_lfa:
   local_convergence_delay: 15000
 
 # What should the defaults be?
-isis_default_is_type: level-2
+isis_default_is_type: level-1-2
 isis_default_circuit_type: level-2
 isis_default_metric: 50
 isis_advertise_passive_only: true
@@ -21,12 +21,8 @@ isis_advertise_passive_only: true
 isis_sr: true
 mpls_ldp: true
 
-# label_distribution:
-#   # protocol: ldp
-#   protocol: isis-sr # Should be the default.
-
 # ibgp should be default
-overlay_routing_protocol: ibgp
+# overlay_routing_protocol: ibgp
 bgp_as: 65000
 # If meshing PEs, client-to-client reflection can be turned off using rr bgp defaults.
 # bgp_mesh_pes: true
@@ -117,7 +113,7 @@ p:
   defaults:
     loopback_ipv4_pool: 100.70.0.0/24
     loopback_ipv6_pool: "2000:1234:ffff:ffff::/64"
-    is_type: level-1-2
+    # is_type: level-1-2
     node_sid_base: 300
     isis_system_id_prefix: '0000.0000'
     raw_eos_cli: |
@@ -141,7 +137,6 @@ pe:
     platform: vEOS-LAB
     loopback_ipv4_pool: 100.70.0.0/24
     loopback_ipv6_pool: "2000:1234:ffff:ffff::/64"
-    # node_sid_base: 10
     is_type: level-1-2
     node_sid_base: 200
     isis_system_id_prefix: '0000.0001'

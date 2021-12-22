@@ -599,6 +599,12 @@ router isis MPLS_UNDERLAY
 
 #### Router BGP EVPN MAC-VRFs
 
+#### Router BGP VPWS Instances
+
+| Instance | Route-Distinguisher | Both Route-Target| Pseudowire | Local ID | Remote ID |
+| -------- | ------------------- | -----------------| ---------- | -------- | --------- |
+| TENANT_B | 100.70.0.3:2000 | 65000:2000 | TEN_B_site3_site5_eline_vlan_based | 35200 | 56200 |
+
 #### Router BGP EVPN VRFs
 
 | VRF | Route-Distinguisher | Redistribute |
@@ -628,6 +634,13 @@ router bgp 65000
    neighbor 100.70.0.7 description rr7
    neighbor 100.70.0.8 peer group MPLS-OVERLAY-PEERS
    neighbor 100.70.0.8 description rr8
+   !
+   vpws TENANT_B
+      rd 100.70.0.3:2000
+      route-target import export evpn 65000:2000
+      !
+      pseudowire TEN_B_site3_site5_eline_vlan_based
+         evpn vpws id local 35200 remote 56200
    !
    address-family evpn
       neighbor default encapsulation mpls next-hop-self source-interface Loopback0

@@ -116,6 +116,14 @@ router_bgp:
     - name: TEN_A_site2_site5_eline_port_based
       id_local: 57100
       id_remote: 26100
+  - name: TENANT_B
+    rd: 100.70.0.5:2000
+    route_targets:
+      import_export: 65000:2000
+    pseudowires:
+    - name: TEN_B_site3_site5_eline_vlan_based
+      id_local: 56200
+      id_remote: 35200
 static_routes:
 - vrf: MGMT
   destination_address_prefix: 0.0.0.0/0

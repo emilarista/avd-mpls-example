@@ -20,10 +20,6 @@ isis_advertise_passive_only: true
 isis_sr: true
 mpls_ldp: true
 
-# label_distribution:
-#   # protocol: ldp
-#   protocol: isis-sr # Should be the default.
-
 # ibgp should be default
 overlay_routing_protocol: ibgp
 bgp_as: 65000

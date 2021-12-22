@@ -30,6 +30,8 @@ bgp_as: 65000
 bgp_peer_groups:
   MPLS_OVERLAY_PEERS:
     password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
+  RR_OVERLAY_PEERS:
+    password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
 
 internal_vlan_order:
   allocation: ascending

@@ -327,7 +327,6 @@ interface Ethernet3
    isis circuit-type level-2
    isis metric 50
    isis network point-to-point
-   no isis hello padding
    mpls ip
    mpls ldp interface
    mpls ldp igp sync

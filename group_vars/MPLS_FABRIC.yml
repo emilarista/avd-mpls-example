@@ -17,7 +17,6 @@ isis_default_is_type: level-2
 isis_default_circuit_type: level-2
 isis_default_metric: 50
 isis_advertise_passive_only: true
-isis_hello_padding: false
 
 isis_sr: true
 mpls_ldp: true

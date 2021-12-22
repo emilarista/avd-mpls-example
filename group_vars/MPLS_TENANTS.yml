@@ -3,8 +3,8 @@ tenants:
     l1_services:
       - name: TEN_A_site2_site5_eline_port_based
         type: vpws-pseudowire  # Should be default
-        ids: [26, 57200 ]
-        nodes: ["pe2", "pe57"]
+        ids: [ 26100, 57100 ]
+        nodes: ["pe2", "pe5"]
         interfaces: ["Ethernet6", "Ethernet7"]
         lldp_disable: true
     l2vlans:
@@ -25,13 +25,14 @@ tenants:
     mac_vrf_rt_base: 20000
     vrfs:
       TENANT_B_INTRA:
-        vrf_rt: 19
+        vrf_id: 19
         address_families:
+          - vpn-ipv4
+          - vpn-ipv6
           - evpn
         ospf:
           enabled: true
           # process_id: 19 - Should default to vrf rt number
-          # address_families: ["ipv4"] # Should default to ["ipv4"]
           router_id: 123.1.1.0
           max_lsa: 10000
           nodes:
@@ -47,7 +48,7 @@ tenants:
             - pe3
             ospf:
               enabled: true
-              p2p: true
+              point_to_point: true
               area: 0
               cost: 10
           - description: TENANT_B_SITE_5_INTRA_L3VPN
@@ -65,8 +66,20 @@ tenants:
             interface: Ethernet6.10
             nodes:
               - pe5
+        svis:
+          2020:
+            enabled: true
+            name: TENANT_B_INSIDE_FW
+            ip_virtual_router_address: 10.1.255.1
+            nodes:
+              pe1:
+                ip_address: 10.1.255.2/27
+              pe2:
+                ip_address: 10.1.255.3/27
+            tags:
+              - tag1
       TENANT_B_WAN:
-        vrf_rt: 20
+        vrf_id: 20
         address_families:
           - vpn-ipv4
         # redistribute_ospf: true should default to true if there is ospf defined in the vrf.
@@ -75,7 +88,6 @@ tenants:
           enabled: true
           process_id: 99      # defaults to vrf RT number
           router_id: 192.168.48.4  # defaults to switch.router_id
-          # address_families: ["ipv4"] # defaults to ["ipv4"]
           # bfd: true           # implicit default is false
           max_lsa: 10000      # omitted if not defined
           nodes:
@@ -89,6 +101,10 @@ tenants:
           - 192.168.48.0/31
           nodes:
           - pe3
+          # bgp_peers:
+          #   192.168.48.1:
+          #     remote_as: 65123
+
         - description: TENANT_B_SITE_3_OSPF
           enabled: true
           interfaces:
@@ -99,7 +115,7 @@ tenants:
           - pe3
           ospf:
             enabled: true
-            p2p: true
+            point_to_point: true
             area: 0
             cost: 10
             # autentication: "simple"
@@ -121,6 +137,8 @@ tenants:
             password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
             remote_as: "65201"
             # send_community: all
+            # set_ipv4_nexthop: 123.123.123.1
+            # route_map:
           192.168.48.3:
             description: TENANT_B_CPE_SITE5
             # ebgp_multihop: 1

@@ -62,8 +62,8 @@ router_bgp:
       import_export: 65000:1000
     pseudowires:
     - name: TEN_A_site2_site5_eline_port_based
-      id_local: 26
-      id_remote: 57200
+      id_local: 26100
+      id_remote: 57100
 static_routes:
 - vrf: MGMT
   destination_address_prefix: 0.0.0.0/0
@@ -127,15 +127,15 @@ loopback_interfaces:
     description: MPLS_Overlay_peering
     shutdown: false
     ip_address: 100.70.0.2/32
-    isis_enable: MPLS_UNDERLAY
-    isis_passive: true
     mpls:
       ip: true
+      ldp:
+        interface: true
+    isis_enable: MPLS_UNDERLAY
+    isis_passive: true
     node_segment:
       index: 202
       ipv4: true
-      ldp:
-        interface: true
 router_isis:
   instance: MPLS_UNDERLAY
   log_adjacency_changes: true

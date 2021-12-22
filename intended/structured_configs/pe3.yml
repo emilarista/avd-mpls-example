@@ -52,9 +52,17 @@ router_bgp:
       rd: 100.70.0.3:19
       route_targets:
         import:
+          vpn-ipv4:
+          - '65000:19'
+          vpn-ipv6:
+          - '65000:19'
           evpn:
           - '65000:19'
         export:
+          vpn-ipv4:
+          - '65000:19'
+          vpn-ipv6:
+          - '65000:19'
           evpn:
           - '65000:19'
       redistribute_routes:
@@ -152,15 +160,15 @@ loopback_interfaces:
     description: MPLS_Overlay_peering
     shutdown: false
     ip_address: 100.70.0.3/32
-    isis_enable: MPLS_UNDERLAY
-    isis_passive: true
     mpls:
       ip: true
+      ldp:
+        interface: true
+    isis_enable: MPLS_UNDERLAY
+    isis_passive: true
     node_segment:
       index: 203
       ipv4: true
-      ldp:
-        interface: true
 router_isis:
   instance: MPLS_UNDERLAY
   log_adjacency_changes: true
@@ -261,8 +269,8 @@ ethernet_interfaces:
     shutdown: false
     description: TENANT_B_SITE_3_INTRA_L3VPN
     ospf_area: 0
-    ospf_cost: 10
     ospf_network_point_to_point: true
+    ospf_cost: 10
   Ethernet5.100:
     type: l3dot1q
     encapsulation_dot1q_vlan: 100
@@ -280,8 +288,8 @@ ethernet_interfaces:
     shutdown: false
     description: TENANT_B_SITE_3_OSPF
     ospf_area: 0
-    ospf_cost: 10
     ospf_network_point_to_point: true
+    ospf_cost: 10
   Ethernet5.200:
     type: l2dot1q
     encapsulation_vlan:
@@ -317,13 +325,26 @@ ip_igmp_snooping:
 ip_virtual_router_mac_address: 00:1c:73:00:dc:00
 router_ospf:
   process_ids:
+    19:
+      vrf: TENANT_B_INTRA
+      passive_interface_default: true
+      router_id: 123.1.1.0
+      no_passive_interfaces:
+      - Ethernet6.10
+      max_lsa: 10000
+      redistribute:
+        bgp:
+          enabled: true
     99:
       vrf: TENANT_B_WAN
       passive_interface_default: true
       router_id: 192.168.48.4
       no_passive_interfaces:
       - Ethernet6.100
-      bgp: true
+      max_lsa: 10000
+      redistribute:
+        bgp:
+          enabled: true
 sflow:
   sample: 40000
   vrfs:

@@ -4,18 +4,20 @@
 fabric_name: MPLS_FABRIC
 
 underlay_routing_protocol: isis
-isis_advertise_passive_only: true
+
 # Disabling ISIS hello padding makes it easier with vEOS-lab.
-isis_hello_padding: false
+
 isis_ti_lfa:
   enabled: true
   protection: link
   local_convergence_delay: 15000
 
 # What should the defaults be?
-isis_default_is_type: level-1-2
-isis_default_circuit_type: level-1-2
+isis_default_is_type: level-2
+isis_default_circuit_type: level-2
 isis_default_metric: 50
+isis_advertise_passive_only: true
+isis_hello_padding: false
 
 isis_sr: true
 mpls_ldp: true
@@ -33,6 +35,8 @@ bgp_as: 65000
 # bgp peer groups passwords
 bgp_peer_groups:
   MPLS_OVERLAY_PEERS:
+    password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
+  RR_OVERLAY_PEERS:
     password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
 
 internal_vlan_order:
@@ -179,7 +183,7 @@ pe:
     pe5:
       filter:
         tenants: [ TENANT_A, TENANT_B ]
-        tags: [ site5 ]
+        tags: [ site5, tag1 ]
       nodes:
         pe5:
           id: 5
@@ -206,6 +210,7 @@ rr:
   node_groups:
     rr7-8:
       bgp_cluster_id: 7.7.7.7
+      # evpn_gw:
       nodes:
         rr7:
           id: 7

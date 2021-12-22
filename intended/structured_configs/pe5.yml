@@ -52,9 +52,17 @@ router_bgp:
       rd: 100.70.0.5:19
       route_targets:
         import:
+          vpn-ipv4:
+          - '65000:19'
+          vpn-ipv6:
+          - '65000:19'
           evpn:
           - '65000:19'
         export:
+          vpn-ipv4:
+          - '65000:19'
+          vpn-ipv6:
+          - '65000:19'
           evpn:
           - '65000:19'
       redistribute_routes:
@@ -91,11 +99,23 @@ router_bgp:
         - 65000:10010
       redistribute_routes:
       - learned
+    2020:
+      tenant: TENANT_B
+      rd: 100.70.0.5:22020
+      route_targets:
+        both:
+        - 65000:22020
+      redistribute_routes:
+      - learned
   vpws:
   - name: TENANT_A
     rd: 100.70.0.5:1000
     route_targets:
       import_export: 65000:1000
+    pseudowires:
+    - name: TEN_A_site2_site5_eline_port_based
+      id_local: 57100
+      id_remote: 26100
 static_routes:
 - vrf: MGMT
   destination_address_prefix: 0.0.0.0/0
@@ -170,15 +190,15 @@ loopback_interfaces:
     description: MPLS_Overlay_peering
     shutdown: false
     ip_address: 100.70.0.5/32
-    isis_enable: MPLS_UNDERLAY
-    isis_passive: true
     mpls:
       ip: true
+      ldp:
+        interface: true
+    isis_enable: MPLS_UNDERLAY
+    isis_passive: true
     node_segment:
       index: 205
       ipv4: true
-      ldp:
-        interface: true
 router_isis:
   instance: MPLS_UNDERLAY
   log_adjacency_changes: true
@@ -262,7 +282,7 @@ ethernet_interfaces:
     isis_metric: 50
     isis_network_point_to_point: true
     isis_hello_padding: false
-    isis_circuit_type: level-1-2
+    isis_circuit_type: level-2
     mpls:
       ip: true
       ldp:
@@ -286,6 +306,13 @@ ethernet_interfaces:
     ip_address: 192.168.48.2/31
     shutdown: false
     description: TENANT_B_SITE_5
+  Ethernet7:
+    type: routed
+    lldp:
+      transmit: false
+      receive: false
+    peer_type: l3_interface
+    shutdown: false
   Ethernet6.200:
     type: l2dot1q
     encapsulation_vlan:
@@ -303,6 +330,15 @@ router_bfd:
     multiplier: 3
 patch_panel:
   patches:
+  - name: TEN_A_site2_site5_eline_port_based
+    enabled: true
+    connectors:
+    - id: 1
+      type: interface
+      endpoint: Ethernet7
+    - id: 2
+      type: pseudowire
+      endpoint: bgp vpws TENANT_A pseudowire TEN_A_site2_site5_eline_port_based
   - name: TEN_B_site3_site5_eline_vlan_based
     enabled: true
     connectors:
@@ -316,9 +352,20 @@ vlans:
   10:
     tenant: TENANT_A
     name: TENANT_A_L2_SERVICE
+  2020:
+    tenant: TENANT_B
+    name: TENANT_B_INSIDE_FW
 ip_igmp_snooping:
   globally_enabled: true
 ip_virtual_router_mac_address: 00:1c:73:00:dc:00
+vlan_interfaces:
+  Vlan2020:
+    tenant: TENANT_B
+    tags:
+    - tag1
+    description: TENANT_B_INSIDE_FW
+    shutdown: false
+    vrf: TENANT_B_INTRA
 sflow:
   sample: 40000
   vrfs:

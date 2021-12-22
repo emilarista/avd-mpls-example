@@ -242,7 +242,7 @@ vlan internal order ascending range 3700 3900
 | --------- | ------------- | ------------- | ----------- | ---- | ----------------- |
 | Ethernet1 | - | MPLS_UNDERLAY | 60 | point-to-point | level-2 |
 | Ethernet2 | - | MPLS_UNDERLAY | 60 | point-to-point | level-2 |
-| Ethernet3 | - | MPLS_UNDERLAY | 50 | point-to-point | level-1-2 |
+| Ethernet3 | - | MPLS_UNDERLAY | 50 | point-to-point | level-2 |
 | Ethernet4 | - | MPLS_UNDERLAY | 60 | point-to-point | level-2 |
 | Ethernet5 | - | MPLS_UNDERLAY | 60 | point-to-point | level-2 |
 
@@ -291,7 +291,7 @@ interface Ethernet3
    no switchport
    ip address unnumbered loopback0
    isis enable MPLS_UNDERLAY
-   isis circuit-type level-1-2
+   isis circuit-type level-2
    isis metric 50
    isis network point-to-point
    no isis hello padding
@@ -366,6 +366,7 @@ interface Loopback0
    ip address 100.70.0.7/32
    isis enable MPLS_UNDERLAY
    isis passive
+   mpls ldp interface
    node-segment ipv4 index 107
 ```
 
@@ -506,6 +507,17 @@ router isis MPLS_UNDERLAY
 | Send community | all |
 | Maximum routes | 0 (no limit) |
 
+#### RR-OVERLAY-PEERS
+
+| Settings | Value |
+| -------- | ----- |
+| Address Family | mpls-vpn |
+| Remote AS | 65000 |
+| Source | Loopback0 |
+| Bfd | true |
+| Send community | all |
+| Maximum routes | 0 (no limit) |
+
 ### BGP Neighbors
 
 | Neighbor | Remote AS | VRF | Send-community | Maximum-routes |
@@ -514,6 +526,7 @@ router isis MPLS_UNDERLAY
 | 100.70.0.2 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS |
 | 100.70.0.3 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS |
 | 100.70.0.5 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS |
+| 100.70.0.8 | Inherited from peer group RR-OVERLAY-PEERS | default | Inherited from peer group RR-OVERLAY-PEERS | Inherited from peer group RR-OVERLAY-PEERS |
 
 ### Router BGP EVPN Address Family
 
@@ -548,6 +561,13 @@ router bgp 65000
    neighbor MPLS-OVERLAY-PEERS password 7 $1c$U4tL2vQP9QwZlxIV1K3/pw==
    neighbor MPLS-OVERLAY-PEERS send-community
    neighbor MPLS-OVERLAY-PEERS maximum-routes 0
+   neighbor RR-OVERLAY-PEERS peer group
+   neighbor RR-OVERLAY-PEERS remote-as 65000
+   neighbor RR-OVERLAY-PEERS update-source Loopback0
+   neighbor RR-OVERLAY-PEERS bfd
+   neighbor RR-OVERLAY-PEERS password 7 $1c$U4tL2vQP9QwZlxIV1K3/pw==
+   neighbor RR-OVERLAY-PEERS send-community
+   neighbor RR-OVERLAY-PEERS maximum-routes 0
    neighbor 100.70.0.1 peer group MPLS-OVERLAY-PEERS
    neighbor 100.70.0.1 description pe1
    neighbor 100.70.0.2 peer group MPLS-OVERLAY-PEERS
@@ -556,19 +576,25 @@ router bgp 65000
    neighbor 100.70.0.3 description pe3
    neighbor 100.70.0.5 peer group MPLS-OVERLAY-PEERS
    neighbor 100.70.0.5 description pe5
+   neighbor 100.70.0.8 peer group RR-OVERLAY-PEERS
+   neighbor 100.70.0.8 description rr8
    !
    address-family evpn
       neighbor default encapsulation mpls
       neighbor MPLS-OVERLAY-PEERS activate
+      neighbor RR-OVERLAY-PEERS activate
    !
    address-family ipv4
       no neighbor MPLS-OVERLAY-PEERS activate
+      no neighbor RR-OVERLAY-PEERS activate
    !
    address-family vpn-ipv4
       neighbor MPLS-OVERLAY-PEERS activate
+      neighbor RR-OVERLAY-PEERS activate
    !
    address-family vpn-ipv6
       neighbor MPLS-OVERLAY-PEERS activate
+      neighbor RR-OVERLAY-PEERS activate
 ```
 
 # BFD
@@ -625,7 +651,7 @@ mpls ldp
 | Ethernet3 | True | True | True |
 | Ethernet4 | True | True | True |
 | Ethernet5 | True | True | True |
-| Loopback0 | - | - | - |
+| Loopback0 | - | True | - |
 
 # Multicast
 

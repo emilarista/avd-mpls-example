@@ -386,6 +386,7 @@ interface Loopback0
    ip address 100.70.0.3/32
    isis enable MPLS_UNDERLAY
    isis passive
+   mpls ldp interface
    node-segment ipv4 index 203
 ```
 
@@ -469,7 +470,16 @@ ip route vrf MGMT 0.0.0.0/0 10.30.30.1
 
 | Process ID | Router ID | Default Passive Interface | No Passive Interface | BFD | Max LSA | Default Information Originate | Log Adjacency Changes Detail | Auto Cost Reference Bandwidth | Maximum Paths | MPLS LDP Sync Default |
 | ---------- | --------- | ------------------------- | -------------------- | --- | ------- | ----------------------------- | ---------------------------- | ----------------------------- | ------------- | --------------------- |
-| 99 | 192.168.48.4 | enabled | Ethernet6.100 <br> | disabled | default | disabled | disabled | - | - | - |
+| 19 | 123.1.1.0 | enabled | Ethernet6.10 <br> | disabled | 10000 | disabled | disabled | - | - | - |
+| 99 | 192.168.48.4 | enabled | Ethernet6.100 <br> | disabled | 10000 | disabled | disabled | - | - | - |
+
+### Router OSPF Router Redistribution
+
+| Process ID | Source Protocol | Route Map |
+| ---------- | --------------- | --------- |
+| 19 | bgp | - |
+| 99 | bgp | - |
+
 
 ### OSPF Interfaces
 
@@ -482,10 +492,19 @@ ip route vrf MGMT 0.0.0.0/0 10.30.30.1
 
 ```eos
 !
+router ospf 19 vrf TENANT_B_INTRA
+   router-id 123.1.1.0
+   passive-interface default
+   no passive-interface Ethernet6.10
+   max-lsa 10000
+   redistribute bgp
+!
 router ospf 99 vrf TENANT_B_WAN
    router-id 192.168.48.4
    passive-interface default
    no passive-interface Ethernet6.100
+   max-lsa 10000
+   redistribute bgp
 ```
 
 ## Router ISIS
@@ -627,7 +646,11 @@ router bgp 65000
    !
    vrf TENANT_B_INTRA
       rd 100.70.0.3:19
+      route-target import vpn-ipv4 65000:19
+      route-target import vpn-ipv6 65000:19
       route-target import evpn 65000:19
+      route-target export vpn-ipv4 65000:19
+      route-target export vpn-ipv6 65000:19
       route-target export evpn 65000:19
       router-id 100.70.0.3
       redistribute connected
@@ -700,7 +723,7 @@ mpls ldp
 | Ethernet1 | True | True | True |
 | Ethernet2 | True | True | True |
 | Ethernet3 | True | True | True |
-| Loopback0 | - | - | - |
+| Loopback0 | - | True | - |
 
 # Patch Panel
 

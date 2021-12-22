@@ -123,15 +123,15 @@ loopback_interfaces:
     description: MPLS_Overlay_peering
     shutdown: false
     ip_address: 100.70.0.1/32
-    isis_enable: MPLS_UNDERLAY
-    isis_passive: true
     mpls:
       ip: true
+      ldp:
+        interface: true
+    isis_enable: MPLS_UNDERLAY
+    isis_passive: true
     node_segment:
       index: 201
       ipv4: true
-      ldp:
-        interface: true
 router_isis:
   instance: MPLS_UNDERLAY
   log_adjacency_changes: true

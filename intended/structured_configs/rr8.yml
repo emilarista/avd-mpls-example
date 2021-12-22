@@ -19,9 +19,19 @@ router_bgp:
       send_community: all
       maximum_routes: 0
       route_reflector_client: true
+    RR-OVERLAY-PEERS:
+      type: mpls-vpn
+      update_source: Loopback0
+      remote_as: '65000'
+      bfd: true
+      password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
+      send_community: all
+      maximum_routes: 0
   address_family_ipv4:
     peer_groups:
       MPLS-OVERLAY-PEERS:
+        activate: false
+      RR-OVERLAY-PEERS:
         activate: false
   address_family_evpn:
     neighbor_default:
@@ -29,13 +39,19 @@ router_bgp:
     peer_groups:
       MPLS-OVERLAY-PEERS:
         activate: true
+      RR-OVERLAY-PEERS:
+        activate: true
   address_family_vpn_ipv4:
     peer_groups:
       MPLS-OVERLAY-PEERS:
         activate: true
+      RR-OVERLAY-PEERS:
+        activate: true
   address_family_vpn_ipv6:
     peer_groups:
       MPLS-OVERLAY-PEERS:
+        activate: true
+      RR-OVERLAY-PEERS:
         activate: true
   neighbors:
     100.70.0.1:
@@ -50,6 +66,9 @@ router_bgp:
     100.70.0.5:
       peer_group: MPLS-OVERLAY-PEERS
       description: pe5
+    100.70.0.7:
+      peer_group: RR-OVERLAY-PEERS
+      description: rr7
 static_routes:
 - vrf: MGMT
   destination_address_prefix: 0.0.0.0/0
@@ -110,15 +129,15 @@ loopback_interfaces:
     description: MPLS_Overlay_peering
     shutdown: false
     ip_address: 100.70.0.8/32
-    isis_enable: MPLS_UNDERLAY
-    isis_passive: true
     mpls:
       ip: true
+      ldp:
+        interface: true
+    isis_enable: MPLS_UNDERLAY
+    isis_passive: true
     node_segment:
       index: 108
       ipv4: true
-      ldp:
-        interface: true
 router_isis:
   instance: MPLS_UNDERLAY
   log_adjacency_changes: true

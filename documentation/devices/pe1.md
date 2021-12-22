@@ -391,6 +391,7 @@ interface Loopback0
    ip address 100.70.0.1/32
    isis enable MPLS_UNDERLAY
    isis passive
+   mpls ldp interface
    node-segment ipv4 index 201
 ```
 
@@ -666,7 +667,7 @@ mpls ldp
 | Ethernet1 | True | True | True |
 | Ethernet2 | True | True | True |
 | Ethernet3 | True | True | True |
-| Loopback0 | - | - | - |
+| Loopback0 | - | True | - |
 
 # Patch Panel
 

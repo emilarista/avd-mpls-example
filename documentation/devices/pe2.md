@@ -400,6 +400,7 @@ interface Loopback0
    ip address 100.70.0.2/32
    isis enable MPLS_UNDERLAY
    isis passive
+   mpls ldp interface
    node-segment ipv4 index 202
 ```
 
@@ -572,7 +573,7 @@ router isis MPLS_UNDERLAY
 
 | Instance | Route-Distinguisher | Both Route-Target| Pseudowire | Local ID | Remote ID |
 | -------- | ------------------- | -----------------| ---------- | -------- | --------- |
-| TENANT_A | 100.70.0.2:1000 | 65000:1000 | TEN_A_site2_site5_eline_port_based | 26 | 57200 |
+| TENANT_A | 100.70.0.2:1000 | 65000:1000 | TEN_A_site2_site5_eline_port_based | 26100 | 57100 |
 
 #### Router BGP EVPN VRFs
 
@@ -609,7 +610,7 @@ router bgp 65000
       route-target import export evpn 65000:1000
       !
       pseudowire TEN_A_site2_site5_eline_port_based
-         evpn vpws id local 26 remote 57200
+         evpn vpws id local 26100 remote 57100
    !
    address-family evpn
       neighbor default encapsulation mpls next-hop-self source-interface Loopback0
@@ -679,7 +680,7 @@ mpls ldp
 | Ethernet1 | True | True | True |
 | Ethernet2 | True | True | True |
 | Ethernet3 | True | True | True |
-| Loopback0 | - | - | - |
+| Loopback0 | - | True | - |
 
 # Patch Panel
 

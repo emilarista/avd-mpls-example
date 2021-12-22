@@ -22,6 +22,7 @@
 - [Interfaces](#interfaces)
   - [Ethernet Interfaces](#ethernet-interfaces)
   - [Loopback Interfaces](#loopback-interfaces)
+  - [VLAN Interfaces](#vlan-interfaces)
 - [Routing](#routing)
   - [Service Routing Protocols Model](#service-routing-protocols-model)
   - [Virtual Router MAC Address](#virtual-router-mac-address)
@@ -226,6 +227,7 @@ vlan internal order ascending range 3700 3900
 | VLAN ID | Name | Trunk Groups |
 | ------- | ---- | ------------ |
 | 10 | TENANT_A_L2_SERVICE | - |
+| 2020 | TENANT_B_INSIDE_FW | - |
 
 ## VLANs Device Configuration
 
@@ -233,6 +235,9 @@ vlan internal order ascending range 3700 3900
 !
 vlan 10
    name TENANT_A_L2_SERVICE
+!
+vlan 2020
+   name TENANT_B_INSIDE_FW
 ```
 
 # Interfaces
@@ -272,7 +277,7 @@ vlan 10
 | --------- | ------------- | ------------- | ----------- | ---- | ----------------- |
 | Ethernet1 | - | MPLS_UNDERLAY | 60 | point-to-point | level-2 |
 | Ethernet2 | - | MPLS_UNDERLAY | 60 | point-to-point | level-2 |
-| Ethernet3 | - | MPLS_UNDERLAY | 50 | point-to-point | level-1-2 |
+| Ethernet3 | - | MPLS_UNDERLAY | 50 | point-to-point | level-2 |
 
 ### Ethernet Interfaces Device Configuration
 
@@ -319,7 +324,7 @@ interface Ethernet3
    no switchport
    ip address unnumbered loopback0
    isis enable MPLS_UNDERLAY
-   isis circuit-type level-1-2
+   isis circuit-type level-2
    isis metric 50
    isis network point-to-point
    no isis hello padding
@@ -350,6 +355,12 @@ interface Ethernet6.200
    no shutdown
    encapsulation vlan
      client dot1q 200
+!
+interface Ethernet7
+   no shutdown
+   no switchport
+   no lldp transmit
+   no lldp receive
 ```
 
 ## Loopback Interfaces
@@ -384,7 +395,33 @@ interface Loopback0
    ip address 100.70.0.5/32
    isis enable MPLS_UNDERLAY
    isis passive
+   mpls ldp interface
    node-segment ipv4 index 205
+```
+
+## VLAN Interfaces
+
+### VLAN Interfaces Summary
+
+| Interface | Description | VRF |  MTU | Shutdown |
+| --------- | ----------- | --- | ---- | -------- |
+| Vlan2020 |  TENANT_B_INSIDE_FW  |  TENANT_B_INTRA  |  -  |  false  |
+
+#### IPv4
+
+| Interface | VRF | IP Address | IP Address Virtual | IP Router Virtual Address | VRRP | ACL In | ACL Out |
+| --------- | --- | ---------- | ------------------ | ------------------------- | ---- | ------ | ------- |
+| Vlan2020 |  TENANT_B_INTRA  |  -  |  -  |  -  |  -  |  -  |  -  |
+
+
+### VLAN Interfaces Device Configuration
+
+```eos
+!
+interface Vlan2020
+   description TENANT_B_INSIDE_FW
+   no shutdown
+   vrf TENANT_B_INTRA
 ```
 
 # Routing
@@ -560,11 +597,13 @@ router isis MPLS_UNDERLAY
 | VLAN | Route-Distinguisher | Both Route-Target | Import Route Target | Export Route-Target | Redistribute |
 | ---- | ------------------- | ----------------- | ------------------- | ------------------- | ------------ |
 | 10 | 100.70.0.5:10010 | 65000:10010 | - | - | learned |
+| 2020 | 100.70.0.5:22020 | 65000:22020 | - | - | learned |
 
 #### Router BGP VPWS Instances
 
 | Instance | Route-Distinguisher | Both Route-Target| Pseudowire | Local ID | Remote ID |
 | -------- | ------------------- | -----------------| ---------- | -------- | --------- |
+| TENANT_A | 100.70.0.5:1000 | 65000:1000 | TEN_A_site2_site5_eline_port_based | 57100 | 26100 |
 
 #### Router BGP EVPN VRFs
 
@@ -601,9 +640,17 @@ router bgp 65000
       route-target both 65000:10010
       redistribute learned
    !
+   vlan 2020
+      rd 100.70.0.5:22020
+      route-target both 65000:22020
+      redistribute learned
+   !
    vpws TENANT_A
       rd 100.70.0.5:1000
       route-target import export evpn 65000:1000
+      !
+      pseudowire TEN_A_site2_site5_eline_port_based
+         evpn vpws id local 57100 remote 26100
    !
    address-family evpn
       neighbor default encapsulation mpls next-hop-self source-interface Loopback0
@@ -622,7 +669,11 @@ router bgp 65000
    !
    vrf TENANT_B_INTRA
       rd 100.70.0.5:19
+      route-target import vpn-ipv4 65000:19
+      route-target import vpn-ipv6 65000:19
       route-target import evpn 65000:19
+      route-target export vpn-ipv4 65000:19
+      route-target export vpn-ipv6 65000:19
       route-target export evpn 65000:19
       router-id 100.70.0.5
       redistribute connected
@@ -694,7 +745,7 @@ mpls ldp
 | Ethernet1 | True | True | True |
 | Ethernet2 | True | True | True |
 | Ethernet3 | True | True | True |
-| Loopback0 | - | - | - |
+| Loopback0 | - | True | - |
 
 # Patch Panel
 
@@ -702,6 +753,7 @@ mpls ldp
 
 | Patch Name | Enabled | Connector A Type | Connector A Endpoint | Connector B Type | Connector B Endpoint |
 | ---------- | ------- | ---------------- | -------------------- | ---------------- | -------------------- |
+| TEN_A_site2_site5_eline_port_based | True | Interface | Ethernet7 | Pseudowire | bgp vpws TENANT_A pseudowire TEN_A_site2_site5_eline_port_based |
 | TEN_B_site3_site5_eline_vlan_based | True | Interface | Ethernet6.200 | Pseudowire | bgp vpws TENANT_B pseudowire TEN_B_site3_site5_eline_vlan_based |
 
 ## Patch Panel Configuration
@@ -709,6 +761,10 @@ mpls ldp
 ```eos
 !
 patch panel
+   patch TEN_A_site2_site5_eline_port_based
+      connector 1 interface Ethernet7
+      connector 2 pseudowire bgp vpws TENANT_A pseudowire TEN_A_site2_site5_eline_port_based
+   !
    patch TEN_B_site3_site5_eline_vlan_based
       connector 1 interface Ethernet6.200
       connector 2 pseudowire bgp vpws TENANT_B pseudowire TEN_B_site3_site5_eline_vlan_based

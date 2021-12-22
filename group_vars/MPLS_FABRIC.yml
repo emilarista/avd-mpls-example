@@ -4,9 +4,8 @@
 fabric_name: MPLS_FABRIC
 
 underlay_routing_protocol: isis
-isis_advertise_passive_only: true
-# Disabling ISIS hello padding makes it easier with vEOS-lab.
-isis_hello_padding: false
+
+# ISIS TI-LFA config
 isis_ti_lfa:
   enabled: true
   protection: link
@@ -16,6 +15,7 @@ isis_ti_lfa:
 isis_default_is_type: level-1-2
 isis_default_circuit_type: level-1-2
 isis_default_metric: 50
+isis_advertise_passive_only: true
 
 isis_sr: true
 mpls_ldp: true

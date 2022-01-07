@@ -23,6 +23,7 @@
   - [Ethernet Interfaces](#ethernet-interfaces)
   - [Port-Channel Interfaces](#port-channel-interfaces)
   - [Loopback Interfaces](#loopback-interfaces)
+  - [VLAN Interfaces](#vlan-interfaces)
 - [Routing](#routing)
   - [Service Routing Protocols Model](#service-routing-protocols-model)
   - [Virtual Router MAC Address](#virtual-router-mac-address)
@@ -42,6 +43,7 @@
 - [Multicast](#multicast)
   - [IP IGMP Snooping](#ip-igmp-snooping)
 - [Filters](#filters)
+  - [Route-maps](#route-maps)
 - [ACL](#acl)
 - [VRF Instances](#vrf-instances)
   - [VRF Instances Summary](#vrf-instances-summary)
@@ -99,15 +101,14 @@ ip name-server vrf MGMT 10.20.20.13
 ### Management API HTTP Summary
 
 | HTTP | HTTPS |
-| ---------- | ---------- |
-| default | true |
+| ---- | ----- |
+| False | True |
 
 ### Management API VRF Access
 
 | VRF Name | IPv4 ACL | IPv6 ACL |
 | -------- | -------- | -------- |
 | MGMT | - | - |
-
 
 ### Management API HTTP Configuration
 
@@ -227,6 +228,7 @@ vlan internal order ascending range 3700 3900
 | VLAN ID | Name | Trunk Groups |
 | ------- | ---- | ------------ |
 | 10 | TENANT_A_L2_SERVICE | - |
+| 2020 | TENANT_B_INSIDE_FW | - |
 
 ## VLANs Device Configuration
 
@@ -234,6 +236,9 @@ vlan internal order ascending range 3700 3900
 !
 vlan 10
    name TENANT_A_L2_SERVICE
+!
+vlan 2020
+   name TENANT_B_INSIDE_FW
 ```
 
 # Interfaces
@@ -246,7 +251,7 @@ vlan 10
 
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
-| Ethernet5 | CPE_TENANT_A_SITE1_Ethernet2 | *trunk | *10 | *- | *- | 5 |
+| Ethernet5 | CPE_TENANT_A_SITE1_Ethernet2 | *trunk | *2020 | *- | *- | 5 |
 
 *Inherited from Port-Channel Interface
 
@@ -349,7 +354,7 @@ interface Ethernet6
 
 | Interface | Description | Type | Mode | VLANs | Native VLAN | Trunk Group | LACP Fallback Timeout | LACP Fallback Mode | MLAG ID | EVPN ESI |
 | --------- | ----------- | ---- | ---- | ----- | ----------- | ------------| --------------------- | ------------------ | ------- | -------- |
-| Port-Channel5 | CPE_TENANT_A_SITE1_EVPN-A-A-PortChannel | switched | trunk | 10 | - | - | - | - | - | 0000:0000:0303:0202:0101 |
+| Port-Channel5 | CPE_TENANT_A_SITE1_EVPN-A-A-PortChannel | switched | trunk | 2020 | - | - | - | - | - | 0000:0000:0303:0202:0101 |
 
 ### Port-Channel Interfaces Device Configuration
 
@@ -359,7 +364,7 @@ interface Port-Channel5
    description CPE_TENANT_A_SITE1_EVPN-A-A-PortChannel
    no shutdown
    switchport
-   switchport trunk allowed vlan 10
+   switchport trunk allowed vlan 2020
    switchport mode trunk
    evpn ethernet-segment
       identifier 0000:0000:0303:0202:0101
@@ -404,6 +409,32 @@ interface Loopback0
    node-segment ipv4 index 202
 ```
 
+## VLAN Interfaces
+
+### VLAN Interfaces Summary
+
+| Interface | Description | VRF |  MTU | Shutdown |
+| --------- | ----------- | --- | ---- | -------- |
+| Vlan2020 |  TENANT_B_INSIDE_FW  |  TENANT_B_INTRA  |  -  |  false  |
+
+#### IPv4
+
+| Interface | VRF | IP Address | IP Address Virtual | IP Router Virtual Address | VRRP | ACL In | ACL Out |
+| --------- | --- | ---------- | ------------------ | ------------------------- | ---- | ------ | ------- |
+| Vlan2020 |  TENANT_B_INTRA  |  10.1.255.3/27  |  -  |  -  |  -  |  -  |  -  |
+
+
+### VLAN Interfaces Device Configuration
+
+```eos
+!
+interface Vlan2020
+   description TENANT_B_INSIDE_FW
+   no shutdown
+   vrf TENANT_B_INTRA
+   ip address 10.1.255.3/27
+```
+
 # Routing
 ## Service Routing Protocols Model
 
@@ -434,6 +465,7 @@ ip virtual-router mac-address 00:1c:73:00:dc:00
 | VRF | Routing Enabled |
 | --- | --------------- |
 | default | true|| MGMT | false |
+| TENANT_B_INTRA | true |
 
 ### IP Routing Device Configuration
 
@@ -441,6 +473,7 @@ ip virtual-router mac-address 00:1c:73:00:dc:00
 !
 ip routing
 no ip routing vrf MGMT
+ip routing vrf TENANT_B_INTRA
 ```
 ## IPv6 Routing
 
@@ -449,6 +482,7 @@ no ip routing vrf MGMT
 | VRF | Routing Enabled |
 | --- | --------------- |
 | default | true | | MGMT | false |
+| TENANT_B_INTRA | false |
 
 ### IPv6 Routing Device Configuration
 
@@ -482,9 +516,12 @@ ip route vrf MGMT 0.0.0.0/0 10.30.30.1
 | Net-ID | 49.0001.0000.0001.0002.00 |
 | Type | level-1-2 |
 | Address Family | ipv4 unicast |
+| Router-ID | 100.70.0.2 |
 | Log Adjacency Changes | True |
+| MPLS LDP Sync Default | True |
+| Local Convergence Delay (ms) | 15000 |
+| Advertise Passive-only | True |
 | SR MPLS Enabled | True |
-| SR MPLS Router-ID | 100.70.0.2 |
 
 ### ISIS Interfaces Summary
 
@@ -495,6 +532,12 @@ ip route vrf MGMT 0.0.0.0/0 10.30.30.1
 | Ethernet3 | MPLS_UNDERLAY | 60 | point-to-point |
 | Loopback0 | MPLS_UNDERLAY | - | passive |
 
+### ISIS Segment-routing Node-SID
+
+| Loopback | IPv4 Index | IPv6 Index |
+| -------- | ---------- | ---------- |
+| Loopback0 | 202 | - |
+
 ### Router ISIS Device Configuration
 
 ```eos
@@ -502,18 +545,17 @@ ip route vrf MGMT 0.0.0.0/0 10.30.30.1
 router isis MPLS_UNDERLAY
    net 49.0001.0000.0001.0002.00
    is-type level-1-2
-   advertise passive-only
    router-id ipv4 100.70.0.2
    log-adjacency-changes
    mpls ldp sync default
    timers local-convergence-delay 15000 protected-prefixes
+   advertise passive-only
    !
    address-family ipv4 unicast
       maximum-paths 4
       fast-reroute ti-lfa mode link-protection
    !
    segment-routing mpls
-      router-id 100.70.0.2
       no shutdown
 ```
 
@@ -552,8 +594,15 @@ router isis MPLS_UNDERLAY
 | -------- | --------- | --- | -------------- | -------------- |
 | 100.70.0.7 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS |
 | 100.70.0.8 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS |
+| 10.1.255.4 | 12345 | TENANT_B_INTRA | - | - |
 
 ### Router BGP EVPN Address Family
+
+#### EVPN Peer Groups
+
+| Peer Group | Activate |
+| ---------- | -------- |
+| MPLS-OVERLAY-PEERS | True |
 
 #### EVPN Neighbor Default Encapsulation
 
@@ -561,21 +610,24 @@ router isis MPLS_UNDERLAY
 | ------------------------------ | ------------------------------ |
 | mpls | Loopback0 |
 
-#### Router BGP EVPN MAC-VRFs
-
-##### VLAN Based
+### Router BGP VLANs
 
 | VLAN | Route-Distinguisher | Both Route-Target | Import Route Target | Export Route-Target | Redistribute |
 | ---- | ------------------- | ----------------- | ------------------- | ------------------- | ------------ |
 | 10 | 100.70.0.2:10010 | 65000:10010 | - | - | learned |
+| 2020 | 100.70.0.2:22020 | 65000:22020 | - | - | learned |
 
-#### Router BGP VPWS Instances
+### Router BGP VPWS Instances
 
-| Instance | Route-Distinguisher | Both Route-Target| Pseudowire | Local ID | Remote ID |
-| -------- | ------------------- | -----------------| ---------- | -------- | --------- |
+| Instance | Route-Distinguisher | Both Route-Target | Pseudowire | Local ID | Remote ID |
+| -------- | ------------------- | ----------------- | ---------- | -------- | --------- |
 | TENANT_A | 100.70.0.2:1000 | 65000:1000 | TEN_A_site2_site5_eline_port_based | 26100 | 57100 |
 
-#### Router BGP EVPN VRFs
+### Router BGP VRFs
+
+| VRF | Route-Distinguisher | Redistribute |
+| --- | ------------------- | ------------ |
+| TENANT_B_INTRA | 100.70.0.2:19 | connected |
 
 ### Router BGP Device Configuration
 
@@ -605,12 +657,21 @@ router bgp 65000
       route-target both 65000:10010
       redistribute learned
    !
+   vlan 2020
+      rd 100.70.0.2:22020
+      route-target both 65000:22020
+      redistribute learned
+   !
    vpws TENANT_A
       rd 100.70.0.2:1000
       route-target import export evpn 65000:1000
       !
       pseudowire TEN_A_site2_site5_eline_port_based
          evpn vpws id local 26100 remote 57100
+   !
+   vpws TENANT_B
+      rd 100.70.0.2:2000
+      route-target import export evpn 65000:2000
    !
    address-family evpn
       neighbor default encapsulation mpls next-hop-self source-interface Loopback0
@@ -626,6 +687,24 @@ router bgp 65000
    address-family vpn-ipv6
       neighbor MPLS-OVERLAY-PEERS activate
       neighbor default encapsulation mpls next-hop-self source-interface Loopback0
+   !
+   vrf TENANT_B_INTRA
+      rd 100.70.0.2:19
+      route-target import vpn-ipv4 65000:19
+      route-target import vpn-ipv6 65000:19
+      route-target import evpn 65000:19
+      route-target export vpn-ipv4 65000:19
+      route-target export vpn-ipv6 65000:19
+      route-target export evpn 65000:19
+      router-id 100.70.0.2
+      neighbor 10.1.255.4 remote-as 12345
+      neighbor 10.1.255.4 password 7 $1c$U4tL2vQP9QwZlxIV1K3/pw==
+      neighbor 10.1.255.4 description TENANT_B_CPE_SITE3
+      neighbor 10.1.255.4 route-map RM-TENANT_B_INTRA-10.1.255.4-SET-NEXT-HOP-OUT out
+      redistribute connected
+      !
+      address-family ipv4
+         neighbor 10.1.255.4 activate
 ```
 
 # BFD
@@ -717,6 +796,24 @@ IGMP snooping is globally enabled.
 
 # Filters
 
+## Route-maps
+
+### Route-maps Summary
+
+#### RM-TENANT_B_INTRA-10.1.255.4-SET-NEXT-HOP-OUT
+
+| Sequence | Type | Match and/or Set |
+| -------- | ---- | ---------------- |
+| 10 | permit | set ip next-hop 10.1.255.1 |
+
+### Route-maps Device Configuration
+
+```eos
+!
+route-map RM-TENANT_B_INTRA-10.1.255.4-SET-NEXT-HOP-OUT permit 10
+   set ip next-hop 10.1.255.1
+```
+
 # ACL
 
 # VRF Instances
@@ -726,12 +823,15 @@ IGMP snooping is globally enabled.
 | VRF Name | IP Routing |
 | -------- | ---------- |
 | MGMT | disabled |
+| TENANT_B_INTRA | enabled |
 
 ## VRF Instances Device Configuration
 
 ```eos
 !
 vrf instance MGMT
+!
+vrf instance TENANT_B_INTRA
 ```
 
 # Quality Of Service

@@ -99,14 +99,6 @@ router_bgp:
         - 65000:10010
       redistribute_routes:
       - learned
-    2020:
-      tenant: TENANT_B
-      rd: 100.70.0.5:22020
-      route_targets:
-        both:
-        - 65000:22020
-      redistribute_routes:
-      - learned
   vpws:
   - name: TENANT_A
     rd: 100.70.0.5:1000
@@ -205,15 +197,15 @@ loopback_interfaces:
     isis_enable: MPLS_UNDERLAY
     isis_passive: true
     node_segment:
-      index: 205
-      ipv4: true
+      ipv4_index: 205
 router_isis:
   instance: MPLS_UNDERLAY
   log_adjacency_changes: true
   net: 49.0001.0000.0001.0005.00
   router_id: 100.70.0.5
   is_type: level-1-2
-  advertise_passive_only: true
+  advertise:
+    passive_only: true
   mpls_ldp_sync_default: true
   timers:
     local_convergence:
@@ -324,7 +316,8 @@ ethernet_interfaces:
   Ethernet6.200:
     type: l2dot1q
     encapsulation_vlan:
-      client_dot1q: 200
+      client: dot1q 200
+      network: client
     peer_type: l3_interface
     shutdown: false
   Ethernet6:
@@ -360,20 +353,9 @@ vlans:
   10:
     tenant: TENANT_A
     name: TENANT_A_L2_SERVICE
-  2020:
-    tenant: TENANT_B
-    name: TENANT_B_INSIDE_FW
 ip_igmp_snooping:
   globally_enabled: true
 ip_virtual_router_mac_address: 00:1c:73:00:dc:00
-vlan_interfaces:
-  Vlan2020:
-    tenant: TENANT_B
-    tags:
-    - tag1
-    description: TENANT_B_INSIDE_FW
-    shutdown: false
-    vrf: TENANT_B_INTRA
 sflow:
   sample: 40000
   vrfs:

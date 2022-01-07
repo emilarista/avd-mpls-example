@@ -157,7 +157,7 @@ pe:
   node_groups:
     pe1-2:
       filter:
-        tenants: [ TENANT_A ]
+        tenants: [ TENANT_A, TENANT_B ]
         tags: [ site1-2 ]
       nodes:
         pe1:

@@ -136,15 +136,15 @@ loopback_interfaces:
     isis_enable: MPLS_UNDERLAY
     isis_passive: true
     node_segment:
-      index: 107
-      ipv4: true
+      ipv4_index: 107
 router_isis:
   instance: MPLS_UNDERLAY
   log_adjacency_changes: true
   net: 49.0001.0000.0002.0007.00
   router_id: 100.70.0.7
   is_type: level-1-2
-  advertise_passive_only: true
+  advertise:
+    passive_only: true
   mpls_ldp_sync_default: true
   timers:
     local_convergence:

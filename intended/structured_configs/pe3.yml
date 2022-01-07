@@ -176,15 +176,15 @@ loopback_interfaces:
     isis_enable: MPLS_UNDERLAY
     isis_passive: true
     node_segment:
-      index: 203
-      ipv4: true
+      ipv4_index: 203
 router_isis:
   instance: MPLS_UNDERLAY
   log_adjacency_changes: true
   net: 49.0001.0000.0001.0003.00
   router_id: 100.70.0.3
   is_type: level-1-2
-  advertise_passive_only: true
+  advertise:
+    passive_only: true
   mpls_ldp_sync_default: true
   timers:
     local_convergence:
@@ -302,7 +302,8 @@ ethernet_interfaces:
   Ethernet5.200:
     type: l2dot1q
     encapsulation_vlan:
-      client_dot1q: 200
+      client: dot1q 200
+      network: client
     peer_type: l3_interface
     shutdown: false
   Ethernet5:

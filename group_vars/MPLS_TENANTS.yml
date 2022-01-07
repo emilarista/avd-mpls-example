@@ -78,7 +78,18 @@ tenants:
               pe2:
                 ip_address: 10.1.255.3/27
             tags:
-              - tag1
+              - site1-2
+        bgp_peers:
+          10.1.255.4:
+            description: TENANT_B_CPE_SITE3
+            # ebgp_multihop: 1
+            nodes:
+            - pe1
+            - pe2
+            password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
+            remote_as: "12345"
+            set_ipv4_next_hop: 10.1.255.1
+
       TENANT_B_WAN:
         vrf_id: 20
         address_families:
@@ -138,7 +149,7 @@ tenants:
             password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
             remote_as: "65201"
             # send_community: all
-            # set_ipv4_nexthop: 123.123.123.1
+            # set_ipv4_next_hop: 123.123.123.1
             # route_map:
           192.168.48.3:
             description: TENANT_B_CPE_SITE5

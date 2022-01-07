@@ -90,15 +90,14 @@ ip name-server vrf MGMT 10.20.20.13
 ### Management API HTTP Summary
 
 | HTTP | HTTPS |
-| ---------- | ---------- |
-| default | true |
+| ---- | ----- |
+| False | True |
 
 ### Management API VRF Access
 
 | VRF Name | IPv4 ACL | IPv6 ACL |
 | -------- | -------- | -------- |
 | MGMT | - | - |
-
 
 ### Management API HTTP Configuration
 
@@ -378,9 +377,12 @@ ip route vrf MGMT 0.0.0.0/0 10.30.30.1
 | Net-ID | 49.0001.0000.0002.0008.00 |
 | Type | level-1-2 |
 | Address Family | ipv4 unicast |
+| Router-ID | 100.70.0.8 |
 | Log Adjacency Changes | True |
+| MPLS LDP Sync Default | True |
+| Local Convergence Delay (ms) | 15000 |
+| Advertise Passive-only | True |
 | SR MPLS Enabled | True |
-| SR MPLS Router-ID | 100.70.0.8 |
 
 ### ISIS Interfaces Summary
 
@@ -390,6 +392,12 @@ ip route vrf MGMT 0.0.0.0/0 10.30.30.1
 | Ethernet2 | MPLS_UNDERLAY | 60 | point-to-point |
 | Loopback0 | MPLS_UNDERLAY | - | passive |
 
+### ISIS Segment-routing Node-SID
+
+| Loopback | IPv4 Index | IPv6 Index |
+| -------- | ---------- | ---------- |
+| Loopback0 | 108 | - |
+
 ### Router ISIS Device Configuration
 
 ```eos
@@ -397,18 +405,17 @@ ip route vrf MGMT 0.0.0.0/0 10.30.30.1
 router isis MPLS_UNDERLAY
    net 49.0001.0000.0002.0008.00
    is-type level-1-2
-   advertise passive-only
    router-id ipv4 100.70.0.8
    log-adjacency-changes
    mpls ldp sync default
    timers local-convergence-delay 15000 protected-prefixes
+   advertise passive-only
    !
    address-family ipv4 unicast
       maximum-paths 4
       fast-reroute ti-lfa mode link-protection
    !
    segment-routing mpls
-      router-id 100.70.0.8
       no shutdown
 ```
 
@@ -470,15 +477,18 @@ router isis MPLS_UNDERLAY
 
 ### Router BGP EVPN Address Family
 
+#### EVPN Peer Groups
+
+| Peer Group | Activate |
+| ---------- | -------- |
+| MPLS-OVERLAY-PEERS | True |
+| RR-OVERLAY-PEERS | True |
+
 #### EVPN Neighbor Default Encapsulation
 
 | Neighbor Default Encapsulation | Next-hop-self Source Interface |
 | ------------------------------ | ------------------------------ |
 | mpls | - |
-
-#### Router BGP EVPN MAC-VRFs
-
-#### Router BGP EVPN VRFs
 
 ### Router BGP Device Configuration
 

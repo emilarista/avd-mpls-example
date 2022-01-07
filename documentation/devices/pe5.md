@@ -22,7 +22,6 @@
 - [Interfaces](#interfaces)
   - [Ethernet Interfaces](#ethernet-interfaces)
   - [Loopback Interfaces](#loopback-interfaces)
-  - [VLAN Interfaces](#vlan-interfaces)
 - [Routing](#routing)
   - [Service Routing Protocols Model](#service-routing-protocols-model)
   - [Virtual Router MAC Address](#virtual-router-mac-address)
@@ -99,15 +98,14 @@ ip name-server vrf MGMT 10.20.20.13
 ### Management API HTTP Summary
 
 | HTTP | HTTPS |
-| ---------- | ---------- |
-| default | true |
+| ---- | ----- |
+| False | True |
 
 ### Management API VRF Access
 
 | VRF Name | IPv4 ACL | IPv6 ACL |
 | -------- | -------- | -------- |
 | MGMT | - | - |
-
 
 ### Management API HTTP Configuration
 
@@ -227,7 +225,6 @@ vlan internal order ascending range 3700 3900
 | VLAN ID | Name | Trunk Groups |
 | ------- | ---- | ------------ |
 | 10 | TENANT_A_L2_SERVICE | - |
-| 2020 | TENANT_B_INSIDE_FW | - |
 
 ## VLANs Device Configuration
 
@@ -235,9 +232,6 @@ vlan internal order ascending range 3700 3900
 !
 vlan 10
    name TENANT_A_L2_SERVICE
-!
-vlan 2020
-   name TENANT_B_INSIDE_FW
 ```
 
 # Interfaces
@@ -270,6 +264,12 @@ vlan 2020
 | --------- | ----------- | ---- | --------------| ------------ | --- | --- | -------- | -------------- | -------------------| ----------- | ------------ |
 | Ethernet1 | P2P_LINK_TO_p6_Ethernet1 | routed | - | - | default | 1500 | false | - | *- | - | - |
 | Ethernet2 | P2P_LINK_TO_p4_Ethernet2 | routed | - | - | default | 1500 | false | - | *- | - | - |
+
+#### Flexible Encapsulation Interfaces
+
+| Interface | Description | Client Encapsulation | Network Encapsulation |
+| --------- | ----------- | -------------------- | --------------------- |
+| Ethernet6.200 | - | dot1q 200 | client |
 
 #### ISIS
 
@@ -353,7 +353,7 @@ interface Ethernet6.10
 interface Ethernet6.200
    no shutdown
    encapsulation vlan
-     client dot1q 200
+      client dot1q 200 network client
 !
 interface Ethernet7
    no shutdown
@@ -396,31 +396,6 @@ interface Loopback0
    isis passive
    mpls ldp interface
    node-segment ipv4 index 205
-```
-
-## VLAN Interfaces
-
-### VLAN Interfaces Summary
-
-| Interface | Description | VRF |  MTU | Shutdown |
-| --------- | ----------- | --- | ---- | -------- |
-| Vlan2020 |  TENANT_B_INSIDE_FW  |  TENANT_B_INTRA  |  -  |  false  |
-
-#### IPv4
-
-| Interface | VRF | IP Address | IP Address Virtual | IP Router Virtual Address | VRRP | ACL In | ACL Out |
-| --------- | --- | ---------- | ------------------ | ------------------------- | ---- | ------ | ------- |
-| Vlan2020 |  TENANT_B_INTRA  |  -  |  -  |  -  |  -  |  -  |  -  |
-
-
-### VLAN Interfaces Device Configuration
-
-```eos
-!
-interface Vlan2020
-   description TENANT_B_INSIDE_FW
-   no shutdown
-   vrf TENANT_B_INTRA
 ```
 
 # Routing
@@ -509,9 +484,12 @@ ip route vrf TENANT_B_INTRA 123.0.10.0/24 Ethernet6.10 123.1.1.3 name TENANT_B_S
 | Net-ID | 49.0001.0000.0001.0005.00 |
 | Type | level-1-2 |
 | Address Family | ipv4 unicast |
+| Router-ID | 100.70.0.5 |
 | Log Adjacency Changes | True |
+| MPLS LDP Sync Default | True |
+| Local Convergence Delay (ms) | 15000 |
+| Advertise Passive-only | True |
 | SR MPLS Enabled | True |
-| SR MPLS Router-ID | 100.70.0.5 |
 
 ### ISIS Interfaces Summary
 
@@ -522,6 +500,12 @@ ip route vrf TENANT_B_INTRA 123.0.10.0/24 Ethernet6.10 123.1.1.3 name TENANT_B_S
 | Ethernet3 | MPLS_UNDERLAY | 50 | point-to-point |
 | Loopback0 | MPLS_UNDERLAY | - | passive |
 
+### ISIS Segment-routing Node-SID
+
+| Loopback | IPv4 Index | IPv6 Index |
+| -------- | ---------- | ---------- |
+| Loopback0 | 205 | - |
+
 ### Router ISIS Device Configuration
 
 ```eos
@@ -529,18 +513,17 @@ ip route vrf TENANT_B_INTRA 123.0.10.0/24 Ethernet6.10 123.1.1.3 name TENANT_B_S
 router isis MPLS_UNDERLAY
    net 49.0001.0000.0001.0005.00
    is-type level-1-2
-   advertise passive-only
    router-id ipv4 100.70.0.5
    log-adjacency-changes
    mpls ldp sync default
    timers local-convergence-delay 15000 protected-prefixes
+   advertise passive-only
    !
    address-family ipv4 unicast
       maximum-paths 4
       fast-reroute ti-lfa mode link-protection
    !
    segment-routing mpls
-      router-id 100.70.0.5
       no shutdown
 ```
 
@@ -583,29 +566,32 @@ router isis MPLS_UNDERLAY
 
 ### Router BGP EVPN Address Family
 
+#### EVPN Peer Groups
+
+| Peer Group | Activate |
+| ---------- | -------- |
+| MPLS-OVERLAY-PEERS | True |
+
 #### EVPN Neighbor Default Encapsulation
 
 | Neighbor Default Encapsulation | Next-hop-self Source Interface |
 | ------------------------------ | ------------------------------ |
 | mpls | Loopback0 |
 
-#### Router BGP EVPN MAC-VRFs
-
-##### VLAN Based
+### Router BGP VLANs
 
 | VLAN | Route-Distinguisher | Both Route-Target | Import Route Target | Export Route-Target | Redistribute |
 | ---- | ------------------- | ----------------- | ------------------- | ------------------- | ------------ |
 | 10 | 100.70.0.5:10010 | 65000:10010 | - | - | learned |
-| 2020 | 100.70.0.5:22020 | 65000:22020 | - | - | learned |
 
-#### Router BGP VPWS Instances
+### Router BGP VPWS Instances
 
-| Instance | Route-Distinguisher | Both Route-Target| Pseudowire | Local ID | Remote ID |
-| -------- | ------------------- | -----------------| ---------- | -------- | --------- |
+| Instance | Route-Distinguisher | Both Route-Target | Pseudowire | Local ID | Remote ID |
+| -------- | ------------------- | ----------------- | ---------- | -------- | --------- |
 | TENANT_A | 100.70.0.5:1000 | 65000:1000 | TEN_A_site2_site5_eline_port_based | 57100 | 26100 |
 | TENANT_B | 100.70.0.5:2000 | 65000:2000 | TEN_B_site3_site5_eline_vlan_based | 56200 | 35200 |
 
-#### Router BGP EVPN VRFs
+### Router BGP VRFs
 
 | VRF | Route-Distinguisher | Redistribute |
 | --- | ------------------- | ------------ |
@@ -638,11 +624,6 @@ router bgp 65000
    vlan 10
       rd 100.70.0.5:10010
       route-target both 65000:10010
-      redistribute learned
-   !
-   vlan 2020
-      rd 100.70.0.5:22020
-      route-target both 65000:22020
       redistribute learned
    !
    vpws TENANT_A

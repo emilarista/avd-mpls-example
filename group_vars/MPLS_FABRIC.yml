@@ -3,9 +3,10 @@
 # local users
 fabric_name: MPLS_FABRIC
 
-underlay_routing_protocol: isis
+underlay_routing_protocol: isis-sr-ldp
 
-# ISIS TI-LFA config
+# Disabling ISIS hello padding makes it easier with vEOS-lab.
+
 isis_ti_lfa:
   enabled: true
   protection: link
@@ -13,15 +14,12 @@ isis_ti_lfa:
 
 # What should the defaults be?
 isis_default_is_type: level-1-2
-isis_default_circuit_type: level-1-2
+isis_default_circuit_type: level-2
 isis_default_metric: 50
 isis_advertise_passive_only: true
 
-isis_sr: true
-mpls_ldp: true
-
 # ibgp should be default
-overlay_routing_protocol: ibgp
+# overlay_routing_protocol: ibgp
 bgp_as: 65000
 # If meshing PEs, client-to-client reflection can be turned off using rr bgp defaults.
 # bgp_mesh_pes: true
@@ -112,7 +110,7 @@ p:
   defaults:
     loopback_ipv4_pool: 100.70.0.0/24
     loopback_ipv6_pool: "2000:1234:ffff:ffff::/64"
-    is_type: level-1-2
+    # is_type: level-1-2
     node_sid_base: 300
     isis_system_id_prefix: '0000.0000'
     raw_eos_cli: |
@@ -136,7 +134,6 @@ pe:
     platform: vEOS-LAB
     loopback_ipv4_pool: 100.70.0.0/24
     loopback_ipv6_pool: "2000:1234:ffff:ffff::/64"
-    # node_sid_base: 10
     is_type: level-1-2
     node_sid_base: 200
     isis_system_id_prefix: '0000.0001'
@@ -157,7 +154,7 @@ pe:
   node_groups:
     pe1-2:
       filter:
-        tenants: [ TENANT_A ]
+        tenants: [ TENANT_A, TENANT_B ]
         tags: [ site1-2 ]
       nodes:
         pe1:
@@ -177,7 +174,7 @@ pe:
     pe5:
       filter:
         tenants: [ TENANT_A, TENANT_B ]
-        tags: [ site5 ]
+        tags: [ site5, tag1 ]
       nodes:
         pe5:
           id: 5
@@ -204,6 +201,7 @@ rr:
   node_groups:
     rr7-8:
       bgp_cluster_id: 7.7.7.7
+      # evpn_gw:
       nodes:
         rr7:
           id: 7

@@ -6,10 +6,14 @@ port_profiles:
     mode: trunk
     vlans: 10
     spanning_tree_portfast: edge
+  TENANT_B_2020:
+    mode: trunk
+    vlans: 2020
+    spanning_tree_portfast: edge
 cpes:
   CPE_TENANT_A_SITE1:
     adapters:
-    - profile: TENANT_A_WAN_SERVICE_10
+    - profile: TENANT_B_2020
       endpoint_ports:
       - Ethernet1
       - Ethernet2

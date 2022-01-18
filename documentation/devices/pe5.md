@@ -267,9 +267,9 @@ vlan 10
 
 #### Flexible Encapsulation Interfaces
 
-| Interface | Description | Client Encapsulation | Network Encapsulation |
-| --------- | ----------- | -------------------- | --------------------- |
-| Ethernet6.200 | - | dot1q 200 | client |
+| Interface | Description | Client Unmatched | Client Dot1q VLAN | Client Dot1q Outer Tag | Client Dot1q Inner Tag | Network Retain Client Encapsulation | Network Dot1q VLAN | Network Dot1q Outer Tag | Network Dot1q Inner Tag |
+| --------- | ----------- | -----------------| ----------------- | ---------------------- | ---------------------- | ----------------------------------- | ------------------ | ----------------------- | ----------------------- |
+| Ethernet6.200 | - | False | 200 | - | - | True | - | - | - |
 
 #### ISIS
 
@@ -446,16 +446,10 @@ ip routing vrf TENANT_B_WAN
 
 | VRF | Routing Enabled |
 | --- | --------------- |
-| default | true | | MGMT | false |
+| default | false || MGMT | false |
 | TENANT_B_INTRA | false |
 | TENANT_B_WAN | false |
 
-### IPv6 Routing Device Configuration
-
-```eos
-!
-ipv6 unicast-routing
-```
 
 ## Static Routes
 
@@ -558,11 +552,11 @@ router isis MPLS_UNDERLAY
 
 ### BGP Neighbors
 
-| Neighbor | Remote AS | VRF | Send-community | Maximum-routes |
-| -------- | --------- | --- | -------------- | -------------- |
-| 100.70.0.7 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS |
-| 100.70.0.8 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS |
-| 192.168.48.3 | 65202 | TENANT_B_WAN | - | - |
+| Neighbor | Remote AS | VRF | Send-community | Maximum-routes | Allowas-in |
+| -------- | --------- | --- | -------------- | -------------- | ---------- |
+| 100.70.0.7 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - |
+| 100.70.0.8 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - |
+| 192.168.48.3 | 65202 | TENANT_B_WAN | - | - | - |
 
 ### Router BGP EVPN Address Family
 

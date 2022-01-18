@@ -75,7 +75,6 @@ static_routes:
   gateway: 10.30.30.1
 service_routing_protocols_model: multi-agent
 ip_routing: true
-ipv6_unicast_routing: true
 daemon_terminattr:
   cvaddrs:
   - 10.20.20.20:9910

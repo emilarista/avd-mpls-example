@@ -481,15 +481,9 @@ ip routing vrf TENANT_B_INTRA
 
 | VRF | Routing Enabled |
 | --- | --------------- |
-| default | true | | MGMT | false |
+| default | false || MGMT | false |
 | TENANT_B_INTRA | false |
 
-### IPv6 Routing Device Configuration
-
-```eos
-!
-ipv6 unicast-routing
-```
 
 ## Static Routes
 
@@ -590,11 +584,11 @@ router isis MPLS_UNDERLAY
 
 ### BGP Neighbors
 
-| Neighbor | Remote AS | VRF | Send-community | Maximum-routes |
-| -------- | --------- | --- | -------------- | -------------- |
-| 100.70.0.7 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS |
-| 100.70.0.8 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS |
-| 10.1.255.4 | 12345 | TENANT_B_INTRA | - | - |
+| Neighbor | Remote AS | VRF | Send-community | Maximum-routes | Allowas-in |
+| -------- | --------- | --- | -------------- | -------------- | ---------- |
+| 100.70.0.7 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - |
+| 100.70.0.8 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - |
+| 10.1.255.4 | 12345 | TENANT_B_INTRA | - | - | - |
 
 ### Router BGP EVPN Address Family
 
@@ -668,10 +662,6 @@ router bgp 65000
       !
       pseudowire TEN_A_site2_site5_eline_port_based
          evpn vpws id local 26100 remote 57100
-   !
-   vpws TENANT_B
-      rd 100.70.0.2:2000
-      route-target import export evpn 65000:2000
    !
    address-family evpn
       neighbor default encapsulation mpls next-hop-self source-interface Loopback0

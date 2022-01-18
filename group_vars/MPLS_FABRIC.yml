@@ -3,7 +3,7 @@
 # local users
 fabric_name: MPLS_FABRIC
 
-underlay_routing_protocol: isis
+underlay_routing_protocol: isis-sr-ldp
 
 # Disabling ISIS hello padding makes it easier with vEOS-lab.
 
@@ -17,9 +17,6 @@ isis_default_is_type: level-1-2
 isis_default_circuit_type: level-2
 isis_default_metric: 50
 isis_advertise_passive_only: true
-
-isis_sr: true
-mpls_ldp: true
 
 # ibgp should be default
 # overlay_routing_protocol: ibgp

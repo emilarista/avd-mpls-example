@@ -104,17 +104,12 @@ router_bgp:
     - name: TEN_A_site2_site5_eline_port_based
       id_local: 26100
       id_remote: 57100
-  - name: TENANT_B
-    rd: 100.70.0.2:2000
-    route_targets:
-      import_export: 65000:2000
 static_routes:
 - vrf: MGMT
   destination_address_prefix: 0.0.0.0/0
   gateway: 10.30.30.1
 service_routing_protocols_model: multi-agent
 ip_routing: true
-ipv6_unicast_routing: true
 daemon_terminattr:
   cvaddrs:
   - 10.20.20.20:9910

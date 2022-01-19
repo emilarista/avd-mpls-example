@@ -222,6 +222,8 @@ ethernet_interfaces:
     isis_network_point_to_point: true
     isis_hello_padding: false
     isis_circuit_type: level-2
+    isis_authentication_mode: md5
+    isis_authentication_key: $1c$sTNAlR6rKSw=
     mpls:
       ip: true
       ldp:
@@ -243,6 +245,8 @@ ethernet_interfaces:
     isis_network_point_to_point: true
     isis_hello_padding: false
     isis_circuit_type: level-2
+    isis_authentication_mode: md5
+    isis_authentication_key: $1c$sTNAlR6rKSw=
     mpls:
       ip: true
       ldp:
@@ -264,6 +268,8 @@ ethernet_interfaces:
     isis_network_point_to_point: true
     isis_hello_padding: false
     isis_circuit_type: level-2
+    isis_authentication_mode: md5
+    isis_authentication_key: $1c$sTNAlR6rKSw=
     mpls:
       ip: true
       ldp:

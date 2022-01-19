@@ -34,6 +34,8 @@ rr,rr7,Ethernet1,pe,pe3,Ethernet3
 rr,rr7,Ethernet2,pe,pe1,Ethernet3
 rr,rr7,Ethernet3,pe,pe5,Ethernet3
 rr,rr7,Ethernet4,p,p4,Ethernet3
-rr,rr7,Ethernet5,rr,rr8,Ethernet2
+rr,rr7,Ethernet5,,,
+rr,rr7,Ethernet6,,,
 rr,rr8,Ethernet1,pe,pe2,Ethernet3
-rr,rr8,Ethernet2,rr,rr7,Ethernet5
+rr,rr8,Ethernet2,,,
+rr,rr8,Ethernet3,,,

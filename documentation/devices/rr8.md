@@ -18,6 +18,7 @@
   - [Internal VLAN Allocation Policy Configuration](#internal-vlan-allocation-policy-configuration)
 - [Interfaces](#interfaces)
   - [Ethernet Interfaces](#ethernet-interfaces)
+  - [Port-Channel Interfaces](#port-channel-interfaces)
   - [Loopback Interfaces](#loopback-interfaces)
 - [Routing](#routing)
   - [Service Routing Protocols Model](#service-routing-protocols-model)
@@ -178,9 +179,6 @@ sflow run
 
 STP mode: **none**
 
-### Global Spanning-Tree Settings
-
-
 ## Spanning Tree Device Configuration
 
 ```eos
@@ -221,21 +219,24 @@ vlan internal order ascending range 3700 3900
 | Interface | Description | Type | Channel Group | IP Address | VRF |  MTU | Shutdown | ACL In | ACL Out |
 | --------- | ----------- | -----| ------------- | ---------- | ----| ---- | -------- | ------ | ------- |
 | Ethernet1 | P2P_LINK_TO_pe2_Ethernet3 | routed | - | 100.64.48.7/31 | default | 1500 | false | - | - |
-| Ethernet2 | P2P_LINK_TO_rr7_Ethernet5 | routed | - | 100.64.48.23/31 | default | 1500 | false | - | - |
+| Ethernet2 | P2P_LINK_TO_rr7_Port-Channel5 | *routed | 2 | *100.64.48.23/31 | **default | *1500 | *false | **- | **- |
+| Ethernet3 | P2P_LINK_TO_rr7_Port-Channel5 | *routed | 2 | *100.64.48.23/31 | **default | *1500 | *false | **- | **- |
+*Inherited from Port-Channel Interface
 
 #### IPv6
 
 | Interface | Description | Type | Channel Group | IPv6 Address | VRF | MTU | Shutdown | ND RA Disabled | Managed Config Flag | IPv6 ACL In | IPv6 ACL Out |
 | --------- | ----------- | ---- | --------------| ------------ | --- | --- | -------- | -------------- | -------------------| ----------- | ------------ |
 | Ethernet1 | P2P_LINK_TO_pe2_Ethernet3 | routed | - | - | default | 1500 | false | - | *- | - | - |
-| Ethernet2 | P2P_LINK_TO_rr7_Ethernet5 | routed | - | - | default | 1500 | false | - | *- | - | - |
 
 #### ISIS
 
-| Interface | Channel Group | ISIS Instance | ISIS Metric | Mode | ISIS Circuit Type |
-| --------- | ------------- | ------------- | ----------- | ---- | ----------------- |
-| Ethernet1 | - | MPLS_UNDERLAY | 60 | point-to-point | level-2 |
-| Ethernet2 | - | MPLS_UNDERLAY | 60 | point-to-point | level-2 |
+| Interface | Channel Group | ISIS Instance | ISIS Metric | Mode | ISIS Circuit Type | Hello Padding | Authentication Mode |
+| --------- | ------------- | ------------- | ----------- | ---- | ----------------- | ------------- | ------------------- |
+| Ethernet1 | - | MPLS_UNDERLAY | 60 | point-to-point | level-2 | False | md5 |
+| Ethernet2 | 2 | *MPLS_UNDERLAY | *60 | *point-to-point | *level-2 | False | md5 |
+| Ethernet3 | 2 | *MPLS_UNDERLAY | *60 | *point-to-point | *level-2 | False | md5 |
+ *Inherited from Port-Channel Interface
 
 ### Ethernet Interfaces Device Configuration
 
@@ -254,26 +255,65 @@ interface Ethernet1
    isis metric 60
    isis network point-to-point
    no isis hello padding
+   isis authentication mode md5
+   isis authentication key 7 $1c$sTNAlR6rKSw=
    mpls ip
    mpls ldp interface
    mpls ldp igp sync
 !
 interface Ethernet2
-   description P2P_LINK_TO_rr7_Ethernet5
+   description P2P_LINK_TO_rr7_Port-Channel5
    no shutdown
-   speed 100full
+   channel-group 2 mode active
+!
+interface Ethernet3
+   description P2P_LINK_TO_rr7_Port-Channel5
+   no shutdown
+   channel-group 2 mode active
+```
+
+## Port-Channel Interfaces
+
+### Port-Channel Interfaces Summary
+
+#### L2
+
+| Interface | Description | Type | Mode | VLANs | Native VLAN | Trunk Group | LACP Fallback Timeout | LACP Fallback Mode | MLAG ID | EVPN ESI |
+| --------- | ----------- | ---- | ---- | ----- | ----------- | ------------| --------------------- | ------------------ | ------- | -------- |
+
+#### IPv4
+
+| Interface | Description | Type | MLAG ID | IP Address | VRF | MTU | Shutdown | ACL In | ACL Out |
+| --------- | ----------- | ---- | ------- | ---------- | --- | --- | -------- | ------ | ------- |
+| Port-Channel2 | P2P_LINK_TO_rr7_Port-Channel5 | routed | - | 100.64.48.23/31 | default | 1500 | false | - | - |
+
+#### ISIS
+
+| Interface | ISIS Instance | ISIS Metric | Mode | ISIS Circuit Type | Hello Padding | Authentication Mode |
+| --------- | ------------- | ----------- | ---- | ----------------- | ------------- | ------------------- |
+| Port-Channel2 | MPLS_UNDERLAY | 60 | point-to-point | level-2 | False | md5 |
+
+### Port-Channel Interfaces Device Configuration
+
+```eos
+!
+interface Port-Channel2
+   description P2P_LINK_TO_rr7_Port-Channel5
+   no shutdown
    mtu 1500
    no switchport
    ip address 100.64.48.23/31
    ipv6 enable
+   mpls ip
+   mpls ldp interface
+   mpls ldp igp sync
    isis enable MPLS_UNDERLAY
    isis circuit-type level-2
    isis metric 60
    isis network point-to-point
    no isis hello padding
-   mpls ip
-   mpls ldp interface
-   mpls ldp igp sync
+   isis authentication mode md5
+   isis authentication key 7 $1c$sTNAlR6rKSw=
 ```
 
 ## Loopback Interfaces
@@ -383,7 +423,6 @@ ip route vrf MGMT 0.0.0.0/0 10.30.30.1
 | Interface | ISIS Instance | ISIS Metric | Interface Mode |
 | --------- | ------------- | ----------- | -------------- |
 | Ethernet1 | MPLS_UNDERLAY | 60 | point-to-point |
-| Ethernet2 | MPLS_UNDERLAY | 60 | point-to-point |
 | Loopback0 | MPLS_UNDERLAY | - | passive |
 
 ### ISIS Segment-routing Node-SID
@@ -591,8 +630,8 @@ mpls ldp
 | Interface | MPLS IP Enabled | LDP Enabled | IGP Sync |
 | --------- | --------------- | ----------- | -------- |
 | Ethernet1 | True | True | True |
-| Ethernet2 | True | True | True |
 | Loopback0 | - | True | - |
+| Port-Channel2 | True | True | True |
 
 # Multicast
 

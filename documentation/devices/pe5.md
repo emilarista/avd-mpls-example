@@ -192,9 +192,6 @@ STP mode: **mstp**
 | -------- | -------- |
 | 0 | 4096 |
 
-### Global Spanning-Tree Settings
-
-
 ## Spanning Tree Device Configuration
 
 ```eos
@@ -273,11 +270,11 @@ vlan 10
 
 #### ISIS
 
-| Interface | Channel Group | ISIS Instance | ISIS Metric | Mode | ISIS Circuit Type |
-| --------- | ------------- | ------------- | ----------- | ---- | ----------------- |
-| Ethernet1 | - | MPLS_UNDERLAY | 60 | point-to-point | level-2 |
-| Ethernet2 | - | MPLS_UNDERLAY | 60 | point-to-point | level-2 |
-| Ethernet3 | - | MPLS_UNDERLAY | 50 | point-to-point | level-2 |
+| Interface | Channel Group | ISIS Instance | ISIS Metric | Mode | ISIS Circuit Type | Hello Padding | Authentication Mode |
+| --------- | ------------- | ------------- | ----------- | ---- | ----------------- | ------------- | ------------------- |
+| Ethernet1 | - | MPLS_UNDERLAY | 60 | point-to-point | level-2 | False | md5 |
+| Ethernet2 | - | MPLS_UNDERLAY | 60 | point-to-point | level-2 | False | md5 |
+| Ethernet3 | - | MPLS_UNDERLAY | 50 | point-to-point | level-2 | True | - |
 
 ### Ethernet Interfaces Device Configuration
 
@@ -296,6 +293,8 @@ interface Ethernet1
    isis metric 60
    isis network point-to-point
    no isis hello padding
+   isis authentication mode md5
+   isis authentication key 7 $1c$sTNAlR6rKSw=
    mpls ip
    mpls ldp interface
    mpls ldp igp sync
@@ -313,6 +312,8 @@ interface Ethernet2
    isis metric 60
    isis network point-to-point
    no isis hello padding
+   isis authentication mode md5
+   isis authentication key 7 $1c$sTNAlR6rKSw=
    mpls ip
    mpls ldp interface
    mpls ldp igp sync

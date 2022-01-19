@@ -3,7 +3,9 @@
 # local users
 fabric_name: MPLS_FABRIC
 
+# Optional, defaults to isis-sr
 underlay_routing_protocol: isis-sr-ldp
+
 
 # Disabling ISIS hello padding makes it easier with vEOS-lab.
 
@@ -18,7 +20,7 @@ isis_default_circuit_type: level-2
 isis_default_metric: 50
 isis_advertise_passive_only: true
 
-# ibgp should be default
+# iBGP is the default and only supported overlay protocol currently
 # overlay_routing_protocol: ibgp
 bgp_as: 65000
 # If meshing PEs, client-to-client reflection can be turned off using rr bgp defaults.
@@ -40,21 +42,21 @@ internal_vlan_order:
 # Update p2p mtu
 p2p_uplinks_mtu: 1600
 
-# local_users:
-#   someuser:
-#     privilege: 15
-#     role: network-admin
-#     sha512_password: "someshapassword"
+local_users:
+  someuser:
+    privilege: 15
+    role: network-admin
+    sha512_password: "someshapassword"
 
-#   cvpadmin:
-#     privilege: 15
-#     role: network-admin
-#     sha512_password: "someshapassword"
+  cvpadmin:
+    privilege: 15
+    role: network-admin
+    sha512_password: "someshapassword"
 
 # Cloud Vision server information
 cvp_instance_ip: 10.20.20.20
 # This ingest key is set at CVP install time.
-# cvp_ingestauth_key: somekey
+cvp_ingestauth_key: somekey
 
 # OOB Management network default gateway.
 mgmt_gateway: 10.30.30.1

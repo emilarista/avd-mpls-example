@@ -228,6 +228,8 @@ backbone_interfaces:
       ip_pool: underlay_pool
       isis_circuit_type: level-2
       ipv6_enable: true
+      isis_authentication_mode: md5
+      isis_authentication_key: $1c$sTNAlR6rKSw=
   p2p_links:
     # PE1 links
     # If using IP unnumbered we don't even need 2 nodes or id or pool or a second interface...
@@ -295,5 +297,9 @@ backbone_interfaces:
     # RR8 links
     - nodes: [ rr7, rr8 ]
       id: 12
-      interfaces: [ Ethernet5, Ethernet2 ]
+      port_channel:
+        mode: active
+        nodes_child_interfaces:
+          rr7: [ Ethernet5, Ethernet6 ]
+          rr8: [ Ethernet2, Ethernet3 ]
       profile: default_bb_profile

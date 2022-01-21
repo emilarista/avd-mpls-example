@@ -6,7 +6,6 @@ fabric_name: MPLS_FABRIC
 # Optional, defaults to isis-sr
 underlay_routing_protocol: isis-sr-ldp
 
-
 # Disabling ISIS hello padding makes it easier with vEOS-lab.
 
 isis_ti_lfa:

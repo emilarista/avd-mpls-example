@@ -2,13 +2,54 @@ tenants:
   TENANT_A:
     mac_vrf_rt_base: 10000
     pseudowire_rt_base: 1000
-    l1_services:
+    # l1_services:
+    #   - name: TEN_A_site2_site5_eline_port_based
+    #     type: vpws-pseudowire  # Should be default
+    #     ids: [ 26100, 57100 ]
+    #     nodes: ["pe2", "pe5"]
+    #     interfaces: ["Ethernet6", "Ethernet7"]
+    #     lldp_disable: true
+    point_to_point_services:
+      # simple p2p pseudowire, no redundancy, port-based
       - name: TEN_A_site2_site5_eline_port_based
-        type: vpws-pseudowire  # Should be default
-        ids: [ 26100, 57100 ]
-        nodes: ["pe2", "pe5"]
-        interfaces: ["Ethernet6", "Ethernet7"]
+        type: vpws-pseudowire
+        endpoints: # Or alternative name: "termination"
+          - id: 26
+            nodes: ["pe2"]
+            interfaces: ["Ethernet6"]
+          - id: 57
+            nodes: ["pe5"]
+            interfaces: ["Ethernet7"]
         lldp_disable: true
+      # pw with ESI active-active port channel on one side, single interface on other side.
+      # multiple subinterfaces will be created, own pw on each, IDs generated from endpoint.id + subif number.
+      - name: TEN_A_site3_site5_eline_vlan_based
+        type: vpws-pseudowire
+        subinterfaces:
+          - number: 1000
+          - number: 1001
+          - number: 1002
+          - number: 1003
+            # client_encapsulation:
+            #   dot1q_vlan: 1234
+            # network_encapsulation:
+            #   retain_client: true
+          - number: 10
+            # client_encapsulation:
+            #   match_any: true
+        endpoints:
+          - id: 10000
+            nodes: ["pe1", "pe2"]
+            interfaces: ["Ethernet5", "Ethernet5"]
+            port_channel:
+              mode: active
+              short_esi: 0303:0202:0101
+          - id: 58000
+            port_channel:
+              mode: active
+            nodes: ["pe5", "pe5"]
+            interfaces: ["Ethernet8", "Ethernet9"]
+
     l2vlans:
       10:
         name: TENANT_A_L2_SERVICE
@@ -18,12 +59,12 @@ tenants:
   TENANT_B:
     pseudowire_rt_base: 2000
     mac_vrf_rt_base: 20000
-    l1_services:
-      - name: TEN_B_site3_site5_eline_vlan_based
-        type: vpws-pseudowire  # Should be default
-        ids: [35200, 56200 ]
-        nodes: ["pe3", "pe5"]
-        interfaces: ["Ethernet5.200", "Ethernet6.200"]
+    # l1_services:
+    #   - name: TEN_B_site3_site5_eline_vlan_based
+    #     type: vpws-pseudowire  # Should be default
+    #     ids: [35200, 56200 ]
+    #     nodes: ["pe3", "pe5"]
+    #     interfaces: ["Ethernet5.200", "Ethernet6.200"]
     vrfs:
       TENANT_B_INTRA:
         vrf_id: 19
@@ -71,7 +112,7 @@ tenants:
           2020:
             enabled: true
             name: TENANT_B_INSIDE_FW
-            ip_virtual_router_address: 10.1.255.1
+            ip_virtual_router_addresses: [10.1.255.1]
             nodes:
               pe1:
                 ip_address: 10.1.255.2/27

@@ -28,23 +28,23 @@
 
 
 
-- name: Configuration deployment with CVP
-  hosts: cv_server
-  connection: local
-  gather_facts: false
-  tasks:
-    - name: run CVP provisioning
-      import_role:
-        name: arista.avd.eos_config_deploy_cvp
-      vars:
-        container_root: 'MPLS_FABRIC'
-        configlets_prefix: 'MPLS-AVD'
-        # execute_tasks: true
-        device_filter:
-          - "p"
-          - "pe"
-          - "rr"
-        search_key: hostname
-        state: present
-        cv_collection: v3
-        apply_mode: strict
+# - name: Configuration deployment with CVP
+#   hosts: cv_server
+#   connection: local
+#   gather_facts: false
+#   tasks:
+#     - name: run CVP provisioning
+#       import_role:
+#         name: arista.avd.eos_config_deploy_cvp
+#       vars:
+#         container_root: 'MPLS_FABRIC'
+#         configlets_prefix: 'MPLS-AVD'
+#         # execute_tasks: true
+#         device_filter:
+#           - "p"
+#           - "pe"
+#           - "rr"
+#         search_key: hostname
+#         state: present
+#         cv_collection: v3
+#         apply_mode: strict

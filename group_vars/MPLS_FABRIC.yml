@@ -233,8 +233,6 @@ backbone_interfaces:
       isis_authentication_key: $1c$sTNAlR6rKSw=
   p2p_links:
     # PE1 links
-    # If using IP unnumbered we don't even need 2 nodes or id or pool or a second interface...
-    # If pool is missing we default to unnumbered?
     - nodes: [ pe1, pe2 ]
       id: 1
       interfaces: [ Ethernet1, Ethernet1 ]
@@ -252,6 +250,8 @@ backbone_interfaces:
       # qos_profile: someprofile
     - nodes: [ pe1, rr7 ]
       id: 3
+      # Selectively turning off mpls_ip on links is now supported.
+      # mpls_ip: false
       interfaces: [ Ethernet3, Ethernet2 ]
       profile: default_bb_profile
 
@@ -260,6 +260,7 @@ backbone_interfaces:
       id: 4
       interfaces: [ Ethernet3, Ethernet1 ]
       profile: default_bb_profile
+      # mpls_ip: false
     - nodes: [ pe2, pe3 ]
       id: 5
       interfaces: [ Ethernet2, Ethernet2 ]
@@ -270,6 +271,7 @@ backbone_interfaces:
       id: 6
       interfaces: [ Ethernet3, Ethernet1 ]
       profile: default_bb_profile
+      # mpls_ip: false
     - nodes: [ pe3, p4 ]
       id: 7
       interfaces: [ Ethernet1, Ethernet1 ]
@@ -280,6 +282,7 @@ backbone_interfaces:
       id: 8
       interfaces: [ Ethernet3, Ethernet4 ]
       profile: default_bb_profile
+      # mpls_ip: false
     - nodes: [ p4, pe5 ]
       id: 9
       interfaces: [ Ethernet2, Ethernet2 ]
@@ -290,6 +293,7 @@ backbone_interfaces:
       id: 10
       interfaces: [ Ethernet3, Ethernet3 ]
       ip: ["unnumbered loopback0", "unnumbered loopback0"]
+      # mpls_ip: false
     - nodes: [ pe5, p6 ]
       id: 11
       interfaces: [ Ethernet1, Ethernet1 ]
@@ -298,6 +302,7 @@ backbone_interfaces:
     # RR8 links
     - nodes: [ rr7, rr8 ]
       id: 12
+      # mpls_ip: false
       port_channel:
         mode: active
         nodes_child_interfaces:

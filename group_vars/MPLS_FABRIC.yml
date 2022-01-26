@@ -251,7 +251,7 @@ backbone_interfaces:
     - nodes: [ pe1, rr7 ]
       id: 3
       # Selectively turning off mpls_ip on links is now supported.
-      # mpls_ip: false
+      mpls_ip: false
       interfaces: [ Ethernet3, Ethernet2 ]
       profile: default_bb_profile
 

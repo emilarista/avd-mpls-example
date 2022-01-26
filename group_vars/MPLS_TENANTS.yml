@@ -50,12 +50,12 @@ tenants:
             nodes: ["pe5", "pe5"]
             interfaces: ["Ethernet8", "Ethernet9"]
 
-    # l2vlans:
-    #   10:
-    #     name: TENANT_A_L2_SERVICE
-    #     tags:
-    #       - site1-2
-    #       - site5
+    l2vlans:
+      10:
+        name: TENANT_A_L2_SERVICE
+        tags:
+          - site1-2
+          - site5
   TENANT_B:
     pseudowire_rt_base: 2000
     mac_vrf_rt_base: 20000

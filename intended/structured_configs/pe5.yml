@@ -39,6 +39,10 @@ router_bgp:
     peer_groups:
       MPLS-OVERLAY-PEERS:
         activate: true
+  address_family_rtc:
+    peer_groups:
+      MPLS-OVERLAY-PEERS:
+        activate: true
   neighbors:
     100.70.0.7:
       peer_group: MPLS-OVERLAY-PEERS
@@ -46,50 +50,6 @@ router_bgp:
     100.70.0.8:
       peer_group: MPLS-OVERLAY-PEERS
       description: rr8
-  vrfs:
-    TENANT_B_INTRA:
-      router_id: 100.70.0.5
-      rd: 100.70.0.5:19
-      route_targets:
-        import:
-          vpn-ipv4:
-          - '65000:19'
-          vpn-ipv6:
-          - '65000:19'
-          evpn:
-          - '65000:19'
-        export:
-          vpn-ipv4:
-          - '65000:19'
-          vpn-ipv6:
-          - '65000:19'
-          evpn:
-          - '65000:19'
-      redistribute_routes:
-      - connected
-      - static
-    TENANT_B_WAN:
-      router_id: 100.70.0.5
-      rd: 100.70.0.5:20
-      route_targets:
-        import:
-          vpn-ipv4:
-          - '65000:20'
-        export:
-          vpn-ipv4:
-          - '65000:20'
-      neighbors:
-        192.168.48.3:
-          description: TENANT_B_CPE_SITE5
-          password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
-          remote_as: '65202'
-      redistribute_routes:
-      - connected
-      address_families:
-        ipv4:
-          neighbors:
-            192.168.48.3:
-              activate: true
   vlans:
     10:
       tenant: TENANT_A
@@ -127,11 +87,6 @@ static_routes:
 - vrf: MGMT
   destination_address_prefix: 0.0.0.0/0
   gateway: 10.30.30.1
-- destination_address_prefix: 123.0.10.0/24
-  vrf: TENANT_B_INTRA
-  gateway: 123.1.1.3
-  name: TENANT_B_SITE_5_SUBNET
-  interface: Ethernet6.10
 service_routing_protocols_model: multi-agent
 ip_routing: true
 daemon_terminattr:
@@ -172,12 +127,6 @@ local_users:
 vrfs:
   MGMT:
     ip_routing: false
-  TENANT_B_INTRA:
-    tenant: TENANT_B
-    ip_routing: true
-  TENANT_B_WAN:
-    tenant: TENANT_B
-    ip_routing: true
 management_interfaces:
   Management1:
     description: oob_management
@@ -308,23 +257,11 @@ ethernet_interfaces:
     mode: trunk
     vlans: 10
     spanning_tree_portfast: edge
-  Ethernet6.10:
-    type: l3dot1q
-    encapsulation_dot1q_vlan: 10
-    peer_type: l3_interface
-    vrf: TENANT_B_WAN
-    ip_address: 192.168.48.2/31
-    shutdown: false
-    description: TENANT_B_SITE_5
   Ethernet7:
     type: routed
     lldp:
       transmit: false
       receive: false
-    peer_type: l3_interface
-    shutdown: false
-  Ethernet6:
-    type: routed
     peer_type: l3_interface
     shutdown: false
   Ethernet8:

@@ -53,6 +53,12 @@ router_bgp:
         activate: true
       RR-OVERLAY-PEERS:
         activate: true
+  address_family_rtc:
+    peer_groups:
+      MPLS-OVERLAY-PEERS:
+        activate: true
+        default_route_target:
+          only: true
   neighbors:
     100.70.0.1:
       peer_group: MPLS-OVERLAY-PEERS

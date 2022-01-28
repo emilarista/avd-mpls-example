@@ -39,6 +39,10 @@ router_bgp:
     peer_groups:
       MPLS-OVERLAY-PEERS:
         activate: true
+  address_family_rtc:
+    peer_groups:
+      MPLS-OVERLAY-PEERS:
+        activate: true
   neighbors:
     100.70.0.7:
       peer_group: MPLS-OVERLAY-PEERS
@@ -46,38 +50,6 @@ router_bgp:
     100.70.0.8:
       peer_group: MPLS-OVERLAY-PEERS
       description: rr8
-  vrfs:
-    TENANT_B_INTRA:
-      router_id: 100.70.0.2
-      rd: 100.70.0.2:19
-      route_targets:
-        import:
-          vpn-ipv4:
-          - '65000:19'
-          vpn-ipv6:
-          - '65000:19'
-          evpn:
-          - '65000:19'
-        export:
-          vpn-ipv4:
-          - '65000:19'
-          vpn-ipv6:
-          - '65000:19'
-          evpn:
-          - '65000:19'
-      neighbors:
-        10.1.255.4:
-          description: TENANT_B_CPE_SITE3
-          password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
-          remote_as: '12345'
-          route_map_out: RM-TENANT_B_INTRA-10.1.255.4-SET-NEXT-HOP-OUT
-      redistribute_routes:
-      - connected
-      address_families:
-        ipv4:
-          neighbors:
-            10.1.255.4:
-              activate: true
   vlans:
     10:
       tenant: TENANT_A
@@ -85,14 +57,6 @@ router_bgp:
       route_targets:
         both:
         - 65000:10010
-      redistribute_routes:
-      - learned
-    2020:
-      tenant: TENANT_B
-      rd: 100.70.0.2:22020
-      route_targets:
-        both:
-        - 65000:22020
       redistribute_routes:
       - learned
   vpws:
@@ -163,9 +127,6 @@ local_users:
 vrfs:
   MGMT:
     ip_routing: false
-  TENANT_B_INTRA:
-    tenant: TENANT_B
-    ip_routing: true
 management_interfaces:
   Management1:
     description: oob_management
@@ -467,30 +428,9 @@ vlans:
   10:
     tenant: TENANT_A
     name: TENANT_A_L2_SERVICE
-  2020:
-    tenant: TENANT_B
-    name: TENANT_B_INSIDE_FW
 ip_igmp_snooping:
   globally_enabled: true
 ip_virtual_router_mac_address: 00:1c:73:00:dc:00
-vlan_interfaces:
-  Vlan2020:
-    tenant: TENANT_B
-    tags:
-    - site1-2
-    description: TENANT_B_INSIDE_FW
-    shutdown: false
-    vrf: TENANT_B_INTRA
-    ip_address: 10.1.255.3/27
-    ip_virtual_router_addresses:
-    - 10.1.255.1
-route_maps:
-  RM-TENANT_B_INTRA-10.1.255.4-SET-NEXT-HOP-OUT:
-    sequence_numbers:
-      10:
-        type: permit
-        set:
-        - ip next-hop 10.1.255.1
 sflow:
   sample: 40000
   vrfs:

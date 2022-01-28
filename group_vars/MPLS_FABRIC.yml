@@ -3,6 +3,8 @@
 # local users
 fabric_name: MPLS_FABRIC
 
+evpn_overlay_bgp_rtc: true
+
 # Optional, defaults to isis-sr
 underlay_routing_protocol: isis-sr-ldp
 
@@ -139,7 +141,6 @@ pe:
     node_sid_base: 200
     isis_system_id_prefix: '0000.0001'
     # loopback_ipv4_offset: 3
-    backbone_interface_speed: forced 100gfull
     spanning_tree_priority: 4096
     spanning_tree_mode: mstp
     # spanning_tree_root_super: true

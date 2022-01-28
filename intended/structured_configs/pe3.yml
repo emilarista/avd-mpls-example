@@ -39,6 +39,10 @@ router_bgp:
     peer_groups:
       MPLS-OVERLAY-PEERS:
         activate: true
+  address_family_rtc:
+    peer_groups:
+      MPLS-OVERLAY-PEERS:
+        activate: true
   neighbors:
     100.70.0.7:
       peer_group: MPLS-OVERLAY-PEERS
@@ -46,51 +50,6 @@ router_bgp:
     100.70.0.8:
       peer_group: MPLS-OVERLAY-PEERS
       description: rr8
-  vrfs:
-    TENANT_B_INTRA:
-      router_id: 100.70.0.3
-      rd: 100.70.0.3:19
-      route_targets:
-        import:
-          vpn-ipv4:
-          - '65000:19'
-          vpn-ipv6:
-          - '65000:19'
-          evpn:
-          - '65000:19'
-        export:
-          vpn-ipv4:
-          - '65000:19'
-          vpn-ipv6:
-          - '65000:19'
-          evpn:
-          - '65000:19'
-      redistribute_routes:
-      - connected
-      - ospf
-    TENANT_B_WAN:
-      router_id: 100.70.0.3
-      rd: 100.70.0.3:20
-      route_targets:
-        import:
-          vpn-ipv4:
-          - '65000:20'
-        export:
-          vpn-ipv4:
-          - '65000:20'
-      neighbors:
-        192.168.48.1:
-          description: TENANT_B_CPE_SITE3
-          password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
-          remote_as: '65201'
-      redistribute_routes:
-      - connected
-      - ospf
-      address_families:
-        ipv4:
-          neighbors:
-            192.168.48.1:
-              activate: true
 static_routes:
 - vrf: MGMT
   destination_address_prefix: 0.0.0.0/0
@@ -135,12 +94,6 @@ local_users:
 vrfs:
   MGMT:
     ip_routing: false
-  TENANT_B_INTRA:
-    tenant: TENANT_B
-    ip_routing: true
-  TENANT_B_WAN:
-    tenant: TENANT_B
-    ip_routing: true
 management_interfaces:
   Management1:
     description: oob_management
@@ -265,44 +218,6 @@ ethernet_interfaces:
       ldp:
         interface: true
         igp_sync: true
-  Ethernet6.10:
-    type: l3dot1q
-    encapsulation_dot1q_vlan: 10
-    peer_type: l3_interface
-    vrf: TENANT_B_INTRA
-    ip_address: 123.1.1.0/31
-    shutdown: false
-    description: TENANT_B_SITE_3_INTRA_L3VPN
-    ospf_area: 0
-    ospf_network_point_to_point: true
-    ospf_cost: 10
-  Ethernet5.100:
-    type: l3dot1q
-    encapsulation_dot1q_vlan: 100
-    peer_type: l3_interface
-    vrf: TENANT_B_WAN
-    ip_address: 192.168.48.0/31
-    shutdown: false
-    description: TENANT_B_SITE_3
-  Ethernet6.100:
-    type: l3dot1q
-    encapsulation_dot1q_vlan: 100
-    peer_type: l3_interface
-    vrf: TENANT_B_WAN
-    ip_address: 192.168.48.4/31
-    shutdown: false
-    description: TENANT_B_SITE_3_OSPF
-    ospf_area: 0
-    ospf_network_point_to_point: true
-    ospf_cost: 10
-  Ethernet5:
-    type: routed
-    peer_type: l3_interface
-    shutdown: false
-  Ethernet6:
-    type: routed
-    peer_type: l3_interface
-    shutdown: false
 router_bfd:
   multihop:
     interval: 5000
@@ -312,28 +227,6 @@ patch_panel: {}
 ip_igmp_snooping:
   globally_enabled: true
 ip_virtual_router_mac_address: 00:1c:73:00:dc:00
-router_ospf:
-  process_ids:
-    19:
-      vrf: TENANT_B_INTRA
-      passive_interface_default: true
-      router_id: 123.1.1.0
-      no_passive_interfaces:
-      - Ethernet6.10
-      max_lsa: 10000
-      redistribute:
-        bgp:
-          enabled: true
-    99:
-      vrf: TENANT_B_WAN
-      passive_interface_default: true
-      router_id: 192.168.48.4
-      no_passive_interfaces:
-      - Ethernet6.100
-      max_lsa: 10000
-      redistribute:
-        bgp:
-          enabled: true
 sflow:
   sample: 40000
   vrfs:

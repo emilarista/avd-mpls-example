@@ -13,8 +13,7 @@ port_profiles:
 cpes:
   CPE_TENANT_A_SITE1:
     adapters:
-    - profile: TENANT_B_2020
-      endpoint_ports:
+    - endpoint_ports:
       - Ethernet1
       - Ethernet2
       switch_ports:
@@ -26,7 +25,19 @@ cpes:
       port_channel:
         description: EVPN-A-A-PortChannel
         mode: active
+        # ESI stuff for main port channel, subinterfaces below use own values.
         short_esi: 0303:0202:0101
+        subinterfaces:
+          - number: 111
+            short_esi: 0303:0202:0111
+          - number: 222
+            short_esi: 0303:0202:0222
+          - number: 333
+            short_esi: 0303:0202:0222
+            vlan_id: 434
+            encapsulation_vlan:
+              client_dot1q: 333
+
     rack: Undefined
 
   CPE_TENANT_A_SITE5:

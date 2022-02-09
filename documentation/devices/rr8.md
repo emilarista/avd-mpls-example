@@ -234,8 +234,8 @@ vlan internal order ascending range 3700 3900
 | Interface | Channel Group | ISIS Instance | ISIS Metric | Mode | ISIS Circuit Type | Hello Padding | Authentication Mode |
 | --------- | ------------- | ------------- | ----------- | ---- | ----------------- | ------------- | ------------------- |
 | Ethernet1 | - | MPLS_UNDERLAY | 60 | point-to-point | level-2 | False | md5 |
-| Ethernet2 | 2 | *MPLS_UNDERLAY | *60 | *point-to-point | *level-2 | False | md5 |
-| Ethernet3 | 2 | *MPLS_UNDERLAY | *60 | *point-to-point | *level-2 | False | md5 |
+| Ethernet2 | 2 | *MPLS_UNDERLAY | *60 | *point-to-point | *level-2 | *False | *md5 |
+| Ethernet3 | 2 | *MPLS_UNDERLAY | *60 | *point-to-point | *level-2 | *False | *md5 |
  *Inherited from Port-Channel Interface
 
 ### Ethernet Interfaces Device Configuration
@@ -368,7 +368,8 @@ service routing protocols model multi-agent
 
 | VRF | Routing Enabled |
 | --- | --------------- |
-| default | true|| MGMT | false |
+| default | true |
+| MGMT | false |
 
 ### IP Routing Device Configuration
 
@@ -383,8 +384,8 @@ no ip routing vrf MGMT
 
 | VRF | Routing Enabled |
 | --- | --------------- |
-| default | false || MGMT | false |
-
+| default | false |
+| MGMT | false |
 
 ## Static Routes
 
@@ -479,11 +480,11 @@ router isis MPLS_UNDERLAY
 
 | Settings | Value |
 | -------- | ----- |
-| Address Family | mpls-vpn |
+| Address Family | mpls |
 | Remote AS | 65000 |
 | Route Reflector Client | Yes |
 | Source | Loopback0 |
-| Bfd | true |
+| BFD | true |
 | Send community | all |
 | Maximum routes | 0 (no limit) |
 
@@ -491,22 +492,22 @@ router isis MPLS_UNDERLAY
 
 | Settings | Value |
 | -------- | ----- |
-| Address Family | mpls-vpn |
+| Address Family | mpls |
 | Remote AS | 65000 |
 | Source | Loopback0 |
-| Bfd | true |
+| BFD | true |
 | Send community | all |
 | Maximum routes | 0 (no limit) |
 
 ### BGP Neighbors
 
-| Neighbor | Remote AS | VRF | Send-community | Maximum-routes | Allowas-in |
-| -------- | --------- | --- | -------------- | -------------- | ---------- |
-| 100.70.0.1 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - |
-| 100.70.0.2 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - |
-| 100.70.0.3 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - |
-| 100.70.0.5 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - |
-| 100.70.0.7 | Inherited from peer group RR-OVERLAY-PEERS | default | Inherited from peer group RR-OVERLAY-PEERS | Inherited from peer group RR-OVERLAY-PEERS | - |
+| Neighbor | Remote AS | VRF | Send-community | Maximum-routes | Allowas-in | BFD |
+| -------- | --------- | --- | -------------- | -------------- | ---------- | --- |
+| 100.70.0.1 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS |
+| 100.70.0.2 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS |
+| 100.70.0.3 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS |
+| 100.70.0.5 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS |
+| 100.70.0.7 | Inherited from peer group RR-OVERLAY-PEERS | default | Inherited from peer group RR-OVERLAY-PEERS | Inherited from peer group RR-OVERLAY-PEERS | - | Inherited from peer group RR-OVERLAY-PEERS |
 
 ### Router BGP EVPN Address Family
 

@@ -19,7 +19,7 @@
         name: arista.avd.eos_designs
       vars:
         design:
-          type: "mpls-vpn"
+          type: "mpls"
       # debugger: always
 
     - name: generate device intended config and documentation

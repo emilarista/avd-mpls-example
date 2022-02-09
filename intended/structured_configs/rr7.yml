@@ -11,7 +11,7 @@ router_bgp:
   bgp_cluster_id: 7.7.7.7
   peer_groups:
     MPLS-OVERLAY-PEERS:
-      type: mpls-vpn
+      type: mpls
       update_source: Loopback0
       remote_as: '65000'
       bfd: true
@@ -20,7 +20,7 @@ router_bgp:
       maximum_routes: 0
       route_reflector_client: true
     RR-OVERLAY-PEERS:
-      type: mpls-vpn
+      type: mpls
       update_source: Loopback0
       remote_as: '65000'
       bfd: true

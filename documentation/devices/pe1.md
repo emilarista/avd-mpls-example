@@ -23,7 +23,6 @@
   - [Ethernet Interfaces](#ethernet-interfaces)
   - [Port-Channel Interfaces](#port-channel-interfaces)
   - [Loopback Interfaces](#loopback-interfaces)
-  - [VLAN Interfaces](#vlan-interfaces)
 - [Routing](#routing)
   - [Service Routing Protocols Model](#service-routing-protocols-model)
   - [Virtual Router MAC Address](#virtual-router-mac-address)
@@ -43,7 +42,6 @@
 - [Multicast](#multicast)
   - [IP IGMP Snooping](#ip-igmp-snooping)
 - [Filters](#filters)
-  - [Route-maps](#route-maps)
 - [ACL](#acl)
 - [VRF Instances](#vrf-instances)
   - [VRF Instances Summary](#vrf-instances-summary)
@@ -225,7 +223,6 @@ vlan internal order ascending range 3700 3900
 | VLAN ID | Name | Trunk Groups |
 | ------- | ---- | ------------ |
 | 10 | TENANT_A_L2_SERVICE | - |
-| 2020 | TENANT_B_INSIDE_FW | - |
 
 ## VLANs Device Configuration
 
@@ -233,9 +230,6 @@ vlan internal order ascending range 3700 3900
 !
 vlan 10
    name TENANT_A_L2_SERVICE
-!
-vlan 2020
-   name TENANT_B_INSIDE_FW
 ```
 
 # Interfaces
@@ -248,7 +242,6 @@ vlan 2020
 
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
-| Ethernet5 | CPE_TENANT_A_SITE1_Ethernet1 | *trunk | *2020 | *- | *- | 5 |
 
 *Inherited from Port-Channel Interface
 
@@ -259,6 +252,7 @@ vlan 2020
 | Ethernet1 | P2P_LINK_TO_pe2_Ethernet1 | routed | - | 100.64.48.0/31 | default | 1500 | false | - | - |
 | Ethernet2 | P2P_LINK_TO_p6_Ethernet2 | routed | - | 100.64.48.2/31 | default | 1500 | false | - | - |
 | Ethernet3 | P2P_LINK_TO_rr7_Ethernet2 | routed | - | 100.64.48.4/31 | default | 1500 | false | - | - |
+| Ethernet21/1 | TENANT_B_SITE_3_INTRA_L3VPN | routed | - | 172.16.3.0/31 | INTERNET | - | false | - | - |
 
 #### IPv6
 
@@ -309,6 +303,7 @@ interface Ethernet2
    isis circuit-type level-2
    isis metric 60
    isis network point-to-point
+   isis hello padding
    mpls ip
    mpls ldp interface
    mpls ldp igp sync
@@ -336,6 +331,13 @@ interface Ethernet5
    description CPE_TENANT_A_SITE1_Ethernet1
    no shutdown
    channel-group 5 mode active
+!
+interface Ethernet21/1
+   description TENANT_B_SITE_3_INTRA_L3VPN
+   no shutdown
+   no switchport
+   vrf INTERNET
+   ip address 172.16.3.0/31
 ```
 
 ## Port-Channel Interfaces
@@ -346,7 +348,19 @@ interface Ethernet5
 
 | Interface | Description | Type | Mode | VLANs | Native VLAN | Trunk Group | LACP Fallback Timeout | LACP Fallback Mode | MLAG ID | EVPN ESI |
 | --------- | ----------- | ---- | ---- | ----- | ----------- | ------------| --------------------- | ------------------ | ------- | -------- |
-| Port-Channel5 | CPE_TENANT_A_SITE1_EVPN-A-A-PortChannel | switched | trunk | 2020 | - | - | - | - | - | 0000:0000:0303:0202:0101 |
+
+#### Flexible Encapsulation Interfaces
+
+| Interface | Description | Type | Vlan ID | Client Unmatched | Client Dot1q VLAN | Client Dot1q Outer Tag | Client Dot1q Inner Tag | Network Retain Client Encapsulation | Network Dot1q VLAN | Network Dot1q Outer Tag | Network Dot1q Inner Tag |
+| --------- | ----------- | ---- | ------- | -----------------| ----------------- | ---------------------- | ---------------------- | ----------------------------------- | ------------------ | ----------------------- | ----------------------- |
+| Port-Channel5.10 | - | l2dot1q | - | False | 10 | - | - | True | - | - | - |
+| Port-Channel5.111 | - | l2dot1q | 111 | False | 111 | - | - | True | - | - | - |
+| Port-Channel5.222 | - | l2dot1q | 222 | False | 222 | - | - | True | - | - | - |
+| Port-Channel5.333 | - | l2dot1q | 434 | False | 333 | - | - | True | - | - | - |
+| Port-Channel5.1000 | - | l2dot1q | - | False | 1000 | - | - | True | - | - | - |
+| Port-Channel5.1001 | - | l2dot1q | - | False | 1001 | - | - | True | - | - | - |
+| Port-Channel5.1002 | - | l2dot1q | - | False | 1002 | - | - | True | - | - | - |
+| Port-Channel5.1003 | - | l2dot1q | - | False | 1003 | - | - | True | - | - | - |
 
 ### Port-Channel Interfaces Device Configuration
 
@@ -355,14 +369,60 @@ interface Ethernet5
 interface Port-Channel5
    description CPE_TENANT_A_SITE1_EVPN-A-A-PortChannel
    no shutdown
-   switchport
-   switchport trunk allowed vlan 2020
-   switchport mode trunk
+   no switchport
    evpn ethernet-segment
       identifier 0000:0000:0303:0202:0101
       route-target import 03:03:02:02:01:01
    lacp system-id 0303.0202.0101
-   spanning-tree portfast
+!
+interface Port-Channel5.10
+   no shutdown
+   encapsulation vlan
+      client dot1q 10 network client
+!
+interface Port-Channel5.111
+   vlan id 111
+   encapsulation vlan
+      client dot1q 111 network client
+   evpn ethernet-segment
+      identifier 0000:0000:0303:0202:0111
+      route-target import 03:03:02:02:01:11
+!
+interface Port-Channel5.222
+   vlan id 222
+   encapsulation vlan
+      client dot1q 222 network client
+   evpn ethernet-segment
+      identifier 0000:0000:0303:0202:0222
+      route-target import 03:03:02:02:02:22
+!
+interface Port-Channel5.333
+   vlan id 434
+   encapsulation vlan
+      client dot1q 333 network client
+   evpn ethernet-segment
+      identifier 0000:0000:0303:0202:0222
+      route-target import 03:03:02:02:02:22
+!
+interface Port-Channel5.1000
+   no shutdown
+   encapsulation vlan
+      client dot1q 1000 network client
+!
+interface Port-Channel5.1001
+   no shutdown
+   encapsulation vlan
+      client dot1q 1001 network client
+!
+interface Port-Channel5.1002
+   no shutdown
+   encapsulation vlan
+      client dot1q 1002 network client
+!
+interface Port-Channel5.1003
+   no shutdown
+   encapsulation vlan
+      client dot1q 1003 network client
 ```
 
 ## Loopback Interfaces
@@ -401,32 +461,6 @@ interface Loopback0
    node-segment ipv4 index 201
 ```
 
-## VLAN Interfaces
-
-### VLAN Interfaces Summary
-
-| Interface | Description | VRF |  MTU | Shutdown |
-| --------- | ----------- | --- | ---- | -------- |
-| Vlan2020 |  TENANT_B_INSIDE_FW  |  TENANT_B_INTRA  |  -  |  false  |
-
-#### IPv4
-
-| Interface | VRF | IP Address | IP Address Virtual | IP Router Virtual Address | VRRP | ACL In | ACL Out |
-| --------- | --- | ---------- | ------------------ | ------------------------- | ---- | ------ | ------- |
-| Vlan2020 |  TENANT_B_INTRA  |  10.1.255.2/27  |  -  |  -  |  -  |  -  |  -  |
-
-
-### VLAN Interfaces Device Configuration
-
-```eos
-!
-interface Vlan2020
-   description TENANT_B_INSIDE_FW
-   no shutdown
-   vrf TENANT_B_INTRA
-   ip address 10.1.255.2/27
-```
-
 # Routing
 ## Service Routing Protocols Model
 
@@ -456,16 +490,17 @@ ip virtual-router mac-address 00:1c:73:00:dc:00
 
 | VRF | Routing Enabled |
 | --- | --------------- |
-| default | true|| MGMT | false |
-| TENANT_B_INTRA | true |
+| default | true |
+| INTERNET | true |
+| MGMT | false |
 
 ### IP Routing Device Configuration
 
 ```eos
 !
 ip routing
+ip routing vrf INTERNET
 no ip routing vrf MGMT
-ip routing vrf TENANT_B_INTRA
 ```
 ## IPv6 Routing
 
@@ -473,9 +508,9 @@ ip routing vrf TENANT_B_INTRA
 
 | VRF | Routing Enabled |
 | --- | --------------- |
-| default | false || MGMT | false |
-| TENANT_B_INTRA | false |
-
+| default | false |
+| INTERNET | false |
+| MGMT | false |
 
 ## Static Routes
 
@@ -567,20 +602,20 @@ router isis MPLS_UNDERLAY
 
 | Settings | Value |
 | -------- | ----- |
-| Address Family | mpls-vpn |
+| Address Family | mpls |
 | Remote AS | 65000 |
 | Source | Loopback0 |
-| Bfd | true |
+| BFD | true |
 | Send community | all |
 | Maximum routes | 0 (no limit) |
 
 ### BGP Neighbors
 
-| Neighbor | Remote AS | VRF | Send-community | Maximum-routes | Allowas-in |
-| -------- | --------- | --- | -------------- | -------------- | ---------- |
-| 100.70.0.7 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - |
-| 100.70.0.8 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - |
-| 10.1.255.4 | 12345 | TENANT_B_INTRA | - | - | - |
+| Neighbor | Remote AS | VRF | Send-community | Maximum-routes | Allowas-in | BFD |
+| -------- | --------- | --- | -------------- | -------------- | ---------- | --- |
+| 100.70.0.7 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS |
+| 100.70.0.8 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS |
+| 172.16.3.1 | 65501 | INTERNET | - | 0 (no limit) | - | - |
 
 ### Router BGP EVPN Address Family
 
@@ -601,13 +636,22 @@ router isis MPLS_UNDERLAY
 | VLAN | Route-Distinguisher | Both Route-Target | Import Route Target | Export Route-Target | Redistribute |
 | ---- | ------------------- | ----------------- | ------------------- | ------------------- | ------------ |
 | 10 | 100.70.0.1:10010 | 65000:10010 | - | - | learned |
-| 2020 | 100.70.0.1:22020 | 65000:22020 | - | - | learned |
+
+### Router BGP VPWS Instances
+
+| Instance | Route-Distinguisher | Both Route-Target | Pseudowire | Local ID | Remote ID |
+| -------- | ------------------- | ----------------- | ---------- | -------- | --------- |
+| TENANT_A | 100.70.0.1:1000 | 65000:1000 | TEN_A_site3_site5_eline_vlan_based_10 | 10010 | 58010 |
+| TENANT_A | 100.70.0.1:1000 | 65000:1000 | TEN_A_site3_site5_eline_vlan_based_1000 | 11000 | 59000 |
+| TENANT_A | 100.70.0.1:1000 | 65000:1000 | TEN_A_site3_site5_eline_vlan_based_1001 | 11001 | 59001 |
+| TENANT_A | 100.70.0.1:1000 | 65000:1000 | TEN_A_site3_site5_eline_vlan_based_1002 | 11002 | 59002 |
+| TENANT_A | 100.70.0.1:1000 | 65000:1000 | TEN_A_site3_site5_eline_vlan_based_1003 | 11003 | 59003 |
 
 ### Router BGP VRFs
 
 | VRF | Route-Distinguisher | Redistribute |
 | --- | ------------------- | ------------ |
-| TENANT_B_INTRA | 100.70.0.1:19 | connected |
+| INTERNET | 100.70.0.1:19 | connected |
 
 ### Router BGP Device Configuration
 
@@ -637,10 +681,24 @@ router bgp 65000
       route-target both 65000:10010
       redistribute learned
    !
-   vlan 2020
-      rd 100.70.0.1:22020
-      route-target both 65000:22020
-      redistribute learned
+   vpws TENANT_A
+      rd 100.70.0.1:1000
+      route-target import export evpn 65000:1000
+      !
+      pseudowire TEN_A_site3_site5_eline_vlan_based_10
+         evpn vpws id local 10010 remote 58010
+      !
+      pseudowire TEN_A_site3_site5_eline_vlan_based_1000
+         evpn vpws id local 11000 remote 59000
+      !
+      pseudowire TEN_A_site3_site5_eline_vlan_based_1001
+         evpn vpws id local 11001 remote 59001
+      !
+      pseudowire TEN_A_site3_site5_eline_vlan_based_1002
+         evpn vpws id local 11002 remote 59002
+      !
+      pseudowire TEN_A_site3_site5_eline_vlan_based_1003
+         evpn vpws id local 11003 remote 59003
    !
    address-family evpn
       neighbor default encapsulation mpls next-hop-self source-interface Loopback0
@@ -657,23 +715,21 @@ router bgp 65000
       neighbor MPLS-OVERLAY-PEERS activate
       neighbor default encapsulation mpls next-hop-self source-interface Loopback0
    !
-   vrf TENANT_B_INTRA
+   vrf INTERNET
       rd 100.70.0.1:19
-      route-target import vpn-ipv4 65000:19
-      route-target import vpn-ipv6 65000:19
       route-target import evpn 65000:19
-      route-target export vpn-ipv4 65000:19
-      route-target export vpn-ipv6 65000:19
+      route-target import vpn-ipv6 65000:19
       route-target export evpn 65000:19
+      route-target export vpn-ipv6 65000:19
       router-id 100.70.0.1
-      neighbor 10.1.255.4 remote-as 12345
-      neighbor 10.1.255.4 password 7 $1c$U4tL2vQP9QwZlxIV1K3/pw==
-      neighbor 10.1.255.4 description TENANT_B_CPE_SITE3
-      neighbor 10.1.255.4 route-map RM-TENANT_B_INTRA-10.1.255.4-SET-NEXT-HOP-OUT out
+      neighbor 172.16.3.1 remote-as 65501
+      neighbor 172.16.3.1 description TENANT_B_CPE_SITE3
+      neighbor 172.16.3.1 maximum-routes 0
+      neighbor 172.16.3.1 default-originate
       redistribute connected
       !
       address-family ipv4
-         neighbor 10.1.255.4 activate
+         neighbor 172.16.3.1 activate
 ```
 
 # BFD
@@ -736,12 +792,37 @@ mpls ldp
 
 | Patch Name | Enabled | Connector A Type | Connector A Endpoint | Connector B Type | Connector B Endpoint |
 | ---------- | ------- | ---------------- | -------------------- | ---------------- | -------------------- |
+| TEN_A_site3_site5_eline_vlan_based_1000 | True | Interface | Port-Channel5.1000 | Pseudowire | bgp vpws TENANT_A pseudowire TEN_A_site3_site5_eline_vlan_based_1000 |
+| TEN_A_site3_site5_eline_vlan_based_1001 | True | Interface | Port-Channel5.1001 | Pseudowire | bgp vpws TENANT_A pseudowire TEN_A_site3_site5_eline_vlan_based_1001 |
+| TEN_A_site3_site5_eline_vlan_based_1002 | True | Interface | Port-Channel5.1002 | Pseudowire | bgp vpws TENANT_A pseudowire TEN_A_site3_site5_eline_vlan_based_1002 |
+| TEN_A_site3_site5_eline_vlan_based_1003 | True | Interface | Port-Channel5.1003 | Pseudowire | bgp vpws TENANT_A pseudowire TEN_A_site3_site5_eline_vlan_based_1003 |
+| TEN_A_site3_site5_eline_vlan_based_10 | True | Interface | Port-Channel5.10 | Pseudowire | bgp vpws TENANT_A pseudowire TEN_A_site3_site5_eline_vlan_based_10 |
 
 ## Patch Panel Configuration
 
 ```eos
 !
 patch panel
+   patch TEN_A_site3_site5_eline_vlan_based_1000
+      connector 1 interface Port-Channel5.1000
+      connector 2 pseudowire bgp vpws TENANT_A pseudowire TEN_A_site3_site5_eline_vlan_based_1000
+   !
+   patch TEN_A_site3_site5_eline_vlan_based_1001
+      connector 1 interface Port-Channel5.1001
+      connector 2 pseudowire bgp vpws TENANT_A pseudowire TEN_A_site3_site5_eline_vlan_based_1001
+   !
+   patch TEN_A_site3_site5_eline_vlan_based_1002
+      connector 1 interface Port-Channel5.1002
+      connector 2 pseudowire bgp vpws TENANT_A pseudowire TEN_A_site3_site5_eline_vlan_based_1002
+   !
+   patch TEN_A_site3_site5_eline_vlan_based_1003
+      connector 1 interface Port-Channel5.1003
+      connector 2 pseudowire bgp vpws TENANT_A pseudowire TEN_A_site3_site5_eline_vlan_based_1003
+   !
+   patch TEN_A_site3_site5_eline_vlan_based_10
+      connector 1 interface Port-Channel5.10
+      connector 2 pseudowire bgp vpws TENANT_A pseudowire TEN_A_site3_site5_eline_vlan_based_10
+   !
 ```
 
 # Multicast
@@ -760,24 +841,6 @@ IGMP snooping is globally enabled.
 
 # Filters
 
-## Route-maps
-
-### Route-maps Summary
-
-#### RM-TENANT_B_INTRA-10.1.255.4-SET-NEXT-HOP-OUT
-
-| Sequence | Type | Match and/or Set |
-| -------- | ---- | ---------------- |
-| 10 | permit | set ip next-hop 10.1.255.1 |
-
-### Route-maps Device Configuration
-
-```eos
-!
-route-map RM-TENANT_B_INTRA-10.1.255.4-SET-NEXT-HOP-OUT permit 10
-   set ip next-hop 10.1.255.1
-```
-
 # ACL
 
 # VRF Instances
@@ -786,16 +849,16 @@ route-map RM-TENANT_B_INTRA-10.1.255.4-SET-NEXT-HOP-OUT permit 10
 
 | VRF Name | IP Routing |
 | -------- | ---------- |
+| INTERNET | enabled |
 | MGMT | disabled |
-| TENANT_B_INTRA | enabled |
 
 ## VRF Instances Device Configuration
 
 ```eos
 !
-vrf instance MGMT
+vrf instance INTERNET
 !
-vrf instance TENANT_B_INTRA
+vrf instance MGMT
 ```
 
 # Quality Of Service

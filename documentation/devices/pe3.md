@@ -25,7 +25,6 @@
   - [IP Routing](#ip-routing)
   - [IPv6 Routing](#ipv6-routing)
   - [Static Routes](#static-routes)
-  - [Router OSPF](#router-ospf)
   - [Router ISIS](#router-isis)
   - [Router BGP](#router-bgp)
 - [BFD](#bfd)
@@ -223,7 +222,6 @@ vlan internal order ascending range 3700 3900
 
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
-| Ethernet5.200 |  - | access | - | - | - | - |
 
 *Inherited from Port-Channel Interface
 
@@ -234,9 +232,6 @@ vlan internal order ascending range 3700 3900
 | Ethernet1 | P2P_LINK_TO_p4_Ethernet1 | routed | - | 100.64.48.12/31 | default | 1500 | false | - | - |
 | Ethernet2 | P2P_LINK_TO_pe2_Ethernet2 | routed | - | 100.64.48.9/31 | default | 1500 | false | - | - |
 | Ethernet3 | P2P_LINK_TO_rr7_Ethernet1 | routed | - | 100.64.48.10/31 | default | 1500 | false | - | - |
-| Ethernet5.100 | TENANT_B_SITE_3 | l3dot1q | - | 192.168.48.0/31 | TENANT_B_WAN | - | false | - | - |
-| Ethernet6.10 | TENANT_B_SITE_3_INTRA_L3VPN | l3dot1q | - | 123.1.1.0/31 | TENANT_B_INTRA | - | false | - | - |
-| Ethernet6.100 | TENANT_B_SITE_3_OSPF | l3dot1q | - | 192.168.48.4/31 | TENANT_B_WAN | - | false | - | - |
 
 #### IPv6
 
@@ -245,12 +240,6 @@ vlan internal order ascending range 3700 3900
 | Ethernet1 | P2P_LINK_TO_p4_Ethernet1 | routed | - | - | default | 1500 | false | - | *- | - | - |
 | Ethernet2 | P2P_LINK_TO_pe2_Ethernet2 | routed | - | - | default | 1500 | false | - | *- | - | - |
 | Ethernet3 | P2P_LINK_TO_rr7_Ethernet1 | routed | - | - | default | 1500 | false | - | *- | - | - |
-
-#### Flexible Encapsulation Interfaces
-
-| Interface | Description | Client Unmatched | Client Dot1q VLAN | Client Dot1q Outer Tag | Client Dot1q Inner Tag | Network Retain Client Encapsulation | Network Dot1q VLAN | Network Dot1q Outer Tag | Network Dot1q Inner Tag |
-| --------- | ----------- | -----------------| ----------------- | ---------------------- | ---------------------- | ----------------------------------- | ------------------ | ----------------------- | ----------------------- |
-| Ethernet5.200 | - | False | 200 | - | - | True | - | - | - |
 
 #### ISIS
 
@@ -320,46 +309,6 @@ interface Ethernet3
    mpls ip
    mpls ldp interface
    mpls ldp igp sync
-!
-interface Ethernet5
-   no shutdown
-   no switchport
-!
-interface Ethernet5.100
-   description TENANT_B_SITE_3
-   no shutdown
-   encapsulation dot1q vlan 100
-   vrf TENANT_B_WAN
-   ip address 192.168.48.0/31
-!
-interface Ethernet5.200
-   no shutdown
-   encapsulation vlan
-      client dot1q 200 network client
-!
-interface Ethernet6
-   no shutdown
-   no switchport
-!
-interface Ethernet6.10
-   description TENANT_B_SITE_3_INTRA_L3VPN
-   no shutdown
-   encapsulation dot1q vlan 10
-   vrf TENANT_B_INTRA
-   ip address 123.1.1.0/31
-   ip ospf network point-to-point
-   ip ospf area 0
-   ip ospf cost 10
-!
-interface Ethernet6.100
-   description TENANT_B_SITE_3_OSPF
-   no shutdown
-   encapsulation dot1q vlan 100
-   vrf TENANT_B_WAN
-   ip address 192.168.48.4/31
-   ip ospf network point-to-point
-   ip ospf area 0
-   ip ospf cost 10
 ```
 
 ## Loopback Interfaces
@@ -427,9 +376,8 @@ ip virtual-router mac-address 00:1c:73:00:dc:00
 
 | VRF | Routing Enabled |
 | --- | --------------- |
-| default | true|| MGMT | false |
-| TENANT_B_INTRA | true |
-| TENANT_B_WAN | true |
+| default | true |
+| MGMT | false |
 
 ### IP Routing Device Configuration
 
@@ -437,8 +385,6 @@ ip virtual-router mac-address 00:1c:73:00:dc:00
 !
 ip routing
 no ip routing vrf MGMT
-ip routing vrf TENANT_B_INTRA
-ip routing vrf TENANT_B_WAN
 ```
 ## IPv6 Routing
 
@@ -446,10 +392,8 @@ ip routing vrf TENANT_B_WAN
 
 | VRF | Routing Enabled |
 | --- | --------------- |
-| default | false || MGMT | false |
-| TENANT_B_INTRA | false |
-| TENANT_B_WAN | false |
-
+| default | false |
+| MGMT | false |
 
 ## Static Routes
 
@@ -464,48 +408,6 @@ ip routing vrf TENANT_B_WAN
 ```eos
 !
 ip route vrf MGMT 0.0.0.0/0 10.30.30.1
-```
-
-## Router OSPF
-
-### Router OSPF Summary
-
-| Process ID | Router ID | Default Passive Interface | No Passive Interface | BFD | Max LSA | Default Information Originate | Log Adjacency Changes Detail | Auto Cost Reference Bandwidth | Maximum Paths | MPLS LDP Sync Default |
-| ---------- | --------- | ------------------------- | -------------------- | --- | ------- | ----------------------------- | ---------------------------- | ----------------------------- | ------------- | --------------------- |
-| 19 | 123.1.1.0 | enabled | Ethernet6.10 <br> | disabled | 10000 | disabled | disabled | - | - | - |
-| 99 | 192.168.48.4 | enabled | Ethernet6.100 <br> | disabled | 10000 | disabled | disabled | - | - | - |
-
-### Router OSPF Router Redistribution
-
-| Process ID | Source Protocol | Route Map |
-| ---------- | --------------- | --------- |
-| 19 | bgp | - |
-| 99 | bgp | - |
-
-### OSPF Interfaces
-
-| Interface | Area | Cost | Point To Point |
-| -------- | -------- | -------- | -------- |
-| Ethernet6.10 | 0 | 10 | True |
-| Ethernet6.100 | 0 | 10 | True |
-
-### Router OSPF Device Configuration
-
-```eos
-!
-router ospf 19 vrf TENANT_B_INTRA
-   router-id 123.1.1.0
-   passive-interface default
-   no passive-interface Ethernet6.10
-   max-lsa 10000
-   redistribute bgp
-!
-router ospf 99 vrf TENANT_B_WAN
-   router-id 192.168.48.4
-   passive-interface default
-   no passive-interface Ethernet6.100
-   max-lsa 10000
-   redistribute bgp
 ```
 
 ## Router ISIS
@@ -583,20 +485,19 @@ router isis MPLS_UNDERLAY
 
 | Settings | Value |
 | -------- | ----- |
-| Address Family | mpls-vpn |
+| Address Family | mpls |
 | Remote AS | 65000 |
 | Source | Loopback0 |
-| Bfd | true |
+| BFD | true |
 | Send community | all |
 | Maximum routes | 0 (no limit) |
 
 ### BGP Neighbors
 
-| Neighbor | Remote AS | VRF | Send-community | Maximum-routes | Allowas-in |
-| -------- | --------- | --- | -------------- | -------------- | ---------- |
-| 100.70.0.7 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - |
-| 100.70.0.8 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - |
-| 192.168.48.1 | 65201 | TENANT_B_WAN | - | - | - |
+| Neighbor | Remote AS | VRF | Send-community | Maximum-routes | Allowas-in | BFD |
+| -------- | --------- | --- | -------------- | -------------- | ---------- | --- |
+| 100.70.0.7 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS |
+| 100.70.0.8 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS |
 
 ### Router BGP EVPN Address Family
 
@@ -611,19 +512,6 @@ router isis MPLS_UNDERLAY
 | Neighbor Default Encapsulation | Next-hop-self Source Interface |
 | ------------------------------ | ------------------------------ |
 | mpls | Loopback0 |
-
-### Router BGP VPWS Instances
-
-| Instance | Route-Distinguisher | Both Route-Target | Pseudowire | Local ID | Remote ID |
-| -------- | ------------------- | ----------------- | ---------- | -------- | --------- |
-| TENANT_B | 100.70.0.3:2000 | 65000:2000 | TEN_B_site3_site5_eline_vlan_based | 35200 | 56200 |
-
-### Router BGP VRFs
-
-| VRF | Route-Distinguisher | Redistribute |
-| --- | ------------------- | ------------ |
-| TENANT_B_INTRA | 100.70.0.3:19 | connected<br>ospf |
-| TENANT_B_WAN | 100.70.0.3:20 | connected<br>ospf |
 
 ### Router BGP Device Configuration
 
@@ -648,13 +536,6 @@ router bgp 65000
    neighbor 100.70.0.8 peer group MPLS-OVERLAY-PEERS
    neighbor 100.70.0.8 description rr8
    !
-   vpws TENANT_B
-      rd 100.70.0.3:2000
-      route-target import export evpn 65000:2000
-      !
-      pseudowire TEN_B_site3_site5_eline_vlan_based
-         evpn vpws id local 35200 remote 56200
-   !
    address-family evpn
       neighbor default encapsulation mpls next-hop-self source-interface Loopback0
       neighbor MPLS-OVERLAY-PEERS activate
@@ -669,32 +550,6 @@ router bgp 65000
    address-family vpn-ipv6
       neighbor MPLS-OVERLAY-PEERS activate
       neighbor default encapsulation mpls next-hop-self source-interface Loopback0
-   !
-   vrf TENANT_B_INTRA
-      rd 100.70.0.3:19
-      route-target import vpn-ipv4 65000:19
-      route-target import vpn-ipv6 65000:19
-      route-target import evpn 65000:19
-      route-target export vpn-ipv4 65000:19
-      route-target export vpn-ipv6 65000:19
-      route-target export evpn 65000:19
-      router-id 100.70.0.3
-      redistribute connected
-      redistribute ospf
-   !
-   vrf TENANT_B_WAN
-      rd 100.70.0.3:20
-      route-target import vpn-ipv4 65000:20
-      route-target export vpn-ipv4 65000:20
-      router-id 100.70.0.3
-      neighbor 192.168.48.1 remote-as 65201
-      neighbor 192.168.48.1 password 7 $1c$U4tL2vQP9QwZlxIV1K3/pw==
-      neighbor 192.168.48.1 description TENANT_B_CPE_SITE3
-      redistribute connected
-      redistribute ospf
-      !
-      address-family ipv4
-         neighbor 192.168.48.1 activate
 ```
 
 # BFD
@@ -757,17 +612,12 @@ mpls ldp
 
 | Patch Name | Enabled | Connector A Type | Connector A Endpoint | Connector B Type | Connector B Endpoint |
 | ---------- | ------- | ---------------- | -------------------- | ---------------- | -------------------- |
-| TEN_B_site3_site5_eline_vlan_based | True | Interface | Ethernet5.200 | Pseudowire | bgp vpws TENANT_B pseudowire TEN_B_site3_site5_eline_vlan_based |
 
 ## Patch Panel Configuration
 
 ```eos
 !
 patch panel
-   patch TEN_B_site3_site5_eline_vlan_based
-      connector 1 interface Ethernet5.200
-      connector 2 pseudowire bgp vpws TENANT_B pseudowire TEN_B_site3_site5_eline_vlan_based
-   !
 ```
 
 # Multicast
@@ -795,18 +645,12 @@ IGMP snooping is globally enabled.
 | VRF Name | IP Routing |
 | -------- | ---------- |
 | MGMT | disabled |
-| TENANT_B_INTRA | enabled |
-| TENANT_B_WAN | enabled |
 
 ## VRF Instances Device Configuration
 
 ```eos
 !
 vrf instance MGMT
-!
-vrf instance TENANT_B_INTRA
-!
-vrf instance TENANT_B_WAN
 ```
 
 # Quality Of Service

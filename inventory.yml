@@ -50,6 +50,8 @@ all:
               hosts:
                 rr7:
                   ansible_host: 10.30.30.107
+                rr8:
+                  ansible_host: 10.30.30.108
 
     MPLS_TENANTS:
       children:
@@ -58,3 +60,7 @@ all:
     MPLS_ENDPOINT_CONNECTIONS:
       children:
         PE:
+
+    LOCAL_USERS:
+      children:
+        MPLS_FABRIC:

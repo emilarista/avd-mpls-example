@@ -3,31 +3,34 @@
 # local users
 fabric_name: MPLS_FABRIC
 
-evpn_overlay_bgp_rtc: true
-
-# Optional, defaults to isis-sr
 underlay_routing_protocol: isis-sr-ldp
+overlay_routing_protocol: ibgp
+
+design:
+  type: "mpls"
 
 # Disabling ISIS hello padding makes it easier with vEOS-lab.
+
 isis_ti_lfa:
   enabled: true
   protection: link
   local_convergence_delay: 15000
 
-isis_default_is_type: level-1-2
+# What should the defaults be?
+isis_default_is_type: level-2
 isis_default_circuit_type: level-2
 isis_default_metric: 50
 isis_advertise_passive_only: true
 
-# iBGP is the default and only supported overlay protocol currently
-# overlay_routing_protocol: ibgp
 bgp_as: 65000
 # If meshing PEs, client-to-client reflection can be turned off using rr bgp defaults.
 # bgp_mesh_pes: true
 
 # bgp peer groups passwords
 bgp_peer_groups:
-  MPLS_OVERLAY_PEERS:
+  mpls_overlay_peers:
+    password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
+  rr_overlay_peers:
     password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
   RR_OVERLAY_PEERS:
     password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
@@ -39,7 +42,7 @@ internal_vlan_order:
     ending: 3900
 
 # Update p2p mtu
-p2p_uplinks_mtu: 1600
+p2p_uplinks_mtu: 1500
 
 local_users:
   someuser:
@@ -65,15 +68,7 @@ name_servers:
   - 10.20.20.13
   - 8.8.8.8
 
-# NTP Servers IP or DNS
-# First NTP server will be preferred
-# Sourced from Managment VRF
-ntp_servers:
-  - 0.se.pool.ntp.org
-  - 1.se.pool.ntp.org
-
-# Sets the administrative subfield of IP/MAC VRF Route-Distinguishers and Route-Targets
-# These are actually the defaults. No need to set anything really.
+# RD/RT Format
 overlay_rd_type:
   admin_subfield: overlay_loopback
 overlay_rt_type:
@@ -92,15 +87,6 @@ bfd_multihop:
   interval: 5000
   min_rx: 5000
   multiplier: 3
-
-custom_structured_configuration_sflow:
-  sample: 40000
-  vrfs:
-    MGMT:
-      destinations:
-        "127.0.0.1":
-      source_interface: Management1
-  run: true
 
 # Disable vlan aware bundles
 # vxlan_vlan_aware_bundles: false
@@ -141,6 +127,7 @@ pe:
     # loopback_ipv4_offset: 3
     spanning_tree_priority: 4096
     spanning_tree_mode: mstp
+    overlay_address_families: [ evpn, vpn-ipv4, vpn-ipv6 ]
     # spanning_tree_root_super: true
     bgp_defaults:
       - 'no bgp default ipv4-unicast'
@@ -186,11 +173,10 @@ rr:
     # virtual_router_mac_address: 00:1c:73:00:dc:00
     loopback_ipv4_pool: 100.70.0.0/24
     loopback_ipv6_pool: "2000:1234:ffff:ffff::/64"
-    # is_type: level-1-2
+    is_type: level-1-2
     node_sid_base: 100
     isis_system_id_prefix: '0000.0002'
-    # spanning_tree_priority: 4096
-    # spanning_tree_mode: mstp
+    overlay_address_families: [ evpn, vpn-ipv4, vpn-ipv6 ]
     bgp_defaults:
       - 'no bgp default ipv4-unicast'
       - 'distance bgp 20 200 200'
@@ -204,9 +190,6 @@ rr:
   node_groups:
     rr7-8:
       bgp_cluster_id: 7.7.7.7
-      # filter:
-      #   tenants: [ TENANT_A, TENANT_B ]
-      #   tags: [ site1-2 ]
       nodes:
         rr7:
           id: 7
@@ -252,11 +235,9 @@ core_interfaces:
       isis_hello_padding: true
       isis_circuit_type: level-2
       isis_metric: 60
-      # qos_profile: someprofile
+
     - nodes: [ pe1, rr7 ]
       id: 3
-      # Selectively turning off mpls_ip on links is now supported.
-      mpls_ip: false
       interfaces: [ Ethernet3, Ethernet2 ]
       profile: default_bb_profile
 
@@ -265,7 +246,6 @@ core_interfaces:
       id: 4
       interfaces: [ Ethernet3, Ethernet1 ]
       profile: default_bb_profile
-      # mpls_ip: false
     - nodes: [ pe2, pe3 ]
       id: 5
       interfaces: [ Ethernet2, Ethernet2 ]
@@ -276,7 +256,6 @@ core_interfaces:
       id: 6
       interfaces: [ Ethernet3, Ethernet1 ]
       profile: default_bb_profile
-      # mpls_ip: false
     - nodes: [ pe3, p4 ]
       id: 7
       interfaces: [ Ethernet1, Ethernet1 ]
@@ -287,7 +266,6 @@ core_interfaces:
       id: 8
       interfaces: [ Ethernet3, Ethernet4 ]
       profile: default_bb_profile
-      # mpls_ip: false
     - nodes: [ p4, pe5 ]
       id: 9
       interfaces: [ Ethernet2, Ethernet2 ]
@@ -298,61 +276,17 @@ core_interfaces:
       id: 10
       interfaces: [ Ethernet3, Ethernet3 ]
       ip: ["unnumbered loopback0", "unnumbered loopback0"]
-      # mpls_ip: false
     - nodes: [ pe5, p6 ]
       id: 11
       interfaces: [ Ethernet1, Ethernet1 ]
       profile: default_bb_profile
 
-    # # RR8 links
-    # - nodes: [ rr7, rr8 ]
-    #   id: 12
-    #   # mpls_ip: false
-    #   port_channel:
-    #     mode: active
-    #     nodes_child_interfaces:
-    #       rr7: [ Ethernet5, Ethernet6 ]
-    #       rr8: [ Ethernet2, Ethernet3 ]
-    #   profile: default_bb_profile
+    # RR8 links
     - nodes: [ rr7, rr8 ]
       id: 12
-      interfaces: [ Ethernet5, Ethernet2 ]
+      port_channel:
+        mode: active
+        nodes_child_interfaces:
+          rr7: [ Ethernet5, Ethernet6 ]
+          rr8: [ Ethernet2, Ethernet3 ]
       profile: default_bb_profile
-
-
-node_type_keys:
-  p:
-    type: p
-    mpls_lsr: true
-    default_mpls_overlay_role: none
-    default_overlay_routing_protocol: ibgp
-    default_underlay_routing_protocol: isis-sr
-  pe:
-    type: pe
-    mpls_lsr: true
-    connected_endpoints: true
-    default_mpls_overlay_role: client
-    default_evpn_role: client
-    network_services:
-      l1: true
-      l2: true
-      l3: true
-    mpls_ler: true
-    default_overlay_routing_protocol: ibgp
-    default_underlay_routing_protocol: isis-sr
-    default_overlay_address_families: [ vpn-ipv4 ]
-    default_evpn_encapsulation: mpls
-  rr:
-    type: rr
-    mpls_lsr: true
-    mpls_ler: true
-    network_services:
-      l1: true
-      l2: true
-      l3: true
-    connected_endpoints: true
-    default_mpls_overlay_role: server
-    default_evpn_role: server
-    default_overlay_routing_protocol: ibgp
-    default_underlay_routing_protocol: isis-sr
-    default_overlay_address_families: [ vpn-ipv4 ]

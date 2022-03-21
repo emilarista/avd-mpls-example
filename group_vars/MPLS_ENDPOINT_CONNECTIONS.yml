@@ -38,7 +38,9 @@ cpes:
             encapsulation_vlan:
               client_dot1q: 333
 
-  CPE-TENANT-A-SITE5:
+    rack: Undefined
+
+  CPE_TENANT_A_SITE5:
     adapters:
     - profile: TENANT_A_WAN_SERVICE_10
       endpoint_ports:

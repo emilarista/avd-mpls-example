@@ -1,0 +1,13 @@
+---
+local_users:
+  emil:
+    privilege: 15
+    role: network-admin
+    sha512_password: "$6$kiCAKn8fb8T12ClP$UchWUxo0y/CpYptWYxj7pC8uzjoUJnvi4lSg1c009mqJG2inlUDQdTi/YVY4M0dzgf4LOkaVtL7U11ZRkP7Rm/"
+
+  cvpadmin:
+    privilege: 15
+    role: network-admin
+    sha512_password: "$6$WRH0YV9I461XA.qn$BYsYGThSIHOh4ic8qdjnHWq9Zi/l0W8Ws4DZ5Y5yI3hBBWGP03W3ggXWdY7MTqVA8plRvaazG/U8CeMPkT5aE."
+
+cvp_ingestauth_key: dudeface

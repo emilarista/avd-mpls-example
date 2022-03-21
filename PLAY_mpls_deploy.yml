@@ -8,9 +8,6 @@
     - name: generate intended variables
       import_role:
         name: arista.avd.eos_designs
-      vars:
-        design:
-          type: "mpls"
 
     - name: generate device intended config and documentation
       import_role:

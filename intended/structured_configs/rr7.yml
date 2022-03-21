@@ -132,12 +132,12 @@ loopback_interfaces:
       ip: true
       ldp:
         interface: true
-    isis_enable: MPLS_UNDERLAY
+    isis_enable: CORE
     isis_passive: true
     node_segment:
       ipv4_index: 107
 router_isis:
-  instance: MPLS_UNDERLAY
+  instance: CORE
   log_adjacency_changes: true
   net: 49.0001.0000.0002.0007.00
   router_id: 100.70.0.7
@@ -176,7 +176,7 @@ ethernet_interfaces:
     ip_address: 100.64.48.11/31
     speed: 100full
     ipv6_enable: true
-    isis_enable: MPLS_UNDERLAY
+    isis_enable: CORE
     isis_metric: 60
     isis_network_point_to_point: true
     isis_hello_padding: false
@@ -199,7 +199,7 @@ ethernet_interfaces:
     ip_address: 100.64.48.5/31
     speed: 100full
     ipv6_enable: true
-    isis_enable: MPLS_UNDERLAY
+    isis_enable: CORE
     isis_metric: 60
     isis_network_point_to_point: true
     isis_hello_padding: false
@@ -218,9 +218,9 @@ ethernet_interfaces:
     description: P2P_LINK_TO_pe5_Ethernet3
     type: routed
     shutdown: false
-    mtu: 1600
+    mtu: 9000
     ip_address: unnumbered loopback0
-    isis_enable: MPLS_UNDERLAY
+    isis_enable: CORE
     isis_metric: 50
     isis_network_point_to_point: true
     isis_hello_padding: true
@@ -241,7 +241,7 @@ ethernet_interfaces:
     ip_address: 100.64.48.15/31
     speed: 100full
     ipv6_enable: true
-    isis_enable: MPLS_UNDERLAY
+    isis_enable: CORE
     isis_metric: 60
     isis_network_point_to_point: true
     isis_hello_padding: false
@@ -279,7 +279,7 @@ port_channel_interfaces:
     ip_address: 100.64.48.22/31
     speed: 100full
     ipv6_enable: true
-    isis_enable: MPLS_UNDERLAY
+    isis_enable: CORE
     isis_metric: 60
     isis_network_point_to_point: true
     isis_hello_padding: false
@@ -296,11 +296,3 @@ router_bfd:
     interval: 5000
     min_rx: 5000
     multiplier: 3
-sflow:
-  sample: 40000
-  vrfs:
-    MGMT:
-      destinations:
-        127.0.0.1: null
-      source_interface: Management1
-  run: true

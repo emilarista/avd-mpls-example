@@ -9,7 +9,6 @@
   - [Local Users](#local-users)
 - [Monitoring](#monitoring)
   - [TerminAttr Daemon](#terminattr-daemon)
-  - [SFlow](#sflow)
 - [Spanning Tree](#spanning-tree)
   - [Spanning Tree Summary](#spanning-tree-summary)
   - [Spanning Tree Device Configuration](#spanning-tree-device-configuration)
@@ -158,29 +157,6 @@ daemon TerminAttr
    no shutdown
 ```
 
-## SFlow
-
-### SFlow Summary
-
-| VRF | SFlow Source Interface | SFlow Destination | Port |
-| --- | ---------------------- | ----------------- | ---- |
-| MGMT | - | 127.0.0.1 | 6343  |
-| MGMT | Management1 | - | - |
-
-sFlow Sample Rate: 40000
-
-sFlow is enabled.
-
-### SFlow Device Configuration
-
-```eos
-!
-sflow sample 40000
-sflow vrf MGMT destination 127.0.0.1
-sflow vrf MGMT source-interface Management1
-sflow run
-```
-
 # Spanning Tree
 
 ## Spanning Tree Summary
@@ -246,13 +222,20 @@ vlan 10
 
 *Inherited from Port-Channel Interface
 
+#### Encapsulation Dot1q Interfaces
+
+| Interface | Description | Type | Vlan ID | Dot1q VLAN Tag |
+| --------- | ----------- | -----| ------- | -------------- |
+| Ethernet6.10 | TENANT_B_SITE_5 | l3dot1q | - | 10 |
+
 #### IPv4
 
 | Interface | Description | Type | Channel Group | IP Address | VRF |  MTU | Shutdown | ACL In | ACL Out |
 | --------- | ----------- | -----| ------------- | ---------- | ----| ---- | -------- | ------ | ------- |
 | Ethernet1 | P2P_LINK_TO_p6_Ethernet1 | routed | - | 100.64.48.20/31 | default | 1500 | false | - | - |
 | Ethernet2 | P2P_LINK_TO_p4_Ethernet2 | routed | - | 100.64.48.17/31 | default | 1500 | false | - | - |
-| Ethernet3 | P2P_LINK_TO_rr7_Ethernet3 | routed | - | unnumbered loopback0 | default | 1600 | false | - | - |
+| Ethernet3 | P2P_LINK_TO_rr7_Ethernet3 | routed | - | unnumbered loopback0 | default | 9000 | false | - | - |
+| Ethernet6.10 | TENANT_B_SITE_5 | l3dot1q | - | 192.168.48.2/31 | TENANT_B_WAN | - | false | - | - |
 
 #### IPv6
 
@@ -265,9 +248,9 @@ vlan 10
 
 | Interface | Channel Group | ISIS Instance | ISIS Metric | Mode | ISIS Circuit Type | Hello Padding | Authentication Mode |
 | --------- | ------------- | ------------- | ----------- | ---- | ----------------- | ------------- | ------------------- |
-| Ethernet1 | - | MPLS_UNDERLAY | 60 | point-to-point | level-2 | False | md5 |
-| Ethernet2 | - | MPLS_UNDERLAY | 60 | point-to-point | level-2 | False | md5 |
-| Ethernet3 | - | MPLS_UNDERLAY | 50 | point-to-point | level-2 | True | - |
+| Ethernet1 | - | CORE | 60 | point-to-point | level-2 | False | md5 |
+| Ethernet2 | - | CORE | 60 | point-to-point | level-2 | False | md5 |
+| Ethernet3 | - | CORE | 50 | point-to-point | level-2 | True | - |
 
 ### Ethernet Interfaces Device Configuration
 
@@ -281,7 +264,7 @@ interface Ethernet1
    no switchport
    ip address 100.64.48.20/31
    ipv6 enable
-   isis enable MPLS_UNDERLAY
+   isis enable CORE
    isis circuit-type level-2
    isis metric 60
    isis network point-to-point
@@ -300,7 +283,7 @@ interface Ethernet2
    no switchport
    ip address 100.64.48.17/31
    ipv6 enable
-   isis enable MPLS_UNDERLAY
+   isis enable CORE
    isis circuit-type level-2
    isis metric 60
    isis network point-to-point
@@ -314,10 +297,10 @@ interface Ethernet2
 interface Ethernet3
    description P2P_LINK_TO_rr7_Ethernet3
    no shutdown
-   mtu 1600
+   mtu 9000
    no switchport
    ip address unnumbered loopback0
-   isis enable MPLS_UNDERLAY
+   isis enable CORE
    isis circuit-type level-2
    isis metric 50
    isis network point-to-point
@@ -333,6 +316,17 @@ interface Ethernet5
    switchport trunk allowed vlan 10
    switchport mode trunk
    spanning-tree portfast
+!
+interface Ethernet6
+   no shutdown
+   no switchport
+!
+interface Ethernet6.10
+   description TENANT_B_SITE_5
+   no shutdown
+   encapsulation dot1q vlan 10
+   vrf TENANT_B_WAN
+   ip address 192.168.48.2/31
 !
 interface Ethernet7
    no shutdown
@@ -421,8 +415,8 @@ interface Port-Channel8.1003
 #### ISIS
 
 | Interface | ISIS instance | ISIS metric | Interface mode |
-| -------- | -------- | -------- | -------- |
-| Loopback0 | MPLS_UNDERLAY |  - |  passive |
+| --------- | ------------- | ----------- | -------------- |
+| Loopback0 | CORE | - | passive |
 
 ### Loopback Interfaces Device Configuration
 
@@ -432,7 +426,7 @@ interface Loopback0
    description MPLS_Overlay_peering
    no shutdown
    ip address 100.70.0.5/32
-   isis enable MPLS_UNDERLAY
+   isis enable CORE
    isis passive
    mpls ldp interface
    node-segment ipv4 index 205
@@ -469,6 +463,8 @@ ip virtual-router mac-address 00:1c:73:00:dc:00
 | --- | --------------- |
 | default | true |
 | MGMT | false |
+| TENANT_B_INTRA | true |
+| TENANT_B_WAN | true |
 
 ### IP Routing Device Configuration
 
@@ -476,6 +472,8 @@ ip virtual-router mac-address 00:1c:73:00:dc:00
 !
 ip routing
 no ip routing vrf MGMT
+ip routing vrf TENANT_B_INTRA
+ip routing vrf TENANT_B_WAN
 ```
 ## IPv6 Routing
 
@@ -485,6 +483,8 @@ no ip routing vrf MGMT
 | --- | --------------- |
 | default | false |
 | MGMT | false |
+| TENANT_B_INTRA | false |
+| TENANT_B_WAN | false |
 
 ## Static Routes
 
@@ -492,13 +492,15 @@ no ip routing vrf MGMT
 
 | VRF | Destination Prefix | Next Hop IP             | Exit interface      | Administrative Distance       | Tag               | Route Name                    | Metric         |
 | --- | ------------------ | ----------------------- | ------------------- | ----------------------------- | ----------------- | ----------------------------- | -------------- |
-| MGMT  | 0.0.0.0/0 |  10.30.30.1  |  -  |  1  |  -  |  -  |  - |
+| MGMT | 0.0.0.0/0 | 10.30.30.1 | - | 1 | - | - | - |
+| TENANT_B_INTRA | 123.0.10.0/24 | 123.1.1.3 | Ethernet6.10 | 1 | - | TENANT_B_SITE_5_SUBNET | - |
 
 ### Static Routes Device Configuration
 
 ```eos
 !
 ip route vrf MGMT 0.0.0.0/0 10.30.30.1
+ip route vrf TENANT_B_INTRA 123.0.10.0/24 Ethernet6.10 123.1.1.3 name TENANT_B_SITE_5_SUBNET
 ```
 
 ## Router ISIS
@@ -507,7 +509,7 @@ ip route vrf MGMT 0.0.0.0/0 10.30.30.1
 
 | Settings | Value |
 | -------- | ----- |
-| Instance | MPLS_UNDERLAY |
+| Instance | CORE |
 | Net-ID | 49.0001.0000.0001.0005.00 |
 | Type | level-1-2 |
 | Address Family | ipv4 unicast |
@@ -522,10 +524,10 @@ ip route vrf MGMT 0.0.0.0/0 10.30.30.1
 
 | Interface | ISIS Instance | ISIS Metric | Interface Mode |
 | --------- | ------------- | ----------- | -------------- |
-| Ethernet1 | MPLS_UNDERLAY | 60 | point-to-point |
-| Ethernet2 | MPLS_UNDERLAY | 60 | point-to-point |
-| Ethernet3 | MPLS_UNDERLAY | 50 | point-to-point |
-| Loopback0 | MPLS_UNDERLAY | - | passive |
+| Ethernet1 | CORE | 60 | point-to-point |
+| Ethernet2 | CORE | 60 | point-to-point |
+| Ethernet3 | CORE | 50 | point-to-point |
+| Loopback0 | CORE | - | passive |
 
 ### ISIS Segment-routing Node-SID
 
@@ -537,7 +539,7 @@ ip route vrf MGMT 0.0.0.0/0 10.30.30.1
 
 ```eos
 !
-router isis MPLS_UNDERLAY
+router isis CORE
    net 49.0001.0000.0001.0005.00
    is-type level-1-2
    router-id ipv4 100.70.0.5
@@ -579,16 +581,17 @@ router isis MPLS_UNDERLAY
 | Address Family | mpls |
 | Remote AS | 65000 |
 | Source | Loopback0 |
-| BFD | true |
+| BFD | True |
 | Send community | all |
 | Maximum routes | 0 (no limit) |
 
 ### BGP Neighbors
 
-| Neighbor | Remote AS | VRF | Send-community | Maximum-routes | Allowas-in | BFD |
-| -------- | --------- | --- | -------------- | -------------- | ---------- | --- |
-| 100.70.0.7 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS |
-| 100.70.0.8 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS |
+| Neighbor | Remote AS | VRF | Shutdown | Send-community | Maximum-routes | Allowas-in | BFD | RIB Pre-Policy Retain |
+| -------- | --------- | --- | -------- | -------------- | -------------- | ---------- | --- | -------------- |
+| 100.70.0.7 | Inherited from peer group MPLS-OVERLAY-PEERS | default | - | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS | - |
+| 100.70.0.8 | Inherited from peer group MPLS-OVERLAY-PEERS | default | - | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS | - |
+| 192.168.48.3 | 65202 | TENANT_B_WAN | - | - | - | - | - | - |
 
 ### Router BGP EVPN Address Family
 
@@ -612,14 +615,21 @@ router isis MPLS_UNDERLAY
 
 ### Router BGP VPWS Instances
 
-| Instance | Route-Distinguisher | Both Route-Target | Pseudowire | Local ID | Remote ID |
-| -------- | ------------------- | ----------------- | ---------- | -------- | --------- |
-| TENANT_A | 100.70.0.5:1000 | 65000:1000 | TEN_A_site2_site5_eline_port_based | 57 | 26 |
-| TENANT_A | 100.70.0.5:1000 | 65000:1000 | TEN_A_site3_site5_eline_vlan_based_10 | 58010 | 10010 |
-| TENANT_A | 100.70.0.5:1000 | 65000:1000 | TEN_A_site3_site5_eline_vlan_based_1000 | 59000 | 11000 |
-| TENANT_A | 100.70.0.5:1000 | 65000:1000 | TEN_A_site3_site5_eline_vlan_based_1001 | 59001 | 11001 |
-| TENANT_A | 100.70.0.5:1000 | 65000:1000 | TEN_A_site3_site5_eline_vlan_based_1002 | 59002 | 11002 |
-| TENANT_A | 100.70.0.5:1000 | 65000:1000 | TEN_A_site3_site5_eline_vlan_based_1003 | 59003 | 11003 |
+| Instance | Route-Distinguisher | Both Route-Target | MPLS Control Word | Label Flow | MTU | Pseudowire | Local ID | Remote ID |
+| -------- | ------------------- | ----------------- | ----------------- | -----------| --- | ---------- | -------- | --------- |
+| TENANT_A | 100.70.0.5:1000 | 65000:1000 | False | False | - | TEN_A_site2_site5_eline_port_based | 57 | 26 |
+| TENANT_A | 100.70.0.5:1000 | 65000:1000 | False | False | - | TEN_A_site3_site5_eline_vlan_based_10 | 58010 | 10010 |
+| TENANT_A | 100.70.0.5:1000 | 65000:1000 | False | False | - | TEN_A_site3_site5_eline_vlan_based_1000 | 59000 | 11000 |
+| TENANT_A | 100.70.0.5:1000 | 65000:1000 | False | False | - | TEN_A_site3_site5_eline_vlan_based_1001 | 59001 | 11001 |
+| TENANT_A | 100.70.0.5:1000 | 65000:1000 | False | False | - | TEN_A_site3_site5_eline_vlan_based_1002 | 59002 | 11002 |
+| TENANT_A | 100.70.0.5:1000 | 65000:1000 | False | False | - | TEN_A_site3_site5_eline_vlan_based_1003 | 59003 | 11003 |
+
+### Router BGP VRFs
+
+| VRF | Route-Distinguisher | Redistribute |
+| --- | ------------------- | ------------ |
+| TENANT_B_INTRA | 100.70.0.5:19 | connected<br>static |
+| TENANT_B_WAN | 100.70.0.5:20 | connected |
 
 ### Router BGP Device Configuration
 
@@ -685,6 +695,29 @@ router bgp 65000
    address-family vpn-ipv6
       neighbor MPLS-OVERLAY-PEERS activate
       neighbor default encapsulation mpls next-hop-self source-interface Loopback0
+   !
+   vrf TENANT_B_INTRA
+      rd 100.70.0.5:19
+      route-target import vpn-ipv4 65000:19
+      route-target import vpn-ipv6 65000:19
+      route-target export vpn-ipv4 65000:19
+      route-target export vpn-ipv6 65000:19
+      router-id 100.70.0.5
+      redistribute connected
+      redistribute static
+   !
+   vrf TENANT_B_WAN
+      rd 100.70.0.5:20
+      route-target import vpn-ipv4 65000:20
+      route-target export vpn-ipv4 65000:20
+      router-id 100.70.0.5
+      neighbor 192.168.48.3 remote-as 65202
+      neighbor 192.168.48.3 password 7 $1c$U4tL2vQP9QwZlxIV1K3/pw==
+      neighbor 192.168.48.3 description TENANT_B_CPE_SITE5
+      redistribute connected
+      !
+      address-family ipv4
+         neighbor 192.168.48.3 activate
 ```
 
 # BFD
@@ -791,8 +824,9 @@ patch panel
 
 ### IP IGMP Snooping Summary
 
-IGMP snooping is globally enabled.
-
+| IGMP Snooping | Fast Leave | Interface Restart Query | Proxy | Restart Query Interval | Robustness Variable |
+| ------------- | ---------- | ----------------------- | ----- | ---------------------- | ------------------- |
+| Enabled | - | - | - | - | - |
 
 ### IP IGMP Snooping Device Configuration
 
@@ -810,12 +844,18 @@ IGMP snooping is globally enabled.
 | VRF Name | IP Routing |
 | -------- | ---------- |
 | MGMT | disabled |
+| TENANT_B_INTRA | enabled |
+| TENANT_B_WAN | enabled |
 
 ## VRF Instances Device Configuration
 
 ```eos
 !
 vrf instance MGMT
+!
+vrf instance TENANT_B_INTRA
+!
+vrf instance TENANT_B_WAN
 ```
 
 # Quality Of Service

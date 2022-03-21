@@ -46,6 +46,34 @@ router_bgp:
     100.70.0.8:
       peer_group: MPLS-OVERLAY-PEERS
       description: rr8
+  vrfs:
+    TENANT_B_INTRA:
+      router_id: 100.70.0.2
+      rd: 100.70.0.2:19
+      route_targets:
+        import:
+          vpn-ipv4:
+          - '65000:19'
+          vpn-ipv6:
+          - '65000:19'
+        export:
+          vpn-ipv4:
+          - '65000:19'
+          vpn-ipv6:
+          - '65000:19'
+      neighbors:
+        10.1.255.4:
+          description: TENANT_B_CPE_SITE3
+          password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
+          remote_as: '12345'
+          route_map_out: RM-TENANT_B_INTRA-10.1.255.4-SET-NEXT-HOP-OUT
+      redistribute_routes:
+      - connected
+      address_families:
+        ipv4:
+          neighbors:
+            10.1.255.4:
+              activate: true
   vlans:
     10:
       tenant: TENANT_A
@@ -53,6 +81,14 @@ router_bgp:
       route_targets:
         both:
         - 65000:10010
+      redistribute_routes:
+      - learned
+    2020:
+      tenant: TENANT_B
+      rd: 100.70.0.2:22020
+      route_targets:
+        both:
+        - 65000:22020
       redistribute_routes:
       - learned
   vpws:
@@ -123,6 +159,9 @@ local_users:
 vrfs:
   MGMT:
     ip_routing: false
+  TENANT_B_INTRA:
+    tenant: TENANT_B
+    ip_routing: true
 management_interfaces:
   Management1:
     description: oob_management
@@ -145,12 +184,12 @@ loopback_interfaces:
       ip: true
       ldp:
         interface: true
-    isis_enable: MPLS_UNDERLAY
+    isis_enable: CORE
     isis_passive: true
     node_segment:
       ipv4_index: 202
 router_isis:
-  instance: MPLS_UNDERLAY
+  instance: CORE
   log_adjacency_changes: true
   net: 49.0001.0000.0001.0002.00
   router_id: 100.70.0.2
@@ -189,7 +228,7 @@ ethernet_interfaces:
     ip_address: 100.64.48.1/31
     speed: 100full
     ipv6_enable: true
-    isis_enable: MPLS_UNDERLAY
+    isis_enable: CORE
     isis_metric: 60
     isis_network_point_to_point: true
     isis_hello_padding: false
@@ -212,7 +251,7 @@ ethernet_interfaces:
     ip_address: 100.64.48.8/31
     speed: 100full
     ipv6_enable: true
-    isis_enable: MPLS_UNDERLAY
+    isis_enable: CORE
     isis_metric: 60
     isis_network_point_to_point: true
     isis_hello_padding: false
@@ -235,7 +274,7 @@ ethernet_interfaces:
     ip_address: 100.64.48.6/31
     speed: 100full
     ipv6_enable: true
-    isis_enable: MPLS_UNDERLAY
+    isis_enable: CORE
     isis_metric: 60
     isis_network_point_to_point: true
     isis_hello_padding: false
@@ -272,10 +311,8 @@ port_channel_interfaces:
     esi: 0000:0000:0303:0202:0101
     rt: 03:03:02:02:01:01
     lacp_id: 0303.0202.0101
-    peer_type: l3_interface
   Port-Channel5.111:
     type: l2dot1q
-    mode: flexencap
     esi: 0000:0000:0303:0202:0111
     rt: 03:03:02:02:01:11
     vlan_id: 111
@@ -287,7 +324,6 @@ port_channel_interfaces:
         client: true
   Port-Channel5.222:
     type: l2dot1q
-    mode: flexencap
     esi: 0000:0000:0303:0202:0222
     rt: 03:03:02:02:02:22
     vlan_id: 222
@@ -299,7 +335,6 @@ port_channel_interfaces:
         client: true
   Port-Channel5.333:
     type: l2dot1q
-    mode: flexencap
     esi: 0000:0000:0303:0202:0222
     rt: 03:03:02:02:02:22
     vlan_id: 434
@@ -424,14 +459,27 @@ vlans:
   10:
     tenant: TENANT_A
     name: TENANT_A_L2_SERVICE
+  2020:
+    tenant: TENANT_B
+    name: TENANT_B_INSIDE_FW
 ip_igmp_snooping:
   globally_enabled: true
 ip_virtual_router_mac_address: 00:1c:73:00:dc:00
-sflow:
-  sample: 40000
-  vrfs:
-    MGMT:
-      destinations:
-        127.0.0.1: null
-      source_interface: Management1
-  run: true
+vlan_interfaces:
+  Vlan2020:
+    tenant: TENANT_B
+    tags:
+    - site1-2
+    description: TENANT_B_INSIDE_FW
+    shutdown: false
+    vrf: TENANT_B_INTRA
+    ip_address: 10.1.255.3/27
+    ip_virtual_router_addresses:
+    - 10.1.255.1
+route_maps:
+  RM-TENANT_B_INTRA-10.1.255.4-SET-NEXT-HOP-OUT:
+    sequence_numbers:
+      10:
+        type: permit
+        set:
+        - ip next-hop 10.1.255.1

@@ -4,6 +4,10 @@
 fabric_name: MPLS_FABRIC
 
 underlay_routing_protocol: isis-sr-ldp
+overlay_routing_protocol: ibgp
+
+design:
+  type: "mpls"
 
 # Disabling ISIS hello padding makes it easier with vEOS-lab.
 
@@ -13,7 +17,7 @@ isis_ti_lfa:
   local_convergence_delay: 15000
 
 # What should the defaults be?
-isis_default_is_type: level-1-2
+isis_default_is_type: level-2
 isis_default_circuit_type: level-2
 isis_default_metric: 50
 isis_advertise_passive_only: true
@@ -26,9 +30,9 @@ bgp_as: 65000
 
 # bgp peer groups passwords
 bgp_peer_groups:
-  MPLS_OVERLAY_PEERS:
+  mpls_overlay_peers:
     password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
-  RR_OVERLAY_PEERS:
+  rr_overlay_peers:
     password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
 
 internal_vlan_order:
@@ -36,20 +40,6 @@ internal_vlan_order:
   range:
     beginning: 3700
     ending: 3900
-
-# Update p2p mtu
-p2p_uplinks_mtu: 1600
-
-# local_users:
-#   someuser:
-#     privilege: 15
-#     role: network-admin
-#     sha512_password: "someshapassword"
-
-#   cvpadmin:
-#     privilege: 15
-#     role: network-admin
-#     sha512_password: "someshapassword"
 
 # Cloud Vision server information
 cvp_instance_ip: 10.20.20.20
@@ -64,15 +54,7 @@ name_servers:
   - 10.20.20.13
   - 8.8.8.8
 
-# NTP Servers IP or DNS
-# First NTP server will be preferred
-# Sourced from Managment VRF
-ntp_servers:
-  - 0.se.pool.ntp.org
-  - 1.se.pool.ntp.org
-
-# Sets the administrative subfield of IP/MAC VRF Route-Distinguishers and Route-Targets
-# These are actually the defaults. No need to set anything really.
+# RD/RT Format
 overlay_rd_type:
   admin_subfield: overlay_loopback
 overlay_rt_type:
@@ -91,15 +73,6 @@ bfd_multihop:
   interval: 5000
   min_rx: 5000
   multiplier: 3
-
-custom_structured_configuration_sflow:
-  sample: 40000
-  vrfs:
-    MGMT:
-      destinations:
-        "127.0.0.1":
-      source_interface: Management1
-  run: true
 
 # Disable vlan aware bundles
 # vxlan_vlan_aware_bundles: false
@@ -141,6 +114,7 @@ pe:
     backbone_interface_speed: forced 100gfull
     spanning_tree_priority: 4096
     spanning_tree_mode: mstp
+    overlay_address_families: [ evpn, vpn-ipv4, vpn-ipv6 ]
     # spanning_tree_root_super: true
     bgp_defaults:
       - 'no bgp default ipv4-unicast'
@@ -188,6 +162,7 @@ rr:
     is_type: level-1-2
     node_sid_base: 100
     isis_system_id_prefix: '0000.0002'
+    overlay_address_families: [ evpn, vpn-ipv4, vpn-ipv6 ]
     bgp_defaults:
       - 'no bgp default ipv4-unicast'
       - 'distance bgp 20 200 200'
@@ -210,17 +185,12 @@ rr:
           id: 8
           mgmt_ip: 10.30.30.108/24
 
-connected_endpoints_keys:
-  routers:
-    type: router
-  cpes:
-    type: cpe
-
-backbone_interfaces:
+core_interfaces:
   p2p_links_ip_pools:
-    underlay_pool: 100.64.48.0/24
+    - name: underlay_pool
+      ipv4_pool: 100.64.48.0/24
   p2p_links_profiles:
-    default_bb_profile:
+    - name: default_bb_profile
       speed: 100full
       mtu: 1500
       isis_hello_padding: false
@@ -232,13 +202,11 @@ backbone_interfaces:
       isis_authentication_key: $1c$sTNAlR6rKSw=
   p2p_links:
     # PE1 links
-    # If using IP unnumbered we don't even need 2 nodes or id or pool or a second interface...
-    # If pool is missing we default to unnumbered?
     - nodes: [ pe1, pe2 ]
       id: 1
       interfaces: [ Ethernet1, Ethernet1 ]
       profile: default_bb_profile
-      # bfd: false # should default to true
+
     - nodes: [ pe1, p6 ]
       id: 2
       interfaces: [ Ethernet2, Ethernet2 ]
@@ -248,7 +216,7 @@ backbone_interfaces:
       isis_hello_padding: true
       isis_circuit_type: level-2
       isis_metric: 60
-      # qos_profile: someprofile
+
     - nodes: [ pe1, rr7 ]
       id: 3
       interfaces: [ Ethernet3, Ethernet2 ]

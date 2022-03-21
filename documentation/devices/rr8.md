@@ -9,7 +9,6 @@
   - [Local Users](#local-users)
 - [Monitoring](#monitoring)
   - [TerminAttr Daemon](#terminattr-daemon)
-  - [SFlow](#sflow)
 - [Spanning Tree](#spanning-tree)
   - [Spanning Tree Summary](#spanning-tree-summary)
   - [Spanning Tree Device Configuration](#spanning-tree-device-configuration)
@@ -150,29 +149,6 @@ daemon TerminAttr
    no shutdown
 ```
 
-## SFlow
-
-### SFlow Summary
-
-| VRF | SFlow Source Interface | SFlow Destination | Port |
-| --- | ---------------------- | ----------------- | ---- |
-| MGMT | - | 127.0.0.1 | 6343  |
-| MGMT | Management1 | - | - |
-
-sFlow Sample Rate: 40000
-
-sFlow is enabled.
-
-### SFlow Device Configuration
-
-```eos
-!
-sflow sample 40000
-sflow vrf MGMT destination 127.0.0.1
-sflow vrf MGMT source-interface Management1
-sflow run
-```
-
 # Spanning Tree
 
 ## Spanning Tree Summary
@@ -233,9 +209,9 @@ vlan internal order ascending range 3700 3900
 
 | Interface | Channel Group | ISIS Instance | ISIS Metric | Mode | ISIS Circuit Type | Hello Padding | Authentication Mode |
 | --------- | ------------- | ------------- | ----------- | ---- | ----------------- | ------------- | ------------------- |
-| Ethernet1 | - | MPLS_UNDERLAY | 60 | point-to-point | level-2 | False | md5 |
-| Ethernet2 | 2 | *MPLS_UNDERLAY | *60 | *point-to-point | *level-2 | *False | *md5 |
-| Ethernet3 | 2 | *MPLS_UNDERLAY | *60 | *point-to-point | *level-2 | *False | *md5 |
+| Ethernet1 | - | CORE | 60 | point-to-point | level-2 | False | md5 |
+| Ethernet2 | 2 | *CORE | *60 | *point-to-point | *level-2 | *False | *md5 |
+| Ethernet3 | 2 | *CORE | *60 | *point-to-point | *level-2 | *False | *md5 |
  *Inherited from Port-Channel Interface
 
 ### Ethernet Interfaces Device Configuration
@@ -250,7 +226,7 @@ interface Ethernet1
    no switchport
    ip address 100.64.48.7/31
    ipv6 enable
-   isis enable MPLS_UNDERLAY
+   isis enable CORE
    isis circuit-type level-2
    isis metric 60
    isis network point-to-point
@@ -291,7 +267,7 @@ interface Ethernet3
 
 | Interface | ISIS Instance | ISIS Metric | Mode | ISIS Circuit Type | Hello Padding | Authentication Mode |
 | --------- | ------------- | ----------- | ---- | ----------------- | ------------- | ------------------- |
-| Port-Channel2 | MPLS_UNDERLAY | 60 | point-to-point | level-2 | False | md5 |
+| Port-Channel2 | CORE | 60 | point-to-point | level-2 | False | md5 |
 
 ### Port-Channel Interfaces Device Configuration
 
@@ -307,7 +283,7 @@ interface Port-Channel2
    mpls ip
    mpls ldp interface
    mpls ldp igp sync
-   isis enable MPLS_UNDERLAY
+   isis enable CORE
    isis circuit-type level-2
    isis metric 60
    isis network point-to-point
@@ -335,8 +311,8 @@ interface Port-Channel2
 #### ISIS
 
 | Interface | ISIS instance | ISIS metric | Interface mode |
-| -------- | -------- | -------- | -------- |
-| Loopback0 | MPLS_UNDERLAY |  - |  passive |
+| --------- | ------------- | ----------- | -------------- |
+| Loopback0 | CORE | - | passive |
 
 ### Loopback Interfaces Device Configuration
 
@@ -346,7 +322,7 @@ interface Loopback0
    description MPLS_Overlay_peering
    no shutdown
    ip address 100.70.0.8/32
-   isis enable MPLS_UNDERLAY
+   isis enable CORE
    isis passive
    mpls ldp interface
    node-segment ipv4 index 108
@@ -393,7 +369,7 @@ no ip routing vrf MGMT
 
 | VRF | Destination Prefix | Next Hop IP             | Exit interface      | Administrative Distance       | Tag               | Route Name                    | Metric         |
 | --- | ------------------ | ----------------------- | ------------------- | ----------------------------- | ----------------- | ----------------------------- | -------------- |
-| MGMT  | 0.0.0.0/0 |  10.30.30.1  |  -  |  1  |  -  |  -  |  - |
+| MGMT | 0.0.0.0/0 | 10.30.30.1 | - | 1 | - | - | - |
 
 ### Static Routes Device Configuration
 
@@ -408,7 +384,7 @@ ip route vrf MGMT 0.0.0.0/0 10.30.30.1
 
 | Settings | Value |
 | -------- | ----- |
-| Instance | MPLS_UNDERLAY |
+| Instance | CORE |
 | Net-ID | 49.0001.0000.0002.0008.00 |
 | Type | level-1-2 |
 | Address Family | ipv4 unicast |
@@ -423,8 +399,8 @@ ip route vrf MGMT 0.0.0.0/0 10.30.30.1
 
 | Interface | ISIS Instance | ISIS Metric | Interface Mode |
 | --------- | ------------- | ----------- | -------------- |
-| Ethernet1 | MPLS_UNDERLAY | 60 | point-to-point |
-| Loopback0 | MPLS_UNDERLAY | - | passive |
+| Ethernet1 | CORE | 60 | point-to-point |
+| Loopback0 | CORE | - | passive |
 
 ### ISIS Segment-routing Node-SID
 
@@ -436,7 +412,7 @@ ip route vrf MGMT 0.0.0.0/0 10.30.30.1
 
 ```eos
 !
-router isis MPLS_UNDERLAY
+router isis CORE
    net 49.0001.0000.0002.0008.00
    is-type level-1-2
    router-id ipv4 100.70.0.8
@@ -484,7 +460,7 @@ router isis MPLS_UNDERLAY
 | Remote AS | 65000 |
 | Route Reflector Client | Yes |
 | Source | Loopback0 |
-| BFD | true |
+| BFD | True |
 | Send community | all |
 | Maximum routes | 0 (no limit) |
 
@@ -495,19 +471,19 @@ router isis MPLS_UNDERLAY
 | Address Family | mpls |
 | Remote AS | 65000 |
 | Source | Loopback0 |
-| BFD | true |
+| BFD | True |
 | Send community | all |
 | Maximum routes | 0 (no limit) |
 
 ### BGP Neighbors
 
-| Neighbor | Remote AS | VRF | Send-community | Maximum-routes | Allowas-in | BFD |
-| -------- | --------- | --- | -------------- | -------------- | ---------- | --- |
-| 100.70.0.1 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS |
-| 100.70.0.2 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS |
-| 100.70.0.3 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS |
-| 100.70.0.5 | Inherited from peer group MPLS-OVERLAY-PEERS | default | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS |
-| 100.70.0.7 | Inherited from peer group RR-OVERLAY-PEERS | default | Inherited from peer group RR-OVERLAY-PEERS | Inherited from peer group RR-OVERLAY-PEERS | - | Inherited from peer group RR-OVERLAY-PEERS |
+| Neighbor | Remote AS | VRF | Shutdown | Send-community | Maximum-routes | Allowas-in | BFD | RIB Pre-Policy Retain |
+| -------- | --------- | --- | -------- | -------------- | -------------- | ---------- | --- | -------------- |
+| 100.70.0.1 | Inherited from peer group MPLS-OVERLAY-PEERS | default | - | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS | - |
+| 100.70.0.2 | Inherited from peer group MPLS-OVERLAY-PEERS | default | - | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS | - |
+| 100.70.0.3 | Inherited from peer group MPLS-OVERLAY-PEERS | default | - | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS | - |
+| 100.70.0.5 | Inherited from peer group MPLS-OVERLAY-PEERS | default | - | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS | - |
+| 100.70.0.7 | Inherited from peer group RR-OVERLAY-PEERS | default | - | Inherited from peer group RR-OVERLAY-PEERS | Inherited from peer group RR-OVERLAY-PEERS | - | Inherited from peer group RR-OVERLAY-PEERS | - |
 
 ### Router BGP EVPN Address Family
 

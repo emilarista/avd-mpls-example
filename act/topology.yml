@@ -1,0 +1,121 @@
+---
+
+cvp:
+  instance: singlenode
+  password: cvproot
+  username: root
+  version: 2022.2.0
+generic:
+  password: arista1234
+  username: cvpadmin
+  version: Rocky-8.5
+veos:
+  password: arista1234
+  username: cvpadmin
+  version: 4.27.6M
+
+nodes:
+  - p4:
+      ip_addr: 192.168.0.11
+      neighbors:
+      - neighborDevice: pe3
+        neighborPort: Ethernet1
+        port: Ethernet1
+      - neighborDevice: pe5
+        neighborPort: Ethernet2
+        port: Ethernet2
+      - neighborDevice: rr7
+        neighborPort: Ethernet4
+        port: Ethernet3
+      node_type: veos
+  - p6:
+      ip_addr: 192.168.0.12
+      neighbors:
+      - neighborDevice: pe5
+        neighborPort: Ethernet1
+        port: Ethernet1
+      - neighborDevice: pe1
+        neighborPort: Ethernet2
+        port: Ethernet2
+      node_type: veos
+  - pe1:
+      ip_addr: 192.168.0.13
+      neighbors:
+      - neighborDevice: pe2
+        neighborPort: Ethernet1
+        port: Ethernet1
+      - neighborDevice: p6
+        neighborPort: Ethernet2
+        port: Ethernet2
+      - neighborDevice: rr7
+        neighborPort: Ethernet2
+        port: Ethernet3
+      node_type: veos
+  - pe2:
+      ip_addr: 192.168.0.14
+      neighbors:
+      - neighborDevice: pe1
+        neighborPort: Ethernet1
+        port: Ethernet1
+      - neighborDevice: pe3
+        neighborPort: Ethernet2
+        port: Ethernet2
+      - neighborDevice: rr8
+        neighborPort: Ethernet1
+        port: Ethernet3
+      node_type: veos
+  - pe3:
+      ip_addr: 192.168.0.15
+      neighbors:
+      - neighborDevice: p4
+        neighborPort: Ethernet1
+        port: Ethernet1
+      - neighborDevice: pe2
+        neighborPort: Ethernet2
+        port: Ethernet2
+      - neighborDevice: rr7
+        neighborPort: Ethernet1
+        port: Ethernet3
+      node_type: veos
+  - pe5:
+      ip_addr: 192.168.0.16
+      neighbors:
+      - neighborDevice: p6
+        neighborPort: Ethernet1
+        port: Ethernet1
+      - neighborDevice: p4
+        neighborPort: Ethernet2
+        port: Ethernet2
+      - neighborDevice: rr7
+        neighborPort: Ethernet3
+        port: Ethernet3
+      node_type: veos
+  - rr7:
+      ip_addr: 192.168.0.17
+      neighbors:
+      - neighborDevice: pe3
+        neighborPort: Ethernet3
+        port: Ethernet1
+      - neighborDevice: pe1
+        neighborPort: Ethernet3
+        port: Ethernet2
+      - neighborDevice: pe5
+        neighborPort: Ethernet3
+        port: Ethernet3
+      - neighborDevice: p4
+        neighborPort: Ethernet3
+        port: Ethernet4
+      node_type: veos
+  - rr8:
+      ip_addr: 192.168.0.18
+      neighbors:
+      - neighborDevice: pe2
+        neighborPort: Ethernet3
+        port: Ethernet1
+      node_type: veos
+  - cvp:
+      ip_addr: 192.168.0.5
+      node_type: cvp
+  - ansible:
+      ip_addr: 192.168.0.6
+      node_type: generic

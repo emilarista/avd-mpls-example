@@ -60,3 +60,7 @@ all:
     MPLS_ENDPOINT_CONNECTIONS:
       children:
         PE:
+
+    ACT:
+      children:
+        MPLS_FABRIC:

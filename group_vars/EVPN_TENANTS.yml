@@ -1,0 +1,27 @@
+tenants:
+  TENANT_A:
+    mac_vrf_rt_base: 10000
+    vrfs:
+      TENANT_A_INTRA:
+        vrf_id: 10
+        address_families:
+          - evpn
+        additional_route_targets:
+          - type: import
+            address_family: vpn-ipv4
+            route_target: "65002:10"
+            nodes: [ lp032 ]
+          - type: export
+            address_family: vpn-ipv4
+            route_target: "65002:10"
+            nodes: [ lp032 ]
+
+        l3_interfaces:
+          - description: TENANT_A_INTRA_L3VPN
+            enabled: true
+            interfaces:
+            - Ethernet54
+            ip_addresses:
+            - 11.11.11.1/24
+            nodes:
+            - wls045

@@ -1,0 +1,180 @@
+router_bgp:
+  as: '65001'
+  router_id: 100.70.1.1
+  bgp_defaults:
+  - no bgp default ipv4-unicast
+  - distance bgp 20 200 200
+  - graceful-restart restart-time 300
+  - graceful-restart
+  - maximum-paths 4 ecmp 4
+  peer_groups:
+    MPLS-OVERLAY-PEERS:
+      type: mpls
+      update_source: Loopback0
+      remote_as: '65001'
+      local_as: '65002'
+      bfd: true
+      password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
+      send_community: all
+      maximum_routes: 0
+  address_family_ipv4:
+    peer_groups:
+      MPLS-OVERLAY-PEERS:
+        activate: false
+  address_family_evpn:
+    neighbor_default:
+      encapsulation: mpls
+      next_hop_self_source_interface: Loopback0
+    peer_groups:
+      MPLS-OVERLAY-PEERS:
+        activate: true
+    domain_identifier: '65001:1'
+  bgp:
+    bestpath:
+      d_path: true
+  address_family_vpn_ipv4:
+    neighbor_default_encapsulation_mpls_next_hop_self:
+      source_interface: Loopback0
+    peer_groups:
+      MPLS-OVERLAY-PEERS:
+        activate: true
+    domain_identifier: '65002:2'
+  neighbors:
+    100.70.1.2:
+      peer_group: MPLS-OVERLAY-PEERS
+      description: wls045
+    100.70.2.1:
+      peer_group: MPLS-OVERLAY-PEERS
+      description: pm047
+      remote_as: '65002'
+  vrfs:
+    TENANT_A_INTRA:
+      router_id: 100.70.1.1
+      rd: 100.70.1.1:10
+      route_targets:
+        import:
+          evpn:
+          - '65001:10'
+          vpn-ipv4:
+          - '65002:10'
+        export:
+          evpn:
+          - '65001:10'
+          vpn-ipv4:
+          - '65002:10'
+      redistribute_routes:
+      - connected
+service_routing_protocols_model: multi-agent
+ip_routing: true
+vlan_internal_order:
+  allocation: ascending
+  range:
+    beginning: 1006
+    ending: 1199
+spanning_tree:
+  mode: mstp
+  mst_instances:
+    '0':
+      priority: 4096
+local_users:
+  cvpadmin:
+    privilege: 15
+    role: network-admin
+    sha512_password: someshapassword
+  someuser:
+    privilege: 15
+    role: network-admin
+    sha512_password: someshapassword
+vrfs:
+  MGMT:
+    ip_routing: false
+  TENANT_A_INTRA:
+    tenant: TENANT_A
+    ip_routing: true
+management_interfaces:
+  Management1:
+    description: oob_management
+    shutdown: false
+    vrf: MGMT
+    ip_address: 10.30.30.103/24
+    gateway: null
+    type: oob
+tcam_profile:
+  system: mpls-evpn
+management_api_http:
+  enable_vrfs:
+    MGMT: {}
+  enable_https: true
+loopback_interfaces:
+  Loopback0:
+    description: MPLS_Overlay_peering
+    shutdown: false
+    ip_address: 100.70.1.1/32
+    mpls:
+      ip: true
+    isis_enable: CORE
+    isis_passive: true
+    node_segment:
+      ipv4_index: 101
+router_isis:
+  instance: CORE
+  log_adjacency_changes: true
+  net: 49.0001.0000.0001.0001.00
+  router_id: 100.70.1.1
+  is_type: level-2
+  advertise:
+    passive_only: true
+  timers:
+    local_convergence:
+      delay: 15000
+      protected_prefixes: true
+  address_family:
+  - ipv4 unicast
+  isis_af_defaults:
+  - maximum-paths 4
+  - fast-reroute ti-lfa mode link-protection
+  segment_routing_mpls:
+    router_id: 100.70.1.1
+    enabled: true
+mpls:
+  ip: true
+ethernet_interfaces:
+  Ethernet36/1:
+    peer: wls045
+    peer_interface: Ethernet53
+    peer_type: pe
+    description: P2P_LINK_TO_wls045_Ethernet53
+    type: routed
+    shutdown: false
+    mtu: 9214
+    isis_enable: CORE
+    isis_metric: 50
+    isis_network_point_to_point: true
+    isis_hello_padding: true
+    isis_circuit_type: level-2
+    mpls:
+      ip: true
+  Ethernet36/2:
+    peer: pm047
+    peer_interface: Ethernet25/1
+    peer_type: other
+    description: P2P_LINK_TO_pm047_Ethernet25/1
+    type: routed
+    shutdown: false
+    mtu: 9214
+    isis_enable: CORE
+    isis_metric: 50
+    isis_network_point_to_point: true
+    isis_hello_padding: true
+    isis_circuit_type: level-2
+    mpls:
+      ip: true
+router_bfd:
+  multihop:
+    interval: 5000
+    min_rx: 5000
+    multiplier: 3
+patch_panel: {}
+ip_igmp_snooping:
+  globally_enabled: true
+ip_virtual_router_mac_address: 00:1c:73:00:dc:00

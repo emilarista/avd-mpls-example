@@ -1,0 +1,102 @@
+---
+# Validation lab
+# local users
+fabric_name: IPVPN
+
+# Optional, defaults to isis-sr
+underlay_routing_protocol: isis-sr
+
+# Disabling ISIS hello padding makes it easier with vEOS-lab.
+
+management_security:
+  password:
+    encryption_key_common: true
+
+isis_ti_lfa:
+  enabled: true
+  protection: link
+  local_convergence_delay: 15000
+
+# What should the defaults be?
+isis_default_is_type: level-1-2
+isis_default_circuit_type: level-2
+isis_default_metric: 50
+isis_advertise_passive_only: true
+
+# iBGP is the default and only supported overlay protocol currently
+# overlay_routing_protocol: ibgp
+bgp_as: 65002
+# If meshing PEs, client-to-client reflection can be turned off using rr bgp defaults.
+bgp_mesh_pes: true
+
+# bgp peer groups passwords
+bgp_peer_groups:
+  mpls_overlay_peers:
+    password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
+
+# Update p2p mtu
+p2p_uplinks_mtu: 9214
+
+local_users:
+  someuser:
+    privilege: 15
+    role: network-admin
+    sha512_password: "someshapassword"
+
+  cvpadmin:
+    privilege: 15
+    role: network-admin
+    sha512_password: "someshapassword"
+
+# Sets the administrative subfield of IP/MAC VRF Route-Distinguishers and Route-Targets
+# These are actually the defaults. No need to set anything really.
+overlay_rd_type:
+  admin_subfield: overlay_loopback
+overlay_rt_type:
+  admin_subfield: 65002
+
+# BGP max-paths and ecmp
+bgp_maximum_paths: 4
+bgp_ecmp: 4
+# evpn_ebgp_multihop: 10
+
+# EVPN prevent readvertising routes
+# overlay_prevent_readvertise_to_server: true
+
+# Adjust default bfd values if desired.
+bfd_multihop:
+  interval: 5000
+  min_rx: 5000
+  multiplier: 3
+
+pe:
+  defaults:
+    virtual_router_mac_address: 00:1c:73:00:dc:00
+    loopback_ipv4_pool: 100.70.2.0/24
+    is_type: level-2
+    node_sid_base: 200
+    isis_system_id_prefix: '0000.0002'
+    spanning_tree_priority: 4096
+    spanning_tree_mode: mstp
+    bgp_defaults:
+      - 'no bgp default ipv4-unicast'
+      - 'distance bgp 20 200 200'
+      - 'graceful-restart restart-time 300'
+      - 'graceful-restart'
+
+  node_groups:
+    pm047:
+      platform: 7020R
+      nodes:
+        pm047:
+          id: 2
+          mgmt_ip: 10.30.30.101/24
+    structured_config:
+      router_bgp:
+        neighbors:
+          100.70.1.1:
+            peer_group: MPLS-OVERLAY-PEERS
+
+platform_settings:
+  - platforms: [ 7280R, 7020R ]
+    tcam_profile: vxlan-routing

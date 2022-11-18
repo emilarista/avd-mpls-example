@@ -1,0 +1,18 @@
+tenants:
+  TENANT_A:
+    # mac_vrf_rt_base: 10000
+    vrfs:
+      TENANT_A_INTRA:
+        vrf_id: 10
+        address_families:
+          - vpn-ipv4
+
+        l3_interfaces:
+          - description: TENANT_A_INTRA_L3VPN
+            enabled: true
+            interfaces:
+            - Ethernet25/2
+            ip_addresses:
+            - 22.22.22.1/24
+            nodes:
+            - pm047

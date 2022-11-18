@@ -1,66 +1,31 @@
 ---
 all:
   children:
-    CVP:
-      hosts:
-        cv_server:
-          ansible_httpapi_host: 10.20.20.20
-          ansible_host: 10.20.20.20
-          ansible_user: cvpadmin
-          ansible_password: somepassword
-          ansible_connection: httpapi
-          ansible_httpapi_use_ssl: true
-          ansible_httpapi_validate_certs: false
-          ansible_network_os: eos
-          ansible_httpapi_port: 443
-          # Configuration to get Virtual Env information
-          ansible_python_interpreter: $(which python3)
-
-    MPLS_FABRIC:
+    MPLS_EVPN:
       children:
-        PE:
+        EVPN_PE:
           vars:
             type: pe
-          children:
-            SITE1:
-              hosts:
-                pe1:
-                  ansible_host: 10.30.30.101
-                pe2:
-                  ansible_host: 10.30.30.102
-            SITE2:
-              hosts:
-                pe3:
-                  ansible_host: 10.30.30.103
-            SITE3:
-              hosts:
-                pe5:
-                  ansible_host: 10.30.30.105
-            P:
-              vars:
-                type: p
-              hosts:
-                p4:
-                  ansible_host: 10.30.30.104
-                p6:
-                  ansible_host: 10.30.30.106
-            RR:
-              vars:
-                type: rr
-              hosts:
-                rr7:
-                  ansible_host: 10.30.30.107
-                rr8:
-                  ansible_host: 10.30.30.108
-
-    MPLS_TENANTS:
+          hosts:
+            wls045:
+            lp032:
+    IPVPN:
       children:
-        PE:
+        IPVPN_PE:
+          vars:
+            type: pe
+          hosts:
+            pm047:
 
-    MPLS_ENDPOINT_CONNECTIONS:
+    IPVPN_TENANTS:
       children:
-        PE:
+        IPVPN_PE:
 
-    ACT:
+    EVPN_TENANTS:
       children:
-        MPLS_FABRIC:
+        EVPN_PE:
+
+    CORE_INTERFACES:
+      children:
+        MPLS_EVPN:
+        IPVPN:

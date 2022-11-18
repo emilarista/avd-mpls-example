@@ -1,0 +1,23 @@
+---
+core_interfaces:
+  p2p_links_ip_pools:
+    - name: underlay_pool
+      ipv4_pool: 100.64.48.0/24
+  p2p_links_profiles:
+    - name: default_bb_profile
+      # speed: 10000full
+      # mtu: 1500
+      # isis_hello_padding: false
+      isis_metric: 50
+      ip_pool: underlay_pool
+      isis_circuit_type: level-2
+  p2p_links:
+    # PE1 links
+    - nodes: [ wls045, lp032 ]
+      id: 1
+      interfaces: [ Ethernet53, Ethernet36/1 ]
+      profile: default_bb_profile
+    - nodes: [ lp032, pm047 ]
+      id: 2
+      interfaces: [ Ethernet36/2, Ethernet25/1 ]
+      profile: default_bb_profile

@@ -1,0 +1,147 @@
+router_bgp:
+  as: '65002'
+  router_id: 100.70.2.2
+  bgp_defaults:
+  - no bgp default ipv4-unicast
+  - distance bgp 20 200 200
+  - graceful-restart restart-time 300
+  - graceful-restart
+  - maximum-paths 4 ecmp 4
+  peer_groups:
+    MPLS-OVERLAY-PEERS:
+      type: mpls
+      update_source: Loopback0
+      remote_as: '65002'
+      bfd: true
+      password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
+      send_community: all
+      maximum_routes: 0
+  address_family_ipv4:
+    peer_groups:
+      MPLS-OVERLAY-PEERS:
+        activate: false
+  address_family_vpn_ipv4:
+    neighbor_default_encapsulation_mpls_next_hop_self:
+      source_interface: Loopback0
+    peer_groups:
+      MPLS-OVERLAY-PEERS:
+        activate: true
+  vrfs:
+    TENANT_A_INTRA:
+      router_id: 100.70.2.2
+      rd: 100.70.2.2:10
+      route_targets:
+        import:
+          vpn-ipv4:
+          - '65002:10'
+        export:
+          vpn-ipv4:
+          - '65002:10'
+      redistribute_routes:
+      - connected
+service_routing_protocols_model: multi-agent
+ip_routing: true
+vlan_internal_order:
+  allocation: ascending
+  range:
+    beginning: 1006
+    ending: 1199
+spanning_tree:
+  mode: mstp
+  mst_instances:
+    '0':
+      priority: 4096
+local_users:
+  cvpadmin:
+    privilege: 15
+    role: network-admin
+    sha512_password: someshapassword
+  someuser:
+    privilege: 15
+    role: network-admin
+    sha512_password: someshapassword
+vrfs:
+  MGMT:
+    ip_routing: false
+  TENANT_A_INTRA:
+    tenant: TENANT_A
+    ip_routing: true
+management_interfaces:
+  Management1:
+    description: oob_management
+    shutdown: false
+    vrf: MGMT
+    ip_address: 10.30.30.101/24
+    gateway: null
+    type: oob
+tcam_profile:
+  system: vxlan-routing
+management_api_http:
+  enable_vrfs:
+    MGMT: {}
+  enable_https: true
+loopback_interfaces:
+  Loopback0:
+    description: MPLS_Overlay_peering
+    shutdown: false
+    ip_address: 100.70.2.2/32
+    mpls:
+      ip: true
+    isis_enable: CORE
+    isis_passive: true
+    node_segment:
+      ipv4_index: 202
+router_isis:
+  instance: CORE
+  log_adjacency_changes: true
+  net: 49.0001.0000.0002.0002.00
+  router_id: 100.70.2.2
+  is_type: level-2
+  advertise:
+    passive_only: true
+  timers:
+    local_convergence:
+      delay: 15000
+      protected_prefixes: true
+  address_family:
+  - ipv4 unicast
+  isis_af_defaults:
+  - maximum-paths 4
+  - fast-reroute ti-lfa mode link-protection
+  segment_routing_mpls:
+    router_id: 100.70.2.2
+    enabled: true
+mpls:
+  ip: true
+ethernet_interfaces:
+  Ethernet25/1:
+    peer: lp032
+    peer_interface: Ethernet36/2
+    peer_type: other
+    description: P2P_LINK_TO_lp032_Ethernet36/2
+    type: routed
+    shutdown: false
+    mtu: 9214
+    isis_enable: CORE
+    isis_metric: 50
+    isis_network_point_to_point: true
+    isis_hello_padding: true
+    isis_circuit_type: level-2
+    mpls:
+      ip: true
+  Ethernet25/2:
+    type: routed
+    peer_type: l3_interface
+    vrf: TENANT_A_INTRA
+    ip_address: 22.22.22.1/24
+    shutdown: false
+    description: TENANT_A_INTRA_L3VPN
+router_bfd:
+  multihop:
+    interval: 5000
+    min_rx: 5000
+    multiplier: 3
+patch_panel: {}
+ip_igmp_snooping:
+  globally_enabled: true
+ip_virtual_router_mac_address: 00:1c:73:00:dc:00

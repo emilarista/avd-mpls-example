@@ -91,11 +91,14 @@ pe:
         pm047:
           id: 2
           mgmt_ip: 10.30.30.101/24
-    structured_config:
-      router_bgp:
-        neighbors:
-          100.70.1.1:
-            peer_group: MPLS-OVERLAY-PEERS
+      structured_config:
+        router_bgp:
+          neighbors:
+            100.70.1.1:
+              peer_group: MPLS-OVERLAY-PEERS
+              remote_as: 65001
+              ebgp_multihop: 3
+
 
 platform_settings:
   - platforms: [ 7280R, 7020R ]

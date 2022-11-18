@@ -39,6 +39,11 @@ router_bgp:
           - '65002:10'
       redistribute_routes:
       - connected
+  neighbors:
+    100.70.1.1:
+      peer_group: MPLS-OVERLAY-PEERS
+      remote_as: 65001
+      ebgp_multihop: 3
 service_routing_protocols_model: multi-agent
 ip_routing: true
 vlan_internal_order:
@@ -80,6 +85,13 @@ management_api_http:
   enable_vrfs:
     MGMT: {}
   enable_https: true
+struct_cfg:
+  router_bgp:
+    neighbors:
+      100.70.1.1:
+        peer_group: MPLS-OVERLAY-PEERS
+        remote_as: 65001
+        ebgp_multihop: 3
 loopback_interfaces:
   Loopback0:
     description: MPLS_Overlay_peering
@@ -122,6 +134,7 @@ ethernet_interfaces:
     type: routed
     shutdown: false
     mtu: 9214
+    ip_address: 100.64.48.3/31
     isis_enable: CORE
     isis_metric: 50
     isis_network_point_to_point: true

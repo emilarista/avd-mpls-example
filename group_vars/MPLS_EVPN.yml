@@ -100,6 +100,12 @@ pe:
 
     lp032:
       platform: 7280R
+      bgp_defaults:
+      - 'no bgp default ipv4-unicast'
+      - 'distance bgp 20 200 200'
+      - 'graceful-restart restart-time 300'
+      - 'graceful-restart'
+      - 'neighbor MPLS-OVERLAY-PEERS ebgp-multihop 3'
       filter:
         always_include_vrfs_in_tenants: [ TENANT_A ]
       nodes:
@@ -112,11 +118,13 @@ pe:
         enabled: true
         evpn_domain_id: "65001:1"
         ipvpn_domain_id: "65002:2"
-        local_as: 65002
+        # Doesn't work with EVPN-MPLS to IPVPN because the local-as config is applied to the same peer group as the "main" overlay peer group
+        # since MPLS_OVERLAY_PEERS is both for ipvpn-gw and main mpls design overlay. Consider moving local-as knob to remote_peers instead.
+        # local_as: 65002
         address_families: [ vpn-ipv4 ]
         remote_peers:
           - hostname: pm047
-            ip_address: 100.70.2.1
+            ip_address: 100.70.2.2
             bgp_as: 65002
 
 platform_settings:

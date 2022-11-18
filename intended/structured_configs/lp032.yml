@@ -6,13 +6,13 @@ router_bgp:
   - distance bgp 20 200 200
   - graceful-restart restart-time 300
   - graceful-restart
+  - neighbor MPLS-OVERLAY-PEERS ebgp-multihop 3
   - maximum-paths 4 ecmp 4
   peer_groups:
     MPLS-OVERLAY-PEERS:
       type: mpls
       update_source: Loopback0
       remote_as: '65001'
-      local_as: '65002'
       bfd: true
       password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
       send_community: all
@@ -43,7 +43,7 @@ router_bgp:
     100.70.1.2:
       peer_group: MPLS-OVERLAY-PEERS
       description: wls045
-    100.70.2.1:
+    100.70.2.2:
       peer_group: MPLS-OVERLAY-PEERS
       description: pm047
       remote_as: '65002'
@@ -147,6 +147,7 @@ ethernet_interfaces:
     type: routed
     shutdown: false
     mtu: 9214
+    ip_address: 100.64.48.1/31
     isis_enable: CORE
     isis_metric: 50
     isis_network_point_to_point: true
@@ -162,6 +163,7 @@ ethernet_interfaces:
     type: routed
     shutdown: false
     mtu: 9214
+    ip_address: 100.64.48.2/31
     isis_enable: CORE
     isis_metric: 50
     isis_network_point_to_point: true

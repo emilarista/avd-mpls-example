@@ -218,11 +218,12 @@ connected_endpoints_keys:
   cpes:
     type: cpe
 
-backbone_interfaces:
+core_interfaces:
   p2p_links_ip_pools:
-    underlay_pool: 100.64.48.0/24
+    - name: underlay_pool
+      ipv4_pool: 100.64.48.0/24
   p2p_links_profiles:
-    default_bb_profile:
+    - name: default_bb_profile
       speed: 100full
       mtu: 1500
       isis_hello_padding: false

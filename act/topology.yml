@@ -28,6 +28,7 @@ nodes:
         neighborPort: Ethernet4
         port: Ethernet3
       node_type: veos
+      ports: []
   - p6:
       ip_addr: 192.168.0.12
       neighbors:
@@ -38,6 +39,7 @@ nodes:
         neighborPort: Ethernet2
         port: Ethernet2
       node_type: veos
+      ports: []
   - pe1:
       ip_addr: 192.168.0.13
       neighbors:
@@ -51,6 +53,8 @@ nodes:
         neighborPort: Ethernet2
         port: Ethernet3
       node_type: veos
+      ports:
+      - Ethernet5
   - pe2:
       ip_addr: 192.168.0.14
       neighbors:
@@ -64,6 +68,8 @@ nodes:
         neighborPort: Ethernet1
         port: Ethernet3
       node_type: veos
+      ports:
+      - Ethernet5
   - pe3:
       ip_addr: 192.168.0.15
       neighbors:
@@ -77,6 +83,7 @@ nodes:
         neighborPort: Ethernet1
         port: Ethernet3
       node_type: veos
+      ports: []
   - pe5:
       ip_addr: 192.168.0.16
       neighbors:
@@ -90,6 +97,8 @@ nodes:
         neighborPort: Ethernet3
         port: Ethernet3
       node_type: veos
+      ports:
+      - Ethernet5
   - rr7:
       ip_addr: 192.168.0.17
       neighbors:
@@ -106,6 +115,7 @@ nodes:
         neighborPort: Ethernet3
         port: Ethernet4
       node_type: veos
+      ports: []
   - rr8:
       ip_addr: 192.168.0.18
       neighbors:
@@ -113,6 +123,7 @@ nodes:
         neighborPort: Ethernet3
         port: Ethernet1
       node_type: veos
+      ports: []
   - cvp:
       ip_addr: 192.168.0.5
       node_type: cvp

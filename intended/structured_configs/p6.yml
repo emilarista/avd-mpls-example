@@ -61,12 +61,12 @@ loopback_interfaces:
       ip: true
       ldp:
         interface: true
-    isis_enable: MPLS_UNDERLAY
+    isis_enable: CORE
     isis_passive: true
     node_segment:
       ipv4_index: 306
 router_isis:
-  instance: MPLS_UNDERLAY
+  instance: CORE
   log_adjacency_changes: true
   net: 49.0001.0000.0000.0006.00
   router_id: 100.70.0.6
@@ -105,7 +105,7 @@ ethernet_interfaces:
     ip_address: 100.64.48.21/31
     speed: 100full
     ipv6_enable: true
-    isis_enable: MPLS_UNDERLAY
+    isis_enable: CORE
     isis_metric: 60
     isis_network_point_to_point: true
     isis_hello_padding: false
@@ -127,7 +127,7 @@ ethernet_interfaces:
     mtu: 1500
     ip_address: 100.64.48.3/31
     speed: 100full
-    isis_enable: MPLS_UNDERLAY
+    isis_enable: CORE
     isis_metric: 60
     isis_network_point_to_point: true
     isis_hello_padding: true

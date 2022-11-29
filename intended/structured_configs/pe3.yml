@@ -9,37 +9,23 @@ router_bgp:
   - maximum-paths 4 ecmp 4
   peer_groups:
     MPLS-OVERLAY-PEERS:
-      type: mpls-vpn
+      type: mpls
       update_source: Loopback0
       remote_as: '65000'
       bfd: true
-      password: $1c$U4tL2vQP9QwZlxIV1K3/pw==
       send_community: all
       maximum_routes: 0
   address_family_ipv4:
     peer_groups:
       MPLS-OVERLAY-PEERS:
         activate: false
-  address_family_evpn:
-    neighbor_default:
-      encapsulation: mpls
-      next_hop_self_source_interface: Loopback0
+  address_family_rtc:
     peer_groups:
       MPLS-OVERLAY-PEERS:
         activate: true
   address_family_vpn_ipv4:
     neighbor_default_encapsulation_mpls_next_hop_self:
       source_interface: Loopback0
-    peer_groups:
-      MPLS-OVERLAY-PEERS:
-        activate: true
-  address_family_vpn_ipv6:
-    neighbor_default_encapsulation_mpls_next_hop_self:
-      source_interface: Loopback0
-    peer_groups:
-      MPLS-OVERLAY-PEERS:
-        activate: true
-  address_family_rtc:
     peer_groups:
       MPLS-OVERLAY-PEERS:
         activate: true
@@ -116,12 +102,12 @@ loopback_interfaces:
       ip: true
       ldp:
         interface: true
-    isis_enable: MPLS_UNDERLAY
+    isis_enable: CORE
     isis_passive: true
     node_segment:
       ipv4_index: 203
 router_isis:
-  instance: MPLS_UNDERLAY
+  instance: CORE
   log_adjacency_changes: true
   net: 49.0001.0000.0001.0003.00
   router_id: 100.70.0.3
@@ -160,7 +146,7 @@ ethernet_interfaces:
     ip_address: 100.64.48.12/31
     speed: 100full
     ipv6_enable: true
-    isis_enable: MPLS_UNDERLAY
+    isis_enable: CORE
     isis_metric: 60
     isis_network_point_to_point: true
     isis_hello_padding: false
@@ -183,7 +169,7 @@ ethernet_interfaces:
     ip_address: 100.64.48.9/31
     speed: 100full
     ipv6_enable: true
-    isis_enable: MPLS_UNDERLAY
+    isis_enable: CORE
     isis_metric: 60
     isis_network_point_to_point: true
     isis_hello_padding: false
@@ -206,7 +192,7 @@ ethernet_interfaces:
     ip_address: 100.64.48.10/31
     speed: 100full
     ipv6_enable: true
-    isis_enable: MPLS_UNDERLAY
+    isis_enable: CORE
     isis_metric: 60
     isis_network_point_to_point: true
     isis_hello_padding: false
@@ -223,7 +209,6 @@ router_bfd:
     interval: 5000
     min_rx: 5000
     multiplier: 3
-patch_panel: {}
 ip_igmp_snooping:
   globally_enabled: true
 ip_virtual_router_mac_address: 00:1c:73:00:dc:00

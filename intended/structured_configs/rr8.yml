@@ -13,24 +13,28 @@ router_bgp:
     MPLS-OVERLAY-PEERS:
       type: mpls
       update_source: Loopback0
-      remote_as: '65000'
       bfd: true
       send_community: all
       maximum_routes: 0
+      remote_as: '65000'
       route_reflector_client: true
     RR-OVERLAY-PEERS:
       type: mpls
       update_source: Loopback0
-      remote_as: '65000'
       bfd: true
       send_community: all
       maximum_routes: 0
+      remote_as: '65000'
   address_family_ipv4:
     peer_groups:
       MPLS-OVERLAY-PEERS:
         activate: false
       RR-OVERLAY-PEERS:
         activate: false
+  address_family_evpn:
+    peer_groups:
+      RR-OVERLAY-PEERS:
+        activate: true
   address_family_rtc:
     peer_groups:
       MPLS-OVERLAY-PEERS:
@@ -116,7 +120,6 @@ loopback_interfaces:
     shutdown: false
     ip_address: 100.70.0.8/32
     mpls:
-      ip: true
       ldp:
         interface: true
     isis_enable: CORE
@@ -129,18 +132,18 @@ router_isis:
   net: 49.0001.0000.0002.0008.00
   router_id: 100.70.0.8
   is_type: level-1-2
-  advertise:
-    passive_only: true
-  mpls_ldp_sync_default: true
-  timers:
-    local_convergence:
-      delay: 15000
-      protected_prefixes: true
   address_family:
   - ipv4 unicast
   isis_af_defaults:
   - maximum-paths 4
   - fast-reroute ti-lfa mode link-protection
+  mpls_ldp_sync_default: true
+  timers:
+    local_convergence:
+      delay: 15000
+      protected_prefixes: true
+  advertise:
+    passive_only: true
   segment_routing_mpls:
     router_id: 100.70.0.8
     enabled: true
@@ -161,7 +164,6 @@ ethernet_interfaces:
     shutdown: false
     mtu: 1500
     ip_address: 100.64.48.7/31
-    speed: 100full
     ipv6_enable: true
     isis_enable: CORE
     isis_metric: 60
@@ -175,31 +177,16 @@ ethernet_interfaces:
       ldp:
         interface: true
         igp_sync: true
+    speed: 100full
   Ethernet2:
-    type: routed
-    description: P2P_LINK_TO_rr7_Port-Channel5
-    shutdown: false
-    channel_group:
-      id: 2
-      mode: active
-  Ethernet3:
-    type: routed
-    description: P2P_LINK_TO_rr7_Port-Channel5
-    shutdown: false
-    channel_group:
-      id: 2
-      mode: active
-port_channel_interfaces:
-  Port-Channel2:
     peer: rr7
-    peer_interface: Port-Channel5
+    peer_interface: Ethernet5
     peer_type: rr
-    description: P2P_LINK_TO_rr7_Port-Channel5
+    description: P2P_LINK_TO_rr7_Ethernet5
     type: routed
     shutdown: false
     mtu: 1500
     ip_address: 100.64.48.23/31
-    speed: 100full
     ipv6_enable: true
     isis_enable: CORE
     isis_metric: 60
@@ -213,6 +200,7 @@ port_channel_interfaces:
       ldp:
         interface: true
         igp_sync: true
+    speed: 100full
 router_bfd:
   multihop:
     interval: 5000

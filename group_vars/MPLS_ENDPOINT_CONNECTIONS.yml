@@ -11,7 +11,7 @@ port_profiles:
     vlans: 2020
     spanning_tree_portfast: edge
 cpes:
-  CPE_TENANT_A_SITE1:
+  CPE-TENANT-A-SITE1:
     adapters:
     - endpoint_ports:
       - Ethernet1
@@ -40,7 +40,7 @@ cpes:
 
     rack: Undefined
 
-  CPE_TENANT_A_SITE5:
+  CPE-TENANT-A-SITE5:
     adapters:
     - profile: TENANT_A_WAN_SERVICE_10
       endpoint_ports:

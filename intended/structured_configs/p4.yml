@@ -58,7 +58,6 @@ loopback_interfaces:
     shutdown: false
     ip_address: 100.70.0.4/32
     mpls:
-      ip: true
       ldp:
         interface: true
     isis_enable: CORE
@@ -71,18 +70,18 @@ router_isis:
   net: 49.0001.0000.0000.0004.00
   router_id: 100.70.0.4
   is_type: level-1-2
-  advertise:
-    passive_only: true
-  mpls_ldp_sync_default: true
-  timers:
-    local_convergence:
-      delay: 15000
-      protected_prefixes: true
   address_family:
   - ipv4 unicast
   isis_af_defaults:
   - maximum-paths 4
   - fast-reroute ti-lfa mode link-protection
+  mpls_ldp_sync_default: true
+  timers:
+    local_convergence:
+      delay: 15000
+      protected_prefixes: true
+  advertise:
+    passive_only: true
   segment_routing_mpls:
     router_id: 100.70.0.4
     enabled: true
@@ -103,7 +102,6 @@ ethernet_interfaces:
     shutdown: false
     mtu: 1500
     ip_address: 100.64.48.13/31
-    speed: 100full
     ipv6_enable: true
     isis_enable: CORE
     isis_metric: 60
@@ -117,29 +115,7 @@ ethernet_interfaces:
       ldp:
         interface: true
         igp_sync: true
-  Ethernet2:
-    peer: pe5
-    peer_interface: Ethernet2
-    peer_type: pe
-    description: P2P_LINK_TO_pe5_Ethernet2
-    type: routed
-    shutdown: false
-    mtu: 1500
-    ip_address: 100.64.48.16/31
     speed: 100full
-    ipv6_enable: true
-    isis_enable: CORE
-    isis_metric: 60
-    isis_network_point_to_point: true
-    isis_hello_padding: false
-    isis_circuit_type: level-2
-    isis_authentication_mode: md5
-    isis_authentication_key: $1c$sTNAlR6rKSw=
-    mpls:
-      ip: true
-      ldp:
-        interface: true
-        igp_sync: true
   Ethernet3:
     peer: rr7
     peer_interface: Ethernet4
@@ -149,7 +125,6 @@ ethernet_interfaces:
     shutdown: false
     mtu: 1500
     ip_address: 100.64.48.14/31
-    speed: 100full
     ipv6_enable: true
     isis_enable: CORE
     isis_metric: 60
@@ -163,6 +138,30 @@ ethernet_interfaces:
       ldp:
         interface: true
         igp_sync: true
+    speed: 100full
+  Ethernet2:
+    peer: pe5
+    peer_interface: Ethernet2
+    peer_type: pe
+    description: P2P_LINK_TO_pe5_Ethernet2
+    type: routed
+    shutdown: false
+    mtu: 1500
+    ip_address: 100.64.48.16/31
+    ipv6_enable: true
+    isis_enable: CORE
+    isis_metric: 60
+    isis_network_point_to_point: true
+    isis_hello_padding: false
+    isis_circuit_type: level-2
+    isis_authentication_mode: md5
+    isis_authentication_key: $1c$sTNAlR6rKSw=
+    mpls:
+      ip: true
+      ldp:
+        interface: true
+        igp_sync: true
+    speed: 100full
 sflow:
   sample: 40000
   vrfs:

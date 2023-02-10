@@ -301,15 +301,19 @@ core_interfaces:
       interfaces: [ Ethernet1, Ethernet1 ]
       profile: default_bb_profile
 
-    # RR8 links
+    # # RR8 links
+    # - nodes: [ rr7, rr8 ]
+    #   id: 12
+    #   # mpls_ip: false
+    #   port_channel:
+    #     mode: active
+    #     nodes_child_interfaces:
+    #       rr7: [ Ethernet5, Ethernet6 ]
+    #       rr8: [ Ethernet2, Ethernet3 ]
+    #   profile: default_bb_profile
     - nodes: [ rr7, rr8 ]
       id: 12
-      # mpls_ip: false
-      port_channel:
-        mode: active
-        nodes_child_interfaces:
-          rr7: [ Ethernet5, Ethernet6 ]
-          rr8: [ Ethernet2, Ethernet3 ]
+      interfaces: [ Ethernet5, Ethernet2 ]
       profile: default_bb_profile
 
 

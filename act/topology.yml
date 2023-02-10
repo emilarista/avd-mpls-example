@@ -16,32 +16,32 @@ veos:
 
 nodes:
   - p4:
-      ip_addr: 192.168.0.11
+      ip_addr: 10.30.30.104
       neighbors:
       - neighborDevice: pe3
         neighborPort: Ethernet1
         port: Ethernet1
-      - neighborDevice: pe5
-        neighborPort: Ethernet2
-        port: Ethernet2
       - neighborDevice: rr7
         neighborPort: Ethernet4
         port: Ethernet3
+      - neighborDevice: pe5
+        neighborPort: Ethernet2
+        port: Ethernet2
       node_type: veos
       ports: []
   - p6:
-      ip_addr: 192.168.0.12
+      ip_addr: 10.30.30.106
       neighbors:
-      - neighborDevice: pe5
-        neighborPort: Ethernet1
-        port: Ethernet1
       - neighborDevice: pe1
         neighborPort: Ethernet2
         port: Ethernet2
+      - neighborDevice: pe5
+        neighborPort: Ethernet1
+        port: Ethernet1
       node_type: veos
       ports: []
   - pe1:
-      ip_addr: 192.168.0.13
+      ip_addr: 10.30.30.101
       neighbors:
       - neighborDevice: pe2
         neighborPort: Ethernet1
@@ -52,76 +52,112 @@ nodes:
       - neighborDevice: rr7
         neighborPort: Ethernet2
         port: Ethernet3
+      - neighborDevice: CPE-TENANT-A-SITE1
+        neighborPort: Ethernet1
+        port: Ethernet5
       node_type: veos
       ports:
-      - Ethernet5
+      - Ethernet21/1
   - pe2:
-      ip_addr: 192.168.0.14
+      ip_addr: 10.30.30.102
       neighbors:
       - neighborDevice: pe1
         neighborPort: Ethernet1
         port: Ethernet1
-      - neighborDevice: pe3
-        neighborPort: Ethernet2
-        port: Ethernet2
       - neighborDevice: rr8
         neighborPort: Ethernet1
         port: Ethernet3
+      - neighborDevice: pe3
+        neighborPort: Ethernet2
+        port: Ethernet2
+      - neighborDevice: CPE-TENANT-A-SITE1
+        neighborPort: Ethernet2
+        port: Ethernet5
       node_type: veos
       ports:
-      - Ethernet5
+      - Ethernet6
   - pe3:
-      ip_addr: 192.168.0.15
+      ip_addr: 10.30.30.103
       neighbors:
-      - neighborDevice: p4
-        neighborPort: Ethernet1
-        port: Ethernet1
       - neighborDevice: pe2
         neighborPort: Ethernet2
         port: Ethernet2
       - neighborDevice: rr7
         neighborPort: Ethernet1
         port: Ethernet3
+      - neighborDevice: p4
+        neighborPort: Ethernet1
+        port: Ethernet1
       node_type: veos
       ports: []
   - pe5:
-      ip_addr: 192.168.0.16
+      ip_addr: 10.30.30.105
       neighbors:
-      - neighborDevice: p6
-        neighborPort: Ethernet1
-        port: Ethernet1
       - neighborDevice: p4
         neighborPort: Ethernet2
         port: Ethernet2
       - neighborDevice: rr7
         neighborPort: Ethernet3
         port: Ethernet3
+      - neighborDevice: p6
+        neighborPort: Ethernet1
+        port: Ethernet1
+      - neighborDevice: CPE-TENANT-A-SITE5
+        neighborPort: eth0
+        port: Ethernet5
       node_type: veos
       ports:
-      - Ethernet5
+      - Ethernet7
+      - Ethernet8
+      - Ethernet9
   - rr7:
-      ip_addr: 192.168.0.17
+      ip_addr: 10.30.30.107
       neighbors:
-      - neighborDevice: pe3
-        neighborPort: Ethernet3
-        port: Ethernet1
       - neighborDevice: pe1
         neighborPort: Ethernet3
         port: Ethernet2
-      - neighborDevice: pe5
+      - neighborDevice: pe3
         neighborPort: Ethernet3
-        port: Ethernet3
+        port: Ethernet1
       - neighborDevice: p4
         neighborPort: Ethernet3
         port: Ethernet4
+      - neighborDevice: pe5
+        neighborPort: Ethernet3
+        port: Ethernet3
+      - neighborDevice: rr8
+        neighborPort: Ethernet2
+        port: Ethernet5
       node_type: veos
       ports: []
   - rr8:
-      ip_addr: 192.168.0.18
+      ip_addr: 10.30.30.108
       neighbors:
       - neighborDevice: pe2
         neighborPort: Ethernet3
         port: Ethernet1
+      - neighborDevice: rr7
+        neighborPort: Ethernet5
+        port: Ethernet2
+      node_type: veos
+      ports: []
+  - CPE-TENANT-A-SITE1:
+      ip_addr: 192.168.0.128
+      neighbors:
+      - neighborDevice: pe1
+        neighborPort: Ethernet5
+        port: Ethernet1
+      - neighborDevice: pe2
+        neighborPort: Ethernet5
+        port: Ethernet2
+      node_type: veos
+      ports: []
+  - CPE-TENANT-A-SITE5:
+      ip_addr: 192.168.0.129
+      neighbors:
+      - neighborDevice: pe5
+        neighborPort: Ethernet5
+        port: eth0
       node_type: veos
       ports: []
   - cvp:

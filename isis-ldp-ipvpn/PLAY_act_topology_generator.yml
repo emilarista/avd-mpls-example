@@ -1,0 +1,16 @@
+---
+- name: Build Switch configuration
+  hosts: MPLS_FABRIC
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: generate intended variables
+      import_role:
+        name: act-topgen
+      # vars:
+        # structured_folder: "intended/structured_configs/"
+        # avd_structured_config_file_format: yml
+        # output_folder: "act/"
+
+

@@ -41,6 +41,7 @@ pe:
     platform: vEOS-lab
     # Pool of IPv4 addresses to configure interface Loopback0 used for BGP EVPN sessions
     loopback_ipv4_pool: 10.255.1.0/27
+    virtual_router_mac_address: 00:1c:73:00:dc:00
     bgp_defaults:
       # The following command must not be enabled when using vEOS-lab
       # - update wait-install

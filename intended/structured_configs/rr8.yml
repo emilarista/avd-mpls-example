@@ -10,56 +10,73 @@ router_bgp:
   - maximum-paths 4 ecmp 4
   bgp_cluster_id: 7.7.7.7
   peer_groups:
-    MPLS-OVERLAY-PEERS:
-      type: mpls
-      update_source: Loopback0
-      bfd: true
-      send_community: all
-      maximum_routes: 0
-      remote_as: '65000'
-      route_reflector_client: true
-    RR-OVERLAY-PEERS:
-      type: mpls
-      update_source: Loopback0
-      bfd: true
-      send_community: all
-      maximum_routes: 0
-      remote_as: '65000'
+  - type: mpls
+    update_source: Loopback0
+    bfd: true
+    send_community: all
+    maximum_routes: 0
+    remote_as: '65000'
+    route_reflector_client: true
+    name: MPLS-OVERLAY-PEERS
+  - type: mpls
+    update_source: Loopback0
+    bfd: true
+    send_community: all
+    maximum_routes: 0
+    remote_as: '65000'
+    name: RR-OVERLAY-PEERS
   address_family_ipv4:
     peer_groups:
-      MPLS-OVERLAY-PEERS:
-        activate: false
-      RR-OVERLAY-PEERS:
-        activate: false
+    - activate: false
+      name: MPLS-OVERLAY-PEERS
+    - activate: false
+      name: RR-OVERLAY-PEERS
   address_family_evpn:
     peer_groups:
-      RR-OVERLAY-PEERS:
-        activate: true
+    - activate: true
+      name: RR-OVERLAY-PEERS
   address_family_rtc:
     peer_groups:
-      MPLS-OVERLAY-PEERS:
-        activate: true
-        default_route_target:
-          only: true
+    - activate: true
+      default_route_target:
+        only: true
+      name: MPLS-OVERLAY-PEERS
   address_family_vpn_ipv4:
+    neighbor_default_encapsulation_mpls_next_hop_self:
+      source_interface: Loopback0
     peer_groups:
-      MPLS-OVERLAY-PEERS:
-        activate: true
-      RR-OVERLAY-PEERS:
-        activate: true
+    - activate: true
+      name: MPLS-OVERLAY-PEERS
+    - activate: true
+      name: RR-OVERLAY-PEERS
   neighbors:
-    100.70.0.1:
-      peer_group: MPLS-OVERLAY-PEERS
-      description: pe1
-    100.70.0.2:
-      peer_group: MPLS-OVERLAY-PEERS
-      description: pe2
-    100.70.0.3:
-      peer_group: MPLS-OVERLAY-PEERS
-      description: pe3
-    100.70.0.5:
-      peer_group: MPLS-OVERLAY-PEERS
-      description: pe5
+  - peer_group: MPLS-OVERLAY-PEERS
+    description: pe1
+    ip_address: 100.70.0.1
+  - peer_group: MPLS-OVERLAY-PEERS
+    description: pe2
+    ip_address: 100.70.0.2
+  - peer_group: MPLS-OVERLAY-PEERS
+    description: pe3
+    ip_address: 100.70.0.3
+  - peer_group: MPLS-OVERLAY-PEERS
+    description: pe5
+    ip_address: 100.70.0.5
+  vrfs:
+  - router_id: 100.70.0.8
+    rd: 100.70.0.8:19
+    route_targets:
+      import:
+      - address_family: vpn-ipv4
+        route_targets:
+        - '65000:19'
+      export:
+      - address_family: vpn-ipv4
+        route_targets:
+        - '65000:19'
+    redistribute_routes:
+    - source_protocol: connected
+    name: TENANT_B_INTRA
 static_routes:
 - vrf: MGMT
   destination_address_prefix: 0.0.0.0/0
@@ -88,50 +105,56 @@ name_server:
   - 10.20.20.13
   - 8.8.8.8
 spanning_tree:
-  mode: none
+  mode: mstp
+  mst_instances:
+  - priority: 4096
+    id: '0'
 local_users:
-  cvpadmin:
-    privilege: 15
-    role: network-admin
-    sha512_password: someshapassword
-  someuser:
-    privilege: 15
-    role: network-admin
-    sha512_password: someshapassword
+- privilege: 15
+  role: network-admin
+  sha512_password: someshapassword
+  name: cvpadmin
+- privilege: 15
+  role: network-admin
+  sha512_password: someshapassword
+  name: someuser
 vrfs:
-  MGMT:
-    ip_routing: false
+- ip_routing: false
+  name: MGMT
+- tenant: TENANT_B
+  ip_routing: true
+  name: TENANT_B_INTRA
 management_interfaces:
-  Management1:
-    description: oob_management
-    shutdown: false
-    vrf: MGMT
-    ip_address: 10.30.30.108/24
-    gateway: 10.30.30.1
-    type: oob
+- description: oob_management
+  shutdown: false
+  vrf: MGMT
+  ip_address: 10.30.30.108/24
+  gateway: 10.30.30.1
+  type: oob
+  name: Management1
 management_api_http:
   enable_vrfs:
-    MGMT: {}
+  - name: MGMT
   enable_https: true
 eos_cli: "management security\n   password encryption-key common\n"
 loopback_interfaces:
-  Loopback0:
-    description: MPLS_Overlay_peering
-    shutdown: false
-    ip_address: 100.70.0.8/32
-    mpls:
-      ldp:
-        interface: true
-    isis_enable: CORE
-    isis_passive: true
-    node_segment:
-      ipv4_index: 108
+- description: MPLS_Overlay_peering
+  shutdown: false
+  ip_address: 100.70.0.8/32
+  mpls:
+    ldp:
+      interface: true
+  isis_enable: CORE
+  isis_passive: true
+  node_segment:
+    ipv4_index: 108
+  name: Loopback0
 router_isis:
   instance: CORE
   log_adjacency_changes: true
   net: 49.0001.0000.0002.0008.00
   router_id: 100.70.0.8
-  is_type: level-1-2
+  is_type: level-2
   address_family:
   - ipv4 unicast
   isis_af_defaults:
@@ -143,7 +166,7 @@ router_isis:
       delay: 15000
       protected_prefixes: true
   advertise:
-    passive_only: true
+    passive_only: false
   segment_routing_mpls:
     router_id: 100.70.0.8
     enabled: true
@@ -155,62 +178,106 @@ mpls:
     shutdown: false
     transport_address_interface: Loopback0
 ethernet_interfaces:
-  Ethernet1:
-    peer: pe2
-    peer_interface: Ethernet3
-    peer_type: pe
-    description: P2P_LINK_TO_pe2_Ethernet3
-    type: routed
-    shutdown: false
-    mtu: 1500
-    ip_address: 100.64.48.7/31
-    ipv6_enable: true
-    isis_enable: CORE
-    isis_metric: 60
-    isis_network_point_to_point: true
-    isis_hello_padding: false
-    isis_circuit_type: level-2
-    isis_authentication_mode: md5
-    isis_authentication_key: $1c$sTNAlR6rKSw=
-    mpls:
-      ip: true
-      ldp:
-        interface: true
-        igp_sync: true
-    speed: 100full
-  Ethernet2:
-    peer: rr7
-    peer_interface: Ethernet5
-    peer_type: rr
-    description: P2P_LINK_TO_rr7_Ethernet5
-    type: routed
-    shutdown: false
-    mtu: 1500
-    ip_address: 100.64.48.23/31
-    ipv6_enable: true
-    isis_enable: CORE
-    isis_metric: 60
-    isis_network_point_to_point: true
-    isis_hello_padding: false
-    isis_circuit_type: level-2
-    isis_authentication_mode: md5
-    isis_authentication_key: $1c$sTNAlR6rKSw=
-    mpls:
-      ip: true
-      ldp:
-        interface: true
-        igp_sync: true
-    speed: 100full
+- peer: pe2
+  peer_interface: Ethernet3
+  peer_type: pe
+  description: P2P_LINK_TO_pe2_Ethernet3
+  type: routed
+  shutdown: false
+  mtu: 1500
+  ip_address: 100.64.48.7/31
+  ipv6_enable: true
+  isis_enable: CORE
+  isis_metric: 60
+  isis_network_point_to_point: true
+  isis_hello_padding: false
+  isis_circuit_type: level-2
+  isis_authentication_mode: md5
+  isis_authentication_key: $1c$sTNAlR6rKSw=
+  mpls:
+    ip: true
+    ldp:
+      interface: true
+      igp_sync: true
+  speed: 100full
+  name: Ethernet1
+- peer: rr7
+  peer_interface: Ethernet5
+  peer_type: rr
+  description: P2P_LINK_TO_rr7_Ethernet5
+  type: routed
+  shutdown: false
+  mtu: 1500
+  ip_address: 100.64.48.23/31
+  ipv6_enable: true
+  isis_enable: CORE
+  isis_metric: 60
+  isis_network_point_to_point: true
+  isis_hello_padding: false
+  isis_circuit_type: level-2
+  isis_authentication_mode: md5
+  isis_authentication_key: $1c$sTNAlR6rKSw=
+  mpls:
+    ip: true
+    ldp:
+      interface: true
+      igp_sync: true
+  speed: 100full
+  name: Ethernet2
+- peer: CPE-TENANT-RR-SITE
+  peer_interface: eth1
+  peer_type: cpe
+  description: CPE-TENANT-RR-SITE_eth1
+  type: switched
+  shutdown: false
+  mode: trunk
+  vlans: '10'
+  spanning_tree_portfast: edge
+  channel_group:
+    id: 5
+    mode: active
+  name: Ethernet5
+port_channel_interfaces:
+- description: CPE-TENANT-RR-SITE_EVPN-A-A-PortChannel
+  type: switched
+  shutdown: false
+  mode: trunk
+  vlans: '10'
+  spanning_tree_portfast: edge
+  evpn_ethernet_segment:
+    identifier: 0000:0000:0303:0202:0101
+    route_target: 03:03:02:02:01:01
+  lacp_id: 0303.0202.0101
+  name: Port-Channel5
 router_bfd:
   multihop:
     interval: 5000
     min_rx: 5000
     multiplier: 3
+vlans:
+- tenant: TENANT_A
+  name: TENANT_A_L2_SERVICE
+  id: 10
+- tenant: TENANT_B
+  name: TENANT_B_INSIDE_FW
+  id: 2020
+ip_igmp_snooping:
+  globally_enabled: true
+ip_virtual_router_mac_address: 00:1c:73:00:dc:00
+vlan_interfaces:
+- tenant: TENANT_B
+  tags:
+  - site1-2
+  description: TENANT_B_INSIDE_FW
+  shutdown: false
+  ip_address_virtual: 10.1.255.1/24
+  vrf: TENANT_B_INTRA
+  name: Vlan2020
 sflow:
   sample: 40000
   vrfs:
-    MGMT:
-      destinations:
-        127.0.0.1: null
-      source_interface: Management1
+  - destinations:
+    - destination: 127.0.0.1
+    source_interface: Management1
+    name: MGMT
   run: true

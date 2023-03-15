@@ -3,9 +3,6 @@
   hosts: MPLS_FABRIC
   connection: local
   gather_facts: false
-  collections:
-    - arista.avd
-    - arista.cvp
 
   tasks:
     - name: generate intended variables
@@ -15,12 +12,6 @@
         design:
           type: "mpls"
 
-    # - name: Build a act topolgy
-    #   import_role:
-    #     name: arista.avd.act_topology_gen
-
     - name: generate device intended config and documentation
       import_role:
         name: arista.avd.eos_cli_config_gen
-      # vars:
-      #   veos_version: 4.28.3M

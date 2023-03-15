@@ -8,36 +8,36 @@ router_bgp:
   - graceful-restart
   - maximum-paths 4 ecmp 4
   peer_groups:
-    MPLS-OVERLAY-PEERS:
-      type: mpls
-      update_source: Loopback0
-      bfd: true
-      send_community: all
-      maximum_routes: 0
-      remote_as: '65000'
+  - type: mpls
+    update_source: Loopback0
+    bfd: true
+    send_community: all
+    maximum_routes: 0
+    remote_as: '65000'
+    name: MPLS-OVERLAY-PEERS
   address_family_ipv4:
     peer_groups:
-      MPLS-OVERLAY-PEERS:
-        activate: false
+    - activate: false
+      name: MPLS-OVERLAY-PEERS
   address_family_evpn:
-    peer_groups: {}
+    peer_groups: []
   address_family_rtc:
     peer_groups:
-      MPLS-OVERLAY-PEERS:
-        activate: true
+    - activate: true
+      name: MPLS-OVERLAY-PEERS
   address_family_vpn_ipv4:
     neighbor_default_encapsulation_mpls_next_hop_self:
       source_interface: Loopback0
     peer_groups:
-      MPLS-OVERLAY-PEERS:
-        activate: true
+    - activate: true
+      name: MPLS-OVERLAY-PEERS
   neighbors:
-    100.70.0.7:
-      peer_group: MPLS-OVERLAY-PEERS
-      description: rr7
-    100.70.0.8:
-      peer_group: MPLS-OVERLAY-PEERS
-      description: rr8
+  - peer_group: MPLS-OVERLAY-PEERS
+    description: rr7
+    ip_address: 100.70.0.7
+  - peer_group: MPLS-OVERLAY-PEERS
+    description: rr8
+    ip_address: 100.70.0.8
 static_routes:
 - vrf: MGMT
   destination_address_prefix: 0.0.0.0/0
@@ -68,51 +68,51 @@ name_server:
 spanning_tree:
   mode: mstp
   mst_instances:
-    '0':
-      priority: 4096
+  - priority: 4096
+    id: '0'
 local_users:
-  cvpadmin:
-    privilege: 15
-    role: network-admin
-    sha512_password: someshapassword
-  someuser:
-    privilege: 15
-    role: network-admin
-    sha512_password: someshapassword
+- privilege: 15
+  role: network-admin
+  sha512_password: someshapassword
+  name: cvpadmin
+- privilege: 15
+  role: network-admin
+  sha512_password: someshapassword
+  name: someuser
 vrfs:
-  MGMT:
-    ip_routing: false
+- ip_routing: false
+  name: MGMT
 management_interfaces:
-  Management1:
-    description: oob_management
-    shutdown: false
-    vrf: MGMT
-    ip_address: 10.30.30.105/24
-    gateway: 10.30.30.1
-    type: oob
+- description: oob_management
+  shutdown: false
+  vrf: MGMT
+  ip_address: 10.30.30.105/24
+  gateway: 10.30.30.1
+  type: oob
+  name: Management1
 management_api_http:
   enable_vrfs:
-    MGMT: {}
+  - name: MGMT
   enable_https: true
 eos_cli: "management security\n   password encryption-key common\n"
 loopback_interfaces:
-  Loopback0:
-    description: MPLS_Overlay_peering
-    shutdown: false
-    ip_address: 100.70.0.5/32
-    mpls:
-      ldp:
-        interface: true
-    isis_enable: CORE
-    isis_passive: true
-    node_segment:
-      ipv4_index: 205
+- description: MPLS_Overlay_peering
+  shutdown: false
+  ip_address: 100.70.0.5/32
+  mpls:
+    ldp:
+      interface: true
+  isis_enable: CORE
+  isis_passive: true
+  node_segment:
+    ipv4_index: 205
+  name: Loopback0
 router_isis:
   instance: CORE
   log_adjacency_changes: true
   net: 49.0001.0000.0001.0005.00
   router_id: 100.70.0.5
-  is_type: level-1-2
+  is_type: level-2
   address_family:
   - ipv4 unicast
   isis_af_defaults:
@@ -124,7 +124,7 @@ router_isis:
       delay: 15000
       protected_prefixes: true
   advertise:
-    passive_only: true
+    passive_only: false
   segment_routing_mpls:
     router_id: 100.70.0.5
     enabled: true
@@ -136,98 +136,98 @@ mpls:
     shutdown: false
     transport_address_interface: Loopback0
 ethernet_interfaces:
-  Ethernet2:
-    peer: p4
-    peer_interface: Ethernet2
-    peer_type: p
-    description: P2P_LINK_TO_p4_Ethernet2
-    type: routed
-    shutdown: false
-    mtu: 1500
-    ip_address: 100.64.48.17/31
-    ipv6_enable: true
-    isis_enable: CORE
-    isis_metric: 60
-    isis_network_point_to_point: true
-    isis_hello_padding: false
-    isis_circuit_type: level-2
-    isis_authentication_mode: md5
-    isis_authentication_key: $1c$sTNAlR6rKSw=
-    mpls:
-      ip: true
-      ldp:
-        interface: true
-        igp_sync: true
-    speed: 100full
-  Ethernet3:
-    peer: rr7
-    peer_interface: Ethernet3
-    peer_type: rr
-    description: P2P_LINK_TO_rr7_Ethernet3
-    type: routed
-    shutdown: false
-    mtu: 1600
-    ip_address: unnumbered loopback0
-    isis_enable: CORE
-    isis_metric: 50
-    isis_network_point_to_point: true
-    isis_hello_padding: true
-    isis_circuit_type: level-2
-    mpls:
-      ip: true
-      ldp:
-        interface: true
-        igp_sync: true
-  Ethernet1:
-    peer: p6
-    peer_interface: Ethernet1
-    peer_type: p
-    description: P2P_LINK_TO_p6_Ethernet1
-    type: routed
-    shutdown: false
-    mtu: 1500
-    ip_address: 100.64.48.20/31
-    ipv6_enable: true
-    isis_enable: CORE
-    isis_metric: 60
-    isis_network_point_to_point: true
-    isis_hello_padding: false
-    isis_circuit_type: level-2
-    isis_authentication_mode: md5
-    isis_authentication_key: $1c$sTNAlR6rKSw=
-    mpls:
-      ip: true
-      ldp:
-        interface: true
-        igp_sync: true
-    speed: 100full
-  Ethernet5:
-    peer: CPE-TENANT-A-SITE5
-    peer_interface: eth0
-    peer_type: cpe
-    description: CPE-TENANT-A-SITE5_eth0
-    type: switched
-    shutdown: false
-    mode: trunk
-    vlans: 10
-    spanning_tree_portfast: edge
-  Ethernet7:
-    type: routed
-    peer_type: l3_interface
-    shutdown: false
-    lldp:
-      transmit: false
-      receive: false
-  Ethernet8:
-    shutdown: false
-    channel_group:
-      id: 8
-      mode: active
-  Ethernet9:
-    shutdown: false
-    channel_group:
-      id: 8
-      mode: active
+- peer: p4
+  peer_interface: Ethernet2
+  peer_type: p
+  description: P2P_LINK_TO_p4_Ethernet2
+  type: routed
+  shutdown: false
+  mtu: 1500
+  ip_address: 100.64.48.17/31
+  ipv6_enable: true
+  isis_enable: CORE
+  isis_metric: 60
+  isis_network_point_to_point: true
+  isis_hello_padding: false
+  isis_circuit_type: level-2
+  isis_authentication_mode: md5
+  isis_authentication_key: $1c$sTNAlR6rKSw=
+  mpls:
+    ip: true
+    ldp:
+      interface: true
+      igp_sync: true
+  speed: 100full
+  name: Ethernet2
+- peer: rr7
+  peer_interface: Ethernet3
+  peer_type: rr
+  description: P2P_LINK_TO_rr7_Ethernet3
+  type: routed
+  shutdown: false
+  mtu: 1600
+  ip_address: unnumbered loopback0
+  isis_enable: CORE
+  isis_metric: 50
+  isis_network_point_to_point: true
+  isis_hello_padding: true
+  isis_circuit_type: level-2
+  mpls:
+    ip: true
+    ldp:
+      interface: true
+      igp_sync: true
+  name: Ethernet3
+- peer: p6
+  peer_interface: Ethernet1
+  peer_type: p
+  description: P2P_LINK_TO_p6_Ethernet1
+  type: routed
+  shutdown: false
+  mtu: 1500
+  ip_address: 100.64.48.20/31
+  ipv6_enable: true
+  isis_enable: CORE
+  isis_metric: 60
+  isis_network_point_to_point: true
+  isis_hello_padding: false
+  isis_circuit_type: level-2
+  isis_authentication_mode: md5
+  isis_authentication_key: $1c$sTNAlR6rKSw=
+  mpls:
+    ip: true
+    ldp:
+      interface: true
+      igp_sync: true
+  speed: 100full
+  name: Ethernet1
+- peer: CPE-TENANT-A-SITE5
+  peer_interface: eth0
+  peer_type: cpe
+  description: CPE-TENANT-A-SITE5_eth0
+  type: switched
+  shutdown: false
+  mode: trunk
+  vlans: '10'
+  spanning_tree_portfast: edge
+  name: Ethernet5
+- type: routed
+  peer_type: l3_interface
+  shutdown: false
+  lldp:
+    transmit: false
+    receive: false
+  name: Ethernet7
+- shutdown: false
+  channel_group:
+    id: 8
+    mode: active
+  name: Ethernet8
+- shutdown: false
+  channel_group:
+    id: 8
+    mode: active
+  name: Ethernet9
 router_bfd:
   multihop:
     interval: 5000
@@ -238,124 +238,124 @@ patch_panel:
   - name: TEN_A_site2_site5_eline_port_based
     enabled: true
     connectors:
-    - id: 1
+    - id: '1'
       type: interface
       endpoint: Ethernet7
-    - id: 2
+    - id: '2'
       type: pseudowire
       endpoint: bgp vpws TENANT_A pseudowire TEN_A_site2_site5_eline_port_based
   - name: TEN_A_site3_site5_eline_vlan_based_1000
     enabled: true
     connectors:
-    - id: 1
+    - id: '1'
       type: interface
       endpoint: Port-Channel8.1000
-    - id: 2
+    - id: '2'
       type: pseudowire
       endpoint: bgp vpws TENANT_A pseudowire TEN_A_site3_site5_eline_vlan_based_1000
   - name: TEN_A_site3_site5_eline_vlan_based_1001
     enabled: true
     connectors:
-    - id: 1
+    - id: '1'
       type: interface
       endpoint: Port-Channel8.1001
-    - id: 2
+    - id: '2'
       type: pseudowire
       endpoint: bgp vpws TENANT_A pseudowire TEN_A_site3_site5_eline_vlan_based_1001
   - name: TEN_A_site3_site5_eline_vlan_based_1002
     enabled: true
     connectors:
-    - id: 1
+    - id: '1'
       type: interface
       endpoint: Port-Channel8.1002
-    - id: 2
+    - id: '2'
       type: pseudowire
       endpoint: bgp vpws TENANT_A pseudowire TEN_A_site3_site5_eline_vlan_based_1002
   - name: TEN_A_site3_site5_eline_vlan_based_1003
     enabled: true
     connectors:
-    - id: 1
+    - id: '1'
       type: interface
       endpoint: Port-Channel8.1003
-    - id: 2
+    - id: '2'
       type: pseudowire
       endpoint: bgp vpws TENANT_A pseudowire TEN_A_site3_site5_eline_vlan_based_1003
   - name: TEN_A_site3_site5_eline_vlan_based_10
     enabled: true
     connectors:
-    - id: 1
+    - id: '1'
       type: interface
       endpoint: Port-Channel8.10
-    - id: 2
+    - id: '2'
       type: pseudowire
       endpoint: bgp vpws TENANT_A pseudowire TEN_A_site3_site5_eline_vlan_based_10
 vlans:
-  10:
-    tenant: TENANT_A
-    name: TENANT_A_L2_SERVICE
+- tenant: TENANT_A
+  name: TENANT_A_L2_SERVICE
+  id: 10
 ip_igmp_snooping:
   globally_enabled: true
 ip_virtual_router_mac_address: 00:1c:73:00:dc:00
 port_channel_interfaces:
-  Port-Channel8.1000:
-    type: l2dot1q
-    encapsulation_vlan:
-      client:
-        dot1q:
-          vlan: 1000
-      network:
-        client: true
-    peer_type: l3_interface
-    shutdown: false
-  Port-Channel8.1001:
-    type: l2dot1q
-    encapsulation_vlan:
-      client:
-        dot1q:
-          vlan: 1001
-      network:
-        client: true
-    peer_type: l3_interface
-    shutdown: false
-  Port-Channel8.1002:
-    type: l2dot1q
-    encapsulation_vlan:
-      client:
-        dot1q:
-          vlan: 1002
-      network:
-        client: true
-    peer_type: l3_interface
-    shutdown: false
-  Port-Channel8.1003:
-    type: l2dot1q
-    encapsulation_vlan:
-      client:
-        dot1q:
-          vlan: 1003
-      network:
-        client: true
-    peer_type: l3_interface
-    shutdown: false
-  Port-Channel8.10:
-    type: l2dot1q
-    encapsulation_vlan:
-      client:
-        dot1q:
-          vlan: 10
-      network:
-        client: true
-    peer_type: l3_interface
-    shutdown: false
-  Port-Channel8:
-    type: routed
-    peer_type: l3_interface
-    shutdown: false
+- type: l2dot1q
+  encapsulation_vlan:
+    client:
+      dot1q:
+        vlan: 1000
+    network:
+      client: true
+  peer_type: l3_interface
+  shutdown: false
+  name: Port-Channel8.1000
+- type: l2dot1q
+  encapsulation_vlan:
+    client:
+      dot1q:
+        vlan: 1001
+    network:
+      client: true
+  peer_type: l3_interface
+  shutdown: false
+  name: Port-Channel8.1001
+- type: l2dot1q
+  encapsulation_vlan:
+    client:
+      dot1q:
+        vlan: 1002
+    network:
+      client: true
+  peer_type: l3_interface
+  shutdown: false
+  name: Port-Channel8.1002
+- type: l2dot1q
+  encapsulation_vlan:
+    client:
+      dot1q:
+        vlan: 1003
+    network:
+      client: true
+  peer_type: l3_interface
+  shutdown: false
+  name: Port-Channel8.1003
+- type: l2dot1q
+  encapsulation_vlan:
+    client:
+      dot1q:
+        vlan: 10
+    network:
+      client: true
+  peer_type: l3_interface
+  shutdown: false
+  name: Port-Channel8.10
+- type: routed
+  peer_type: l3_interface
+  shutdown: false
+  name: Port-Channel8
 sflow:
   sample: 40000
   vrfs:
-    MGMT:
-      destinations:
-        127.0.0.1: null
-      source_interface: Management1
+  - destinations:
+    - destination: 127.0.0.1
+    source_interface: Management1
+    name: MGMT
   run: true

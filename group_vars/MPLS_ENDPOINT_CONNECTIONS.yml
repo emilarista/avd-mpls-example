@@ -38,8 +38,6 @@ cpes:
             encapsulation_vlan:
               client_dot1q: 333
 
-    rack: Undefined
-
   CPE-TENANT-A-SITE5:
     adapters:
     - profile: TENANT_A_WAN_SERVICE_10
@@ -49,5 +47,22 @@ cpes:
       - Ethernet5
       switches:
       - pe5
-    rack: Undefined
 
+
+  CPE-TENANT-RR-SITE:
+    adapters:
+    - profile: TENANT_A_WAN_SERVICE_10
+      endpoint_ports:
+      - eth0
+      - eth1
+      switch_ports:
+      - Ethernet5
+      - Ethernet5
+      switches:
+      - rr7
+      - rr8
+      port_channel:
+        description: EVPN-A-A-PortChannel
+        mode: active
+        # ESI stuff for main port channel, subinterfaces below use own values.
+        short_esi: 0303:0202:0101

@@ -8,28 +8,61 @@ all:
             WAN1_P_ROUTERS:
               hosts:
                 p1:
-                  ansible_host: 172.16.1.11
+                  ansible_host: 10.255.80.79
                 p2:
-                  ansible_host: 172.16.1.12
+                  ansible_host: 10.255.38.14
                 p3:
-                  ansible_host: 172.16.1.13
+                  ansible_host: 10.255.77.32
                 p4:
-                  ansible_host: 172.16.1.14
+                  ansible_host: 10.255.87.247
             WAN1_PE_ROUTERS:
               hosts:
                 pe1:
-                  ansible_host: 172.16.1.101
+                  ansible_host: 10.255.73.249
                 pe2:
-                  ansible_host: 172.16.1.102
+                  ansible_host: 10.255.23.39
                 pe3:
-                  ansible_host: 172.16.1.103
+                  ansible_host: 10.255.101.73
             WAN1_RR_ROUTERS:
               hosts:
                 rr1:
-                  ansible_host: 172.16.1.151
+                  ansible_host: 10.255.28.83
                 rr2:
-                  ansible_host: 172.16.1.152
+                  ansible_host: 10.255.4.153
 
         NETWORK_SERVICES:
           children:
             WAN1_PE_ROUTERS:
+
+    ACT_STUFF:
+      children:
+        FABRIC:
+
+    OTHERS:
+      vars:
+        # Ansible connectivity definitions
+        # eAPI connectivity via HTTPS is specified (as opposed to CLI via SSH)
+        ansible_connection: ansible.netcommon.httpapi
+        # Specifies that we are indeed using Arista EOS
+        ansible_network_os: arista.eos.eos
+        # This user/password must exist on the switches to enable Ansible access
+        ansible_user: cvpadmin
+        ansible_password: arista1234
+        # User escalation (to enter enable mode)
+        ansible_become: true
+        ansible_become_method: enable
+        # Use SSL (HTTPS)
+        ansible_httpapi_use_ssl: true
+        # Do not try to validate certs
+        ansible_httpapi_validate_certs: false
+      hosts:
+        c1cpe1:
+          ansible_host: 10.255.28.161
+        c1cpe2:
+          ansible_host: 10.255.22.224
+        c2cpe1:
+          ansible_host: 10.255.41.200
+        c2cpe2:
+          ansible_host: 10.255.37.83
+        eth-agg:
+          ansible_host: 10.255.79.133

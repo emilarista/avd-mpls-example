@@ -42,6 +42,7 @@ pe:
     # Pool of IPv4 addresses to configure interface Loopback0 used for BGP EVPN sessions
     loopback_ipv4_pool: 10.255.1.0/27
     virtual_router_mac_address: 00:1c:73:00:dc:00
+    mpls_route_reflectors: [ rr1, rr2 ]
     bgp_defaults:
       # The following command must not be enabled when using vEOS-lab
       # - update wait-install
@@ -77,6 +78,7 @@ rr:
     platform: vEOS-lab
     spanning_tree_mode: none
     loopback_ipv4_pool: 10.255.2.0/27
+    mpls_route_reflectors: [ rr1, rr2 ]
     bgp_defaults:
       # The following command must not be enabled when using vEOS-lab
       # - update wait-install
@@ -106,7 +108,7 @@ core_interfaces:
       ipv4_pool: 100.64.48.0/24
   p2p_links_profiles:
     - name: core_profile
-      speed: 100gfull
+      # speed: 100gfull
       # On vEOS-lab, MTU values larger than 1500 can cause issues, in an actual production network this is normally a larger value
       mtu: 1500
       isis_metric: 50
@@ -121,7 +123,7 @@ core_interfaces:
       interfaces: [ Ethernet1, Ethernet1 ]
       profile: core_profile
     - nodes: [ pe1, p2 ]
-      id: 1
+      id: 2
       interfaces: [ Ethernet2, Ethernet2 ]
       profile: core_profile
     # PE2 links

@@ -1,0 +1,43 @@
+---
+all:
+  children:
+    VEOS:
+      hosts:
+
+
+        p1:
+          ansible_host: 10.255.80.79
+          ansible_user: cvpadmin
+          ansible_ssh_pass: arista1234
+        p2:
+          ansible_host: 10.255.38.14
+          ansible_user: cvpadmin
+          ansible_ssh_pass: arista1234
+        p3:
+          ansible_host: 10.255.77.32
+          ansible_user: cvpadmin
+          ansible_ssh_pass: arista1234
+        p4:
+          ansible_host: 10.255.87.247
+          ansible_user: cvpadmin
+          ansible_ssh_pass: arista1234
+        pe1:
+          ansible_host: 10.255.73.249
+          ansible_user: cvpadmin
+          ansible_ssh_pass: arista1234
+        pe2:
+          ansible_host: 10.255.23.39
+          ansible_user: cvpadmin
+          ansible_ssh_pass: arista1234
+        pe3:
+          ansible_host: 10.255.101.73
+          ansible_user: cvpadmin
+          ansible_ssh_pass: arista1234
+        rr1:
+          ansible_host: 10.255.28.83
+          ansible_user: cvpadmin
+          ansible_ssh_pass: arista1234
+        rr2:
+          ansible_host: 10.255.4.153
+          ansible_user: cvpadmin
+          ansible_ssh_pass: arista1234

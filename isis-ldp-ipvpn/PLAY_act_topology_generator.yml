@@ -1,6 +1,6 @@
 ---
 - name: Build Switch configuration
-  hosts: MPLS_FABRIC
+  hosts: FABRIC
   connection: local
   gather_facts: false
 

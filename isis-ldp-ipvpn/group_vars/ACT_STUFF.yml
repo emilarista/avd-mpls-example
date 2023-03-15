@@ -1,0 +1,10 @@
+---
+custom_structured_configuration_management_api_http:
+  enable_https: true
+  enable_vrfs:
+    default:
+    MGMT:
+
+management_security:
+  password:
+    encryption_key_common: true

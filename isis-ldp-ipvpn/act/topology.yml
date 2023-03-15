@@ -1,0 +1,155 @@
+---
+
+cvp:
+  instance: singlenode
+  password: cvproot
+  username: root
+  version: 2022.2.0
+generic:
+  password: arista1234
+  username: cvpadmin
+  version: Rocky-8.5
+veos:
+  password: arista1234
+  username: cvpadmin
+  version: 4.27.6M
+
+nodes:
+  - p1:
+      ip_addr: 172.16.1.11
+      neighbors:
+      - neighborDevice: pe1
+        neighborPort: Ethernet1
+        port: Ethernet1
+      - neighborDevice: pe2
+        neighborPort: Ethernet2
+        port: Ethernet2
+      - neighborDevice: p2
+        neighborPort: Ethernet4
+        port: Ethernet4
+      - neighborDevice: rr1
+        neighborPort: Ethernet3
+        port: Ethernet3
+      node_type: veos
+      ports: []
+  - p2:
+      ip_addr: 172.16.1.12
+      neighbors:
+      - neighborDevice: pe1
+        neighborPort: Ethernet2
+        port: Ethernet2
+      - neighborDevice: pe2
+        neighborPort: Ethernet1
+        port: Ethernet1
+      - neighborDevice: p1
+        neighborPort: Ethernet4
+        port: Ethernet4
+      - neighborDevice: rr2
+        neighborPort: Ethernet3
+        port: Ethernet3
+      node_type: veos
+      ports: []
+  - p3:
+      ip_addr: 172.16.1.13
+      neighbors:
+      - neighborDevice: rr1
+        neighborPort: Ethernet2
+        port: Ethernet2
+      - neighborDevice: p4
+        neighborPort: Ethernet4
+        port: Ethernet4
+      - neighborDevice: pe3
+        neighborPort: Ethernet1
+        port: Ethernet1
+      node_type: veos
+      ports: []
+  - p4:
+      ip_addr: 172.16.1.14
+      neighbors:
+      - neighborDevice: rr2
+        neighborPort: Ethernet2
+        port: Ethernet2
+      - neighborDevice: p3
+        neighborPort: Ethernet4
+        port: Ethernet4
+      - neighborDevice: pe3
+        neighborPort: Ethernet3
+        port: Ethernet3
+      node_type: veos
+      ports: []
+  - pe1:
+      ip_addr: 172.16.1.101
+      neighbors:
+      - neighborDevice: p1
+        neighborPort: Ethernet1
+        port: Ethernet1
+      - neighborDevice: p2
+        neighborPort: Ethernet2
+        port: Ethernet2
+      node_type: veos
+      ports:
+      - Ethernet3
+  - pe2:
+      ip_addr: 172.16.1.102
+      neighbors:
+      - neighborDevice: p2
+        neighborPort: Ethernet1
+        port: Ethernet1
+      - neighborDevice: p1
+        neighborPort: Ethernet2
+        port: Ethernet2
+      node_type: veos
+      ports:
+      - Ethernet4
+  - pe3:
+      ip_addr: 172.16.1.103
+      neighbors:
+      - neighborDevice: p3
+        neighborPort: Ethernet1
+        port: Ethernet1
+      - neighborDevice: p4
+        neighborPort: Ethernet3
+        port: Ethernet3
+      node_type: veos
+      ports:
+      - Ethernet2
+      - Ethernet4
+  - rr1:
+      ip_addr: 172.16.1.151
+      neighbors:
+      - neighborDevice: p1
+        neighborPort: Ethernet3
+        port: Ethernet3
+      - neighborDevice: p3
+        neighborPort: Ethernet2
+        port: Ethernet2
+      - neighborDevice: rr2
+        neighborPort: Ethernet4
+        port: Ethernet4
+      node_type: veos
+      ports: []
+  - rr2:
+      ip_addr: 172.16.1.152
+      neighbors:
+      - neighborDevice: rr1
+        neighborPort: Ethernet4
+        port: Ethernet4
+      - neighborDevice: p2
+        neighborPort: Ethernet3
+        port: Ethernet3
+      - neighborDevice: p4
+        neighborPort: Ethernet2
+        port: Ethernet2
+      node_type: veos
+      ports: []
+
+  - eth_agg:
+    node_type: veos
+  - c1cpe1:
+    node_type: veos
+  - c2cpe1:
+    node_type: veos
+  - c1cpe2:
+    node_type: veos
+  - c2cpe2:
+    node_type: veos

@@ -11,7 +11,7 @@ router_bgp:
   - type: mpls
     update_source: Loopback0
     bfd: true
-    password: Q4fqtbqcZ7oQuKfuWtNGRQ==
+    password: $1c$G8BQN0ezkiJOX2cuAYpsEA==
     send_community: all
     maximum_routes: 0
     remote_as: '65001'
@@ -28,6 +28,13 @@ router_bgp:
     peer_groups:
     - activate: true
       name: MPLS-OVERLAY-PEERS
+  neighbors:
+  - peer_group: MPLS-OVERLAY-PEERS
+    description: rr1
+    ip_address: 10.255.2.1
+  - peer_group: MPLS-OVERLAY-PEERS
+    description: rr2
+    ip_address: 10.255.2.2
   vrfs:
   - router_id: 10.255.1.1
     rd: 10.255.1.1:10
@@ -89,7 +96,7 @@ local_users:
   name: admin
 - privilege: 15
   role: network-admin
-  sha512_password: $6$7u4j1rkb3VELgcZE$EJt2Qff8kd/TapRoci0XaIZsL4tFzgq1YZBLD9c6f/knXzvcYY0NcMKndZeCv0T268knGKhOEwZAxqKjlMm920
+  sha512_password: $6$QJUtFkyu9yoecsq.$ysGzlb2YXaIMvezqGEna7RE8CMALJHnv7Q1i.27VygyKUtSeX.n2xRTyOtCR8eOAl.4imBLyhXFc4o97P5n071
   name: ansible
 vrfs:
 - ip_routing: false
@@ -111,6 +118,7 @@ management_interfaces:
 management_api_http:
   enable_vrfs:
   - name: MGMT
+  - name: default
   enable_https: true
 loopback_interfaces:
 - description: MPLS_Overlay_peering
@@ -161,7 +169,6 @@ ethernet_interfaces:
     ldp:
       interface: true
       igp_sync: true
-  speed: 100gfull
   name: Ethernet1
 - peer: p2
   peer_interface: Ethernet2
@@ -170,7 +177,7 @@ ethernet_interfaces:
   type: routed
   shutdown: false
   mtu: 1500
-  ip_address: 100.64.48.0/31
+  ip_address: 100.64.48.2/31
   isis_enable: CORE
   isis_metric: 50
   isis_network_point_to_point: true
@@ -183,7 +190,6 @@ ethernet_interfaces:
     ldp:
       interface: true
       igp_sync: true
-  speed: 100gfull
   name: Ethernet2
 - peer_type: l3_interface
   ip_address: 10.0.1.0/31

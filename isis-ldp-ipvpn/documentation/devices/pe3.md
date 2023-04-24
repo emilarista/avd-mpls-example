@@ -6,6 +6,9 @@
   - [Management API HTTP](#management-api-http)
 - [Authentication](#authentication)
   - [Local Users](#local-users)
+- [Management Security](#management-security)
+  - [Management Security Summary](#management-security-summary)
+  - [Management Security Configuration](#management-security-configuration)
 - [Spanning Tree](#spanning-tree)
   - [Spanning Tree Summary](#spanning-tree-summary)
   - [Spanning Tree Device Configuration](#spanning-tree-device-configuration)
@@ -110,7 +113,23 @@ management api http-commands
 ```eos
 !
 username admin privilege 15 role network-admin nopassword
-username ansible privilege 15 role network-admin secret sha512 $6$7u4j1rkb3VELgcZE$EJt2Qff8kd/TapRoci0XaIZsL4tFzgq1YZBLD9c6f/knXzvcYY0NcMKndZeCv0T268knGKhOEwZAxqKjlMm920
+username ansible privilege 15 role network-admin secret sha512 $6$QJUtFkyu9yoecsq.$ysGzlb2YXaIMvezqGEna7RE8CMALJHnv7Q1i.27VygyKUtSeX.n2xRTyOtCR8eOAl.4imBLyhXFc4o97P5n071
+```
+
+# Management Security
+
+## Management Security Summary
+
+| Settings | Value |
+| -------- | ----- |
+| Common password encryption key | True |
+
+## Management Security Configuration
+
+```eos
+!
+management security
+   password encryption-key common
 ```
 
 # Spanning Tree
@@ -159,9 +178,9 @@ vlan internal order ascending range 1006 1199
 | Interface | Description | Type | Channel Group | IP Address | VRF |  MTU | Shutdown | ACL In | ACL Out |
 | --------- | ----------- | -----| ------------- | ---------- | ----| ---- | -------- | ------ | ------- |
 | Ethernet1 | P2P_LINK_TO_p3_Ethernet1 | routed | - | 100.64.48.22/31 | default | 1500 | False | - | - |
-| Ethernet2 | C1_VLAN10 | routed | - | 10.0.1.4/31 | C1_VRF1 | - | False | - | - |
+| Ethernet2 | C1_VLAN10 | routed | - | 10.0.1.9/30 | C1_VRF1 | - | False | - | - |
 | Ethernet3 | P2P_LINK_TO_p4_Ethernet3 | routed | - | 100.64.48.24/31 | default | 1500 | False | - | - |
-| Ethernet4 | C2_VLAN20 | routed | - | 10.1.1.4/31 | C2_VRF1 | - | False | - | - |
+| Ethernet4 | C2_VLAN20 | routed | - | 10.1.1.9/30 | C2_VRF1 | - | False | - | - |
 
 #### ISIS
 
@@ -178,7 +197,6 @@ interface Ethernet1
    description P2P_LINK_TO_p3_Ethernet1
    no shutdown
    mtu 1500
-   speed 100gfull
    no switchport
    ip address 100.64.48.22/31
    mpls ldp igp sync
@@ -197,14 +215,13 @@ interface Ethernet2
    no shutdown
    no switchport
    vrf C1_VRF1
-   ip address 10.0.1.4/31
+   ip address 10.0.1.9/30
    ip ospf area 0
 !
 interface Ethernet3
    description P2P_LINK_TO_p4_Ethernet3
    no shutdown
    mtu 1500
-   speed 100gfull
    no switchport
    ip address 100.64.48.24/31
    mpls ldp igp sync
@@ -223,7 +240,7 @@ interface Ethernet4
    no shutdown
    no switchport
    vrf C2_VRF1
-   ip address 10.1.1.4/31
+   ip address 10.1.1.9/30
 ```
 
 ## Loopback Interfaces
@@ -368,6 +385,7 @@ router ospf 10 vrf C1_VRF1
 | Settings | Value |
 | -------- | ----- |
 | Instance | CORE |
+| Net-ID | 49.0001.0000.0001.0003.00 |
 | Type | level-2 |
 | Address Family | ipv4 unicast |
 | Router-ID | 10.255.1.3 |
@@ -387,6 +405,7 @@ router ospf 10 vrf C1_VRF1
 ```eos
 !
 router isis CORE
+   net 49.0001.0000.0001.0003.00
    is-type level-2
    router-id ipv4 10.255.1.3
    log-adjacency-changes
@@ -430,7 +449,9 @@ router isis CORE
 
 | Neighbor | Remote AS | VRF | Shutdown | Send-community | Maximum-routes | Allowas-in | BFD | RIB Pre-Policy Retain | Route-Reflector Client |
 | -------- | --------- | --- | -------- | -------------- | -------------- | ---------- | --- | --------------------- | ---------------------- |
-| 10.1.1.5 | 321 | C2_VRF1 | - | standard | 100 | - | - | - | - |
+| 10.255.2.1 | Inherited from peer group MPLS-OVERLAY-PEERS | default | - | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS | - | - |
+| 10.255.2.2 | Inherited from peer group MPLS-OVERLAY-PEERS | default | - | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS | - | - |
+| 10.1.1.10 | 321 | C2_VRF1 | - | standard | 100 | - | - | - | - |
 
 ### Router BGP EVPN Address Family
 
@@ -469,9 +490,13 @@ router bgp 65001
    neighbor MPLS-OVERLAY-PEERS remote-as 65001
    neighbor MPLS-OVERLAY-PEERS update-source Loopback0
    neighbor MPLS-OVERLAY-PEERS bfd
-   neighbor MPLS-OVERLAY-PEERS password 7 Q4fqtbqcZ7oQuKfuWtNGRQ==
+   neighbor MPLS-OVERLAY-PEERS password 7 $1c$G8BQN0ezkiJOX2cuAYpsEA==
    neighbor MPLS-OVERLAY-PEERS send-community
    neighbor MPLS-OVERLAY-PEERS maximum-routes 0
+   neighbor 10.255.2.1 peer group MPLS-OVERLAY-PEERS
+   neighbor 10.255.2.1 description rr1
+   neighbor 10.255.2.2 peer group MPLS-OVERLAY-PEERS
+   neighbor 10.255.2.2 description rr2
    !
    address-family evpn
    !
@@ -495,14 +520,14 @@ router bgp 65001
       route-target import vpn-ipv4 20:20
       route-target export vpn-ipv4 20:20
       router-id 10.255.1.3
-      neighbor 10.1.1.5 remote-as 321
-      neighbor 10.1.1.5 description C1_CPE
-      neighbor 10.1.1.5 send-community standard
-      neighbor 10.1.1.5 maximum-routes 100
+      neighbor 10.1.1.10 remote-as 321
+      neighbor 10.1.1.10 description C1_CPE
+      neighbor 10.1.1.10 send-community standard
+      neighbor 10.1.1.10 maximum-routes 100
       redistribute connected
       !
       address-family ipv4
-         neighbor 10.1.1.5 activate
+         neighbor 10.1.1.10 activate
 ```
 
 # BFD

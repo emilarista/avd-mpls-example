@@ -6,6 +6,9 @@
   - [Management API HTTP](#management-api-http)
 - [Authentication](#authentication)
   - [Local Users](#local-users)
+- [Management Security](#management-security)
+  - [Management Security Summary](#management-security-summary)
+  - [Management Security Configuration](#management-security-configuration)
 - [Spanning Tree](#spanning-tree)
   - [Spanning Tree Summary](#spanning-tree-summary)
   - [Spanning Tree Device Configuration](#spanning-tree-device-configuration)
@@ -106,7 +109,23 @@ management api http-commands
 ```eos
 !
 username admin privilege 15 role network-admin nopassword
-username ansible privilege 15 role network-admin secret sha512 $6$7u4j1rkb3VELgcZE$EJt2Qff8kd/TapRoci0XaIZsL4tFzgq1YZBLD9c6f/knXzvcYY0NcMKndZeCv0T268knGKhOEwZAxqKjlMm920
+username ansible privilege 15 role network-admin secret sha512 $6$QJUtFkyu9yoecsq.$ysGzlb2YXaIMvezqGEna7RE8CMALJHnv7Q1i.27VygyKUtSeX.n2xRTyOtCR8eOAl.4imBLyhXFc4o97P5n071
+```
+
+# Management Security
+
+## Management Security Summary
+
+| Settings | Value |
+| -------- | ----- |
+| Common password encryption key | True |
+
+## Management Security Configuration
+
+```eos
+!
+management security
+   password encryption-key common
 ```
 
 # Spanning Tree
@@ -174,7 +193,6 @@ interface Ethernet2
    description P2P_LINK_TO_p3_Ethernet2
    no shutdown
    mtu 1500
-   speed 100gfull
    no switchport
    ip address 100.64.48.12/31
    mpls ldp igp sync
@@ -192,7 +210,6 @@ interface Ethernet3
    description P2P_LINK_TO_p1_Ethernet3
    no shutdown
    mtu 1500
-   speed 100gfull
    no switchport
    ip address 100.64.48.10/31
    mpls ldp igp sync
@@ -210,7 +227,6 @@ interface Ethernet4
    description P2P_LINK_TO_rr2_Ethernet4
    no shutdown
    mtu 1500
-   speed 100gfull
    no switchport
    ip address 100.64.48.14/31
    mpls ldp igp sync
@@ -317,6 +333,7 @@ ip route vrf MGMT 0.0.0.0/0 172.16.1.1
 | Settings | Value |
 | -------- | ----- |
 | Instance | CORE |
+| Net-ID | 49.0001.0000.0002.0001.00 |
 | Type | level-2 |
 | Address Family | ipv4 unicast |
 | Router-ID | 10.255.2.1 |
@@ -337,6 +354,7 @@ ip route vrf MGMT 0.0.0.0/0 172.16.1.1
 ```eos
 !
 router isis CORE
+   net 49.0001.0000.0002.0001.00
    is-type level-2
    router-id ipv4 10.255.2.1
    log-adjacency-changes
@@ -392,6 +410,15 @@ router isis CORE
 | Send community | all |
 | Maximum routes | 0 (no limit) |
 
+### BGP Neighbors
+
+| Neighbor | Remote AS | VRF | Shutdown | Send-community | Maximum-routes | Allowas-in | BFD | RIB Pre-Policy Retain | Route-Reflector Client |
+| -------- | --------- | --- | -------- | -------------- | -------------- | ---------- | --- | --------------------- | ---------------------- |
+| 10.255.1.1 | Inherited from peer group MPLS-OVERLAY-PEERS | default | - | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS |
+| 10.255.1.2 | Inherited from peer group MPLS-OVERLAY-PEERS | default | - | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS |
+| 10.255.1.3 | Inherited from peer group MPLS-OVERLAY-PEERS | default | - | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS |
+| 10.255.2.2 | Inherited from peer group RR-OVERLAY-PEERS | default | - | Inherited from peer group RR-OVERLAY-PEERS | Inherited from peer group RR-OVERLAY-PEERS | - | Inherited from peer group RR-OVERLAY-PEERS | - | - |
+
 ### Router BGP EVPN Address Family
 
 #### EVPN Peer Groups
@@ -426,15 +453,24 @@ router bgp 65001
    neighbor MPLS-OVERLAY-PEERS update-source Loopback0
    neighbor MPLS-OVERLAY-PEERS route-reflector-client
    neighbor MPLS-OVERLAY-PEERS bfd
-   neighbor MPLS-OVERLAY-PEERS password 7 Q4fqtbqcZ7oQuKfuWtNGRQ==
+   neighbor MPLS-OVERLAY-PEERS password 7 $1c$G8BQN0ezkiJOX2cuAYpsEA==
    neighbor MPLS-OVERLAY-PEERS send-community
    neighbor MPLS-OVERLAY-PEERS maximum-routes 0
    neighbor RR-OVERLAY-PEERS peer group
    neighbor RR-OVERLAY-PEERS remote-as 65001
    neighbor RR-OVERLAY-PEERS update-source Loopback0
    neighbor RR-OVERLAY-PEERS bfd
+   neighbor RR-OVERLAY-PEERS password 7 $1c$G8BQN0ezkiJOX2cuAYpsEA==
    neighbor RR-OVERLAY-PEERS send-community
    neighbor RR-OVERLAY-PEERS maximum-routes 0
+   neighbor 10.255.1.1 peer group MPLS-OVERLAY-PEERS
+   neighbor 10.255.1.1 description pe1
+   neighbor 10.255.1.2 peer group MPLS-OVERLAY-PEERS
+   neighbor 10.255.1.2 description pe2
+   neighbor 10.255.1.3 peer group MPLS-OVERLAY-PEERS
+   neighbor 10.255.1.3 description pe3
+   neighbor 10.255.2.2 peer group RR-OVERLAY-PEERS
+   neighbor 10.255.2.2 description rr2
    !
    address-family evpn
       neighbor RR-OVERLAY-PEERS activate

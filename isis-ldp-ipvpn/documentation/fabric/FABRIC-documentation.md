@@ -68,7 +68,7 @@
 | p1 | Ethernet3 | 100.64.48.11/31 | rr1 | Ethernet3 | 100.64.48.10/31 |
 | p1 | Ethernet4 | 100.64.48.8/31 | p2 | Ethernet4 | 100.64.48.9/31 |
 | p2 | Ethernet1 | 100.64.48.5/31 | pe2 | Ethernet1 | 100.64.48.4/31 |
-| p2 | Ethernet2 | 100.64.48.1/31 | pe1 | Ethernet2 | 100.64.48.0/31 |
+| p2 | Ethernet2 | 100.64.48.3/31 | pe1 | Ethernet2 | 100.64.48.2/31 |
 | p2 | Ethernet3 | 100.64.48.17/31 | rr2 | Ethernet3 | 100.64.48.16/31 |
 | p3 | Ethernet1 | 100.64.48.23/31 | pe3 | Ethernet1 | 100.64.48.22/31 |
 | p3 | Ethernet2 | 100.64.48.13/31 | rr1 | Ethernet2 | 100.64.48.12/31 |
@@ -103,6 +103,15 @@
 
 | POD | Node | CLNS Address |
 | --- | ---- | ------------ |
+| FABRIC | p1 | 49.0001.0000.0000.0001.00 |
+| FABRIC | p2 | 49.0001.0000.0000.0002.00 |
+| FABRIC | p3 | 49.0001.0000.0000.0003.00 |
+| FABRIC | p4 | 49.0001.0000.0000.0004.00 |
+| FABRIC | pe1 | 49.0001.0000.0001.0001.00 |
+| FABRIC | pe2 | 49.0001.0000.0001.0002.00 |
+| FABRIC | pe3 | 49.0001.0000.0001.0003.00 |
+| FABRIC | rr1 | 49.0001.0000.0002.0001.00 |
+| FABRIC | rr2 | 49.0001.0000.0002.0002.00 |
 
 ## VTEP Loopback VXLAN Tunnel Source Interfaces (VTEPs Only)
 

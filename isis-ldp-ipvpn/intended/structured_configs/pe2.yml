@@ -133,7 +133,7 @@ loopback_interfaces:
 router_isis:
   instance: CORE
   log_adjacency_changes: true
-  net: null
+  net: 49.0001.0000.0001.0002.00
   router_id: 10.255.1.2
   is_type: level-2
   address_family:
@@ -192,7 +192,7 @@ ethernet_interfaces:
       igp_sync: true
   name: Ethernet2
 - peer_type: l3_interface
-  ip_address: 10.0.1.2/31
+  ip_address: 10.0.1.2/29
   shutdown: false
   description: C1_VLAN10
   type: l3dot1q
@@ -202,7 +202,7 @@ ethernet_interfaces:
   ospf_network_point_to_point: false
   name: Ethernet4.10
 - peer_type: l3_interface
-  ip_address: 10.1.1.2/31
+  ip_address: 10.1.1.2/29
   shutdown: false
   description: C2_VLAN20
   type: l3dot1q

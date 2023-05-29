@@ -110,7 +110,7 @@ management api http-commands
 ```eos
 !
 username admin privilege 15 role network-admin nopassword
-username ansible privilege 15 role network-admin secret sha512 $6$QJUtFkyu9yoecsq.$ysGzlb2YXaIMvezqGEna7RE8CMALJHnv7Q1i.27VygyKUtSeX.n2xRTyOtCR8eOAl.4imBLyhXFc4o97P5n071
+username ansible privilege 15 role network-admin secret sha512 <removed>
 ```
 
 ## Management Security
@@ -205,7 +205,7 @@ interface Ethernet1
    isis hello padding
    isis network point-to-point
    isis authentication mode md5
-   isis authentication key 7 $1c$sTNAlR6rKSw=
+   isis authentication key 7 <removed>
 !
 interface Ethernet2
    description C1_L3_SERVICE
@@ -230,7 +230,7 @@ interface Ethernet3
    isis hello padding
    isis network point-to-point
    isis authentication mode md5
-   isis authentication key 7 $1c$sTNAlR6rKSw=
+   isis authentication key 7 <removed>
 !
 interface Ethernet4
    description C2_L3_SERVICE
@@ -386,7 +386,6 @@ router ospf 10 vrf C1_VRF1
 | Instance | CORE |
 | Net-ID | 49.0001.0000.0001.0003.00 |
 | Type | level-2 |
-| Address Family | ipv4 unicast |
 | Router-ID | 10.255.1.3 |
 | Log Adjacency Changes | True |
 | MPLS LDP Sync Default | True |
@@ -398,6 +397,13 @@ router ospf 10 vrf C1_VRF1
 | Ethernet1 | CORE | 50 | point-to-point |
 | Ethernet3 | CORE | 50 | point-to-point |
 | Loopback0 | CORE | - | passive |
+
+#### ISIS IPv4 Address Family Summary
+
+| Settings | Value |
+| -------- | ----- |
+| IPv4 Address-family Enabled | True |
+| Maximum-paths | 4 |
 
 #### Router ISIS Device Configuration
 
@@ -429,6 +435,9 @@ router isis CORE
 | distance bgp 20 200 200 |
 | graceful-restart restart-time 300 |
 | graceful-restart |
+| graceful-restart restart-time 300 |
+| graceful-restart |
+| no bgp default ipv4-unicast |
 | maximum-paths 4 ecmp 4 |
 
 #### Router BGP Peer Groups
@@ -480,16 +489,19 @@ router isis CORE
 !
 router bgp 65001
    router-id 10.255.1.3
+   graceful-restart restart-time 300
+   graceful-restart
+   maximum-paths 4 ecmp 4
+   no bgp default ipv4-unicast
    no bgp default ipv4-unicast
    distance bgp 20 200 200
    graceful-restart restart-time 300
    graceful-restart
-   maximum-paths 4 ecmp 4
    neighbor MPLS-OVERLAY-PEERS peer group
    neighbor MPLS-OVERLAY-PEERS remote-as 65001
    neighbor MPLS-OVERLAY-PEERS update-source Loopback0
    neighbor MPLS-OVERLAY-PEERS bfd
-   neighbor MPLS-OVERLAY-PEERS password 7 $1c$G8BQN0ezkiJOX2cuAYpsEA==
+   neighbor MPLS-OVERLAY-PEERS password 7 <removed>
    neighbor MPLS-OVERLAY-PEERS send-community
    neighbor MPLS-OVERLAY-PEERS maximum-routes 0
    neighbor 10.255.2.1 peer group MPLS-OVERLAY-PEERS

@@ -1,5 +1,6 @@
 # pe3
-# Table of Contents
+
+## Table of Contents
 
 - [Management](#management)
   - [Management Interfaces](#management-interfaces)
@@ -38,25 +39,25 @@
   - [VRF Instances Summary](#vrf-instances-summary)
   - [VRF Instances Device Configuration](#vrf-instances-device-configuration)
 
-# Management
+## Management
 
-## Management Interfaces
+### Management Interfaces
 
-### Management Interfaces Summary
+#### Management Interfaces Summary
 
-#### IPv4
+##### IPv4
 
 | Management Interface | description | Type | VRF | IP Address | Gateway |
 | -------------------- | ----------- | ---- | --- | ---------- | ------- |
 | Management1 | oob_management | oob | MGMT | 172.16.1.103/24 | 172.16.1.1 |
 
-#### IPv6
+##### IPv6
 
 | Management Interface | description | Type | VRF | IPv6 Address | IPv6 Gateway |
 | -------------------- | ----------- | ---- | --- | ------------ | ------------ |
 | Management1 | oob_management | oob | MGMT | - | - |
 
-### Management Interfaces Device Configuration
+#### Management Interfaces Device Configuration
 
 ```eos
 !
@@ -67,22 +68,21 @@ interface Management1
    ip address 172.16.1.103/24
 ```
 
-## Management API HTTP
+### Management API HTTP
 
-### Management API HTTP Summary
+#### Management API HTTP Summary
 
 | HTTP | HTTPS | Default Services |
 | ---- | ----- | ---------------- |
 | False | True | - |
 
-### Management API VRF Access
+#### Management API VRF Access
 
 | VRF Name | IPv4 ACL | IPv6 ACL |
 | -------- | -------- | -------- |
-| default | - | - |
 | MGMT | - | - |
 
-### Management API HTTP Configuration
+#### Management API HTTP Configuration
 
 ```eos
 !
@@ -90,25 +90,22 @@ management api http-commands
    protocol https
    no shutdown
    !
-   vrf default
-      no shutdown
-   !
    vrf MGMT
       no shutdown
 ```
 
-# Authentication
+## Authentication
 
-## Local Users
+### Local Users
 
-### Local Users Summary
+#### Local Users Summary
 
-| User | Privilege | Role | Disabled |
-| ---- | --------- | ---- | -------- |
-| admin | 15 | network-admin | False |
-| ansible | 15 | network-admin | False |
+| User | Privilege | Role | Disabled | Shell |
+| ---- | --------- | ---- | -------- | ----- |
+| admin | 15 | network-admin | False | - |
+| ansible | 15 | network-admin | False | - |
 
-### Local Users Device Configuration
+#### Local Users Device Configuration
 
 ```eos
 !
@@ -116,15 +113,15 @@ username admin privilege 15 role network-admin nopassword
 username ansible privilege 15 role network-admin secret sha512 $6$QJUtFkyu9yoecsq.$ysGzlb2YXaIMvezqGEna7RE8CMALJHnv7Q1i.27VygyKUtSeX.n2xRTyOtCR8eOAl.4imBLyhXFc4o97P5n071
 ```
 
-# Management Security
+## Management Security
 
-## Management Security Summary
+### Management Security Summary
 
 | Settings | Value |
 | -------- | ----- |
 | Common password encryption key | True |
 
-## Management Security Configuration
+### Management Security Configuration
 
 ```eos
 !
@@ -132,64 +129,64 @@ management security
    password encryption-key common
 ```
 
-# Spanning Tree
+## Spanning Tree
 
-## Spanning Tree Summary
+### Spanning Tree Summary
 
 STP mode: **none**
 
-## Spanning Tree Device Configuration
+### Spanning Tree Device Configuration
 
 ```eos
 !
 spanning-tree mode none
 ```
 
-# Internal VLAN Allocation Policy
+## Internal VLAN Allocation Policy
 
-## Internal VLAN Allocation Policy Summary
+### Internal VLAN Allocation Policy Summary
 
 | Policy Allocation | Range Beginning | Range Ending |
 | ------------------| --------------- | ------------ |
 | ascending | 1006 | 1199 |
 
-## Internal VLAN Allocation Policy Configuration
+### Internal VLAN Allocation Policy Configuration
 
 ```eos
 !
 vlan internal order ascending range 1006 1199
 ```
 
-# Interfaces
+## Interfaces
 
-## Ethernet Interfaces
+### Ethernet Interfaces
 
-### Ethernet Interfaces Summary
+#### Ethernet Interfaces Summary
 
-#### L2
+##### L2
 
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
 
 *Inherited from Port-Channel Interface
 
-#### IPv4
+##### IPv4
 
 | Interface | Description | Type | Channel Group | IP Address | VRF |  MTU | Shutdown | ACL In | ACL Out |
 | --------- | ----------- | -----| ------------- | ---------- | ----| ---- | -------- | ------ | ------- |
 | Ethernet1 | P2P_LINK_TO_p3_Ethernet1 | routed | - | 100.64.48.22/31 | default | 1500 | False | - | - |
-| Ethernet2 | C1_VLAN10 | routed | - | 10.0.1.9/30 | C1_VRF1 | - | False | - | - |
+| Ethernet2 | C1_L3_SERVICE | routed | - | 10.0.1.9/30 | C1_VRF1 | - | False | - | - |
 | Ethernet3 | P2P_LINK_TO_p4_Ethernet3 | routed | - | 100.64.48.24/31 | default | 1500 | False | - | - |
-| Ethernet4 | C2_VLAN20 | routed | - | 10.1.1.9/30 | C2_VRF1 | - | False | - | - |
+| Ethernet4 | C2_L3_SERVICE | routed | - | 10.1.1.9/30 | C2_VRF1 | - | False | - | - |
 
-#### ISIS
+##### ISIS
 
 | Interface | Channel Group | ISIS Instance | ISIS Metric | Mode | ISIS Circuit Type | Hello Padding | Authentication Mode |
 | --------- | ------------- | ------------- | ----------- | ---- | ----------------- | ------------- | ------------------- |
 | Ethernet1 | - | CORE | 50 | point-to-point | level-2 | True | md5 |
 | Ethernet3 | - | CORE | 50 | point-to-point | level-2 | True | md5 |
 
-### Ethernet Interfaces Device Configuration
+#### Ethernet Interfaces Device Configuration
 
 ```eos
 !
@@ -211,7 +208,7 @@ interface Ethernet1
    isis authentication key 7 $1c$sTNAlR6rKSw=
 !
 interface Ethernet2
-   description C1_VLAN10
+   description C1_L3_SERVICE
    no shutdown
    no switchport
    vrf C1_VRF1
@@ -236,36 +233,36 @@ interface Ethernet3
    isis authentication key 7 $1c$sTNAlR6rKSw=
 !
 interface Ethernet4
-   description C2_VLAN20
+   description C2_L3_SERVICE
    no shutdown
    no switchport
    vrf C2_VRF1
    ip address 10.1.1.9/30
 ```
 
-## Loopback Interfaces
+### Loopback Interfaces
 
-### Loopback Interfaces Summary
+#### Loopback Interfaces Summary
 
-#### IPv4
+##### IPv4
 
 | Interface | Description | VRF | IP Address |
 | --------- | ----------- | --- | ---------- |
 | Loopback0 | MPLS_Overlay_peering | default | 10.255.1.3/32 |
 
-#### IPv6
+##### IPv6
 
 | Interface | Description | VRF | IPv6 Address |
 | --------- | ----------- | --- | ------------ |
 | Loopback0 | MPLS_Overlay_peering | default | - |
 
-#### ISIS
+##### ISIS
 
 | Interface | ISIS instance | ISIS metric | Interface mode |
 | --------- | ------------- | ----------- | -------------- |
 | Loopback0 | CORE | - | passive |
 
-### Loopback Interfaces Device Configuration
+#### Loopback Interfaces Device Configuration
 
 ```eos
 !
@@ -278,8 +275,9 @@ interface Loopback0
    mpls ldp interface
 ```
 
-# Routing
-## Service Routing Protocols Model
+## Routing
+
+### Service Routing Protocols Model
 
 Multi agent routing protocol model enabled
 
@@ -288,30 +286,31 @@ Multi agent routing protocol model enabled
 service routing protocols model multi-agent
 ```
 
-## Virtual Router MAC Address
+### Virtual Router MAC Address
 
-### Virtual Router MAC Address Summary
+#### Virtual Router MAC Address Summary
 
-#### Virtual Router MAC Address: 00:1c:73:00:dc:00
+##### Virtual Router MAC Address: 00:1c:73:00:dc:00
 
-### Virtual Router MAC Address Configuration
+#### Virtual Router MAC Address Configuration
 
 ```eos
 !
 ip virtual-router mac-address 00:1c:73:00:dc:00
 ```
-## IP Routing
 
-### IP Routing Summary
+### IP Routing
+
+#### IP Routing Summary
 
 | VRF | Routing Enabled |
 | --- | --------------- |
 | default | True |
-| C1_VRF1 | true |
-| C2_VRF1 | true |
-| MGMT | false |
+| C1_VRF1 | True |
+| C2_VRF1 | True |
+| MGMT | False |
 
-### IP Routing Device Configuration
+#### IP Routing Device Configuration
 
 ```eos
 !
@@ -321,9 +320,9 @@ ip routing vrf C2_VRF1
 no ip routing vrf MGMT
 ```
 
-## IPv6 Routing
+### IPv6 Routing
 
-### IPv6 Routing Summary
+#### IPv6 Routing Summary
 
 | VRF | Routing Enabled |
 | --- | --------------- |
@@ -332,42 +331,42 @@ no ip routing vrf MGMT
 | C2_VRF1 | false |
 | MGMT | false |
 
-## Static Routes
+### Static Routes
 
-### Static Routes Summary
+#### Static Routes Summary
 
 | VRF | Destination Prefix | Next Hop IP             | Exit interface      | Administrative Distance       | Tag               | Route Name                    | Metric         |
 | --- | ------------------ | ----------------------- | ------------------- | ----------------------------- | ----------------- | ----------------------------- | -------------- |
 | MGMT | 0.0.0.0/0 | 172.16.1.1 | - | 1 | - | - | - |
 
-### Static Routes Device Configuration
+#### Static Routes Device Configuration
 
 ```eos
 !
 ip route vrf MGMT 0.0.0.0/0 172.16.1.1
 ```
 
-## Router OSPF
+### Router OSPF
 
-### Router OSPF Summary
+#### Router OSPF Summary
 
 | Process ID | Router ID | Default Passive Interface | No Passive Interface | BFD | Max LSA | Default Information Originate | Log Adjacency Changes Detail | Auto Cost Reference Bandwidth | Maximum Paths | MPLS LDP Sync Default | Distribute List In |
 | ---------- | --------- | ------------------------- | -------------------- | --- | ------- | ----------------------------- | ---------------------------- | ----------------------------- | ------------- | --------------------- | ------------------ |
 | 10 | 10.255.1.3 | enabled | Ethernet2 <br> | disabled | default | disabled | disabled | - | - | - | - |
 
-### Router OSPF Router Redistribution
+#### Router OSPF Router Redistribution
 
-| Process ID | Source Protocol | Route Map |
-| ---------- | --------------- | --------- |
-| 10 | bgp | - |
+| Process ID | Source Protocol | Include Leaked | Route Map |
+| ---------- | --------------- | -------------- | --------- |
+| 10 | bgp | disabled | - |
 
-### OSPF Interfaces
+#### OSPF Interfaces
 
 | Interface | Area | Cost | Point To Point |
 | -------- | -------- | -------- | -------- |
 | Ethernet2 | 0 | - | False |
 
-### Router OSPF Device Configuration
+#### Router OSPF Device Configuration
 
 ```eos
 !
@@ -378,9 +377,9 @@ router ospf 10 vrf C1_VRF1
    redistribute bgp
 ```
 
-## Router ISIS
+### Router ISIS
 
-### Router ISIS Summary
+#### Router ISIS Summary
 
 | Settings | Value |
 | -------- | ----- |
@@ -392,7 +391,7 @@ router ospf 10 vrf C1_VRF1
 | Log Adjacency Changes | True |
 | MPLS LDP Sync Default | True |
 
-### ISIS Interfaces Summary
+#### ISIS Interfaces Summary
 
 | Interface | ISIS Instance | ISIS Metric | Interface Mode |
 | --------- | ------------- | ----------- | -------------- |
@@ -400,7 +399,7 @@ router ospf 10 vrf C1_VRF1
 | Ethernet3 | CORE | 50 | point-to-point |
 | Loopback0 | CORE | - | passive |
 
-### Router ISIS Device Configuration
+#### Router ISIS Device Configuration
 
 ```eos
 !
@@ -416,9 +415,9 @@ router isis CORE
    !
 ```
 
-## Router BGP
+### Router BGP
 
-### Router BGP Summary
+#### Router BGP Summary
 
 | BGP AS | Router ID |
 | ------ | --------- |
@@ -432,9 +431,9 @@ router isis CORE
 | graceful-restart |
 | maximum-paths 4 ecmp 4 |
 
-### Router BGP Peer Groups
+#### Router BGP Peer Groups
 
-#### MPLS-OVERLAY-PEERS
+##### MPLS-OVERLAY-PEERS
 
 | Settings | Value |
 | -------- | ----- |
@@ -445,37 +444,37 @@ router isis CORE
 | Send community | all |
 | Maximum routes | 0 (no limit) |
 
-### BGP Neighbors
+#### BGP Neighbors
 
-| Neighbor | Remote AS | VRF | Shutdown | Send-community | Maximum-routes | Allowas-in | BFD | RIB Pre-Policy Retain | Route-Reflector Client |
-| -------- | --------- | --- | -------- | -------------- | -------------- | ---------- | --- | --------------------- | ---------------------- |
-| 10.255.2.1 | Inherited from peer group MPLS-OVERLAY-PEERS | default | - | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS | - | - |
-| 10.255.2.2 | Inherited from peer group MPLS-OVERLAY-PEERS | default | - | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS | - | - |
-| 10.1.1.10 | 321 | C2_VRF1 | - | standard | 100 | - | - | - | - |
+| Neighbor | Remote AS | VRF | Shutdown | Send-community | Maximum-routes | Allowas-in | BFD | RIB Pre-Policy Retain | Route-Reflector Client | Passive |
+| -------- | --------- | --- | -------- | -------------- | -------------- | ---------- | --- | --------------------- | ---------------------- | ------- |
+| 10.255.2.1 | Inherited from peer group MPLS-OVERLAY-PEERS | default | - | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS | - | - | - |
+| 10.255.2.2 | Inherited from peer group MPLS-OVERLAY-PEERS | default | - | Inherited from peer group MPLS-OVERLAY-PEERS | Inherited from peer group MPLS-OVERLAY-PEERS | - | Inherited from peer group MPLS-OVERLAY-PEERS | - | - | - |
+| 10.1.1.10 | 65124 | C2_VRF1 | - | standard | 100 | - | - | - | - | - |
 
-### Router BGP EVPN Address Family
+#### Router BGP EVPN Address Family
 
-#### EVPN Peer Groups
+##### EVPN Peer Groups
 
 | Peer Group | Activate | Encapsulation |
 | ---------- | -------- | ------------- |
 
-### Router BGP VPN-IPv4 Address Family
+#### Router BGP VPN-IPv4 Address Family
 
-#### VPN-IPv4 Peer Groups
+##### VPN-IPv4 Peer Groups
 
 | Peer Group | Activate | Route-map In | Route-map Out |
 | ---------- | -------- | ------------ | ------------- |
 | MPLS-OVERLAY-PEERS | True | - | - |
 
-### Router BGP VRFs
+#### Router BGP VRFs
 
 | VRF | Route-Distinguisher | Redistribute |
 | --- | ------------------- | ------------ |
 | C1_VRF1 | 10.255.1.3:10 | connected<br>ospf |
 | C2_VRF1 | 10.255.1.3:20 | connected |
 
-### Router BGP Device Configuration
+#### Router BGP Device Configuration
 
 ```eos
 !
@@ -520,8 +519,8 @@ router bgp 65001
       route-target import vpn-ipv4 20:20
       route-target export vpn-ipv4 20:20
       router-id 10.255.1.3
-      neighbor 10.1.1.10 remote-as 321
-      neighbor 10.1.1.10 description C1_CPE
+      neighbor 10.1.1.10 remote-as 65124
+      neighbor 10.1.1.10 description C2_ROUTER2
       neighbor 10.1.1.10 send-community standard
       neighbor 10.1.1.10 maximum-routes 100
       redistribute connected
@@ -530,17 +529,17 @@ router bgp 65001
          neighbor 10.1.1.10 activate
 ```
 
-# BFD
+## BFD
 
-## Router BFD
+### Router BFD
 
-### Router BFD Multihop Summary
+#### Router BFD Multihop Summary
 
 | Interval | Minimum RX | Multiplier |
 | -------- | ---------- | ---------- |
 | 300 | 300 | 3 |
 
-### Router BFD Device Configuration
+#### Router BFD Device Configuration
 
 ```eos
 !
@@ -548,11 +547,11 @@ router bfd
    multihop interval 300 min-rx 300 multiplier 3
 ```
 
-# MPLS
+## MPLS
 
-## MPLS and LDP
+### MPLS and LDP
 
-### MPLS and LDP Summary
+#### MPLS and LDP Summary
 
 | Setting | Value |
 | -------- | ---- |
@@ -562,7 +561,7 @@ router bfd
 | LDP Interface Disabled Default | True |
 | LDP Transport-Address Interface | Loopback0 |
 
-### MPLS and LDP Configuration
+#### MPLS and LDP Configuration
 
 ```eos
 !
@@ -575,7 +574,7 @@ mpls ldp
    transport-address interface Loopback0
 ```
 
-## MPLS Interfaces
+### MPLS Interfaces
 
 | Interface | MPLS IP Enabled | LDP Enabled | IGP Sync |
 | --------- | --------------- | ----------- | -------- |
@@ -583,24 +582,24 @@ mpls ldp
 | Ethernet3 | True | True | True |
 | Loopback0 | - | True | - |
 
-# Multicast
+## Multicast
 
-## IP IGMP Snooping
+### IP IGMP Snooping
 
-### IP IGMP Snooping Summary
+#### IP IGMP Snooping Summary
 
 | IGMP Snooping | Fast Leave | Interface Restart Query | Proxy | Restart Query Interval | Robustness Variable |
 | ------------- | ---------- | ----------------------- | ----- | ---------------------- | ------------------- |
 | Enabled | - | - | - | - | - |
 
-### IP IGMP Snooping Device Configuration
+#### IP IGMP Snooping Device Configuration
 
 ```eos
 ```
 
-# VRF Instances
+## VRF Instances
 
-## VRF Instances Summary
+### VRF Instances Summary
 
 | VRF Name | IP Routing |
 | -------- | ---------- |
@@ -608,7 +607,7 @@ mpls ldp
 | C2_VRF1 | enabled |
 | MGMT | disabled |
 
-## VRF Instances Device Configuration
+### VRF Instances Device Configuration
 
 ```eos
 !

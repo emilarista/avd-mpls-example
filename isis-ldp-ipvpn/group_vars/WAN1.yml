@@ -5,6 +5,8 @@ mgmt_gateway: 172.16.1.1
 # iBGP ASN for the fabric
 bgp_as: 65001
 
+bgp_mesh_pes: true
+
 # P router group
 p:
   # Definition of default values that will be configured to all nodes defined in this group

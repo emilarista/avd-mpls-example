@@ -8,27 +8,27 @@ all:
             WAN1_P_ROUTERS:
               hosts:
                 p1:
-                  ansible_host: 10.255.80.79
+                  ansible_host: 10.255.72.12
                 p2:
-                  ansible_host: 10.255.38.14
+                  ansible_host: 10.255.37.241
                 p3:
-                  ansible_host: 10.255.77.32
+                  ansible_host: 10.255.50.134
                 p4:
-                  ansible_host: 10.255.87.247
+                  ansible_host: 10.255.88.116
             WAN1_PE_ROUTERS:
               hosts:
                 pe1:
-                  ansible_host: 10.255.73.249
+                  ansible_host: 10.255.112.0
                 pe2:
-                  ansible_host: 10.255.23.39
+                  ansible_host: 10.255.86.158
                 pe3:
-                  ansible_host: 10.255.101.73
+                  ansible_host: 10.255.78.133
             WAN1_RR_ROUTERS:
               hosts:
                 rr1:
-                  ansible_host: 10.255.28.83
+                  ansible_host: 10.255.77.72
                 rr2:
-                  ansible_host: 10.255.4.153
+                  ansible_host: 10.255.24.85
 
         NETWORK_SERVICES:
           children:
@@ -57,12 +57,12 @@ all:
         ansible_httpapi_validate_certs: false
       hosts:
         c1cpe1:
-          ansible_host: 10.255.28.161
+          ansible_host: 10.255.46.231
         c1cpe2:
-          ansible_host: 10.255.22.224
+          ansible_host: 10.255.44.122
         c2cpe1:
-          ansible_host: 10.255.41.200
+          ansible_host: 10.255.86.74
         c2cpe2:
-          ansible_host: 10.255.37.83
+          ansible_host: 10.255.11.87
         eth-agg:
-          ansible_host: 10.255.79.133
+          ansible_host: 10.255.21.47

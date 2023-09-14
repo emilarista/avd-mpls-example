@@ -60,6 +60,15 @@ router_bgp:
   - ip_address: 10.255.1.3
     peer_group: MPLS-OVERLAY-PEERS
     description: pe3
+  - ip_address: 10.255.1.1
+    peer_group: MPLS-OVERLAY-PEERS
+    description: pe1
+  - ip_address: 10.255.1.2
+    peer_group: MPLS-OVERLAY-PEERS
+    description: pe2
+  - ip_address: 10.255.1.3
+    peer_group: MPLS-OVERLAY-PEERS
+    description: pe3
   - ip_address: 10.255.2.1
     peer_group: RR-OVERLAY-PEERS
     description: rr1

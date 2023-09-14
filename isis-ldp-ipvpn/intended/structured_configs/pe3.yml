@@ -43,6 +43,12 @@ router_bgp:
   - ip_address: 10.255.2.2
     peer_group: MPLS-OVERLAY-PEERS
     description: rr2
+  - ip_address: 10.255.1.1
+    peer_group: MPLS-OVERLAY-PEERS
+    description: pe1
+  - ip_address: 10.255.1.2
+    peer_group: MPLS-OVERLAY-PEERS
+    description: pe2
   vrfs:
   - name: C1_VRF1
     router_id: 10.255.1.3
